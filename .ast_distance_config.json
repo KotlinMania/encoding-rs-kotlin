@@ -1,0 +1,22 @@
+{
+  "type": "port",
+  "name": "encoding-rs-kotlin",
+  "source": {
+    "path": "tmp/encoding_rs/src",
+    "lang": "rust"
+  },
+  "target": {
+    "path": "src/commonMain/kotlin/io/github/kotlinmania/encodingrs",
+    "lang": "kotlin"
+  },
+  "checks": {
+    "deep": true,
+    "missing": true,
+    "todos": true,
+    "lint": true
+  },
+  "reexport_modules": [
+    "mod.rs",
+    "lib.rs"
+  ]
+}
