@@ -17,3 +17,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "encoding-rs-kotlin"
+
