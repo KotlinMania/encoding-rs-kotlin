@@ -199,10 +199,18 @@ kotlin {
         binaries.framework { baseName = "EncodingRs"; xcf.add(this) }
     }
     iosSimulatorArm64 {
-        binaries.framework { baseName = "EncodingRs"; xcf.add(this) }
+        binaries.framework {
+            baseName = "EncodingRs"
+            isStatic = true
+            xcf.add(this)
+        }
     }
     iosX64 {
-        binaries.framework { baseName = "EncodingRs"; xcf.add(this) }
+        binaries.framework {
+            baseName = "EncodingRs"
+            isStatic = true
+            xcf.add(this)
+        }
     }
 
     tvosArm64 {
