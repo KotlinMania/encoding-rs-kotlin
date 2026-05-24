@@ -7,17 +7,13 @@ import kotlin.test.assertEquals
 class Gb180302022Test {
     @Test
     fun overrideTablesStayPaired() {
-        assertEquals(18, GB18030_2022_OVERRIDE_PUA.size)
+        assertEquals(18, gb180302022OverrideCount())
         assertEquals(18, GB18030_2022_OVERRIDE_BYTES.size)
-        assertEquals(0xE78Du.toUShort(), GB18030_2022_OVERRIDE_PUA.first())
-        assertEquals(
-            listOf(0xA6u.toUByte(), 0xD9u.toUByte()),
-            GB18030_2022_OVERRIDE_BYTES.first().toList(),
-        )
-        assertEquals(0xE864u.toUShort(), GB18030_2022_OVERRIDE_PUA.last())
-        assertEquals(
-            listOf(0xFEu.toUByte(), 0xA0u.toUByte()),
-            GB18030_2022_OVERRIDE_BYTES.last().toList(),
-        )
+        assertEquals(0xE78D, gb180302022OverridePuaAt(0))
+        assertEquals(0xA6, gb180302022OverrideByteAt(0, 0))
+        assertEquals(0xD9, gb180302022OverrideByteAt(0, 1))
+        assertEquals(0xE864, gb180302022OverridePuaAt(17))
+        assertEquals(0xFE, gb180302022OverrideByteAt(17, 0))
+        assertEquals(0xA0, gb180302022OverrideByteAt(17, 1))
     }
 }

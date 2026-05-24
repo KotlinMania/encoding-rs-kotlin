@@ -1,35 +1,14 @@
 import XCTest
 import EncodingRs
 
-// Smoke test for the Kotlin → Swift Export → SPM → swift test pipeline.
-//
-// The file's mere existence and successful compilation prove three layers
-// of the pipeline:
-//
-//   1. `embedSwiftExportForXcode` produced `EncodingRs.swiftmodule/`
-//      and the supporting KotlinRuntimeSupport / ExportedKotlinPackages /
-//      KotlinRuntime swiftmodule bundles. If any of them were missing,
-//      `import EncodingRs` above would fail at compile time.
-//
-//   2. The static archive `libEncodingRs.a` (produced by the
-//      `linkSwiftExportBinaryDebugStaticMacosArm64` and
-//      `mergeMacosDebugSwiftExportLibraries` tasks) supplied every
-//      `__root____*` and `KotlinError`-related symbol the Swift modules
-//      reference. If the archive were missing or empty, this test
-//      executable would fail to link with "undefined symbols for
-//      architecture arm64".
-//
-//   3. The Kotlin `swiftExport { moduleName = "EncodingRs" }` and
-//      `flattenPackage = "io.github.kotlinmania.encodingrs"` configuration in
-//      build.gradle.kts produced a module name that's both syntactically
-//      valid as a Swift identifier and reachable from this Package.swift
-//      via the `EncodingRsLibrary` product.
-//
-// Add more meaningful per-API tests below as the Swift Export surface
-// grows. For now the import + a single passing assertion is the
-// canary that the pipeline is green for this repo.
 final class EncodingRsExportTests: XCTestCase {
-    func testSwiftModuleLoads() throws {
-        XCTAssertTrue(true, "EncodingRs swift module imported cleanly")
+    func testGb180302022OverrideTableMatchesCommonTest() throws {
+        XCTAssertEqual(gb180302022OverrideCount(), 18)
+        XCTAssertEqual(gb180302022OverridePuaAt(index: 0), 0xE78D)
+        XCTAssertEqual(gb180302022OverrideByteAt(index: 0, byteIndex: 0), 0xA6)
+        XCTAssertEqual(gb180302022OverrideByteAt(index: 0, byteIndex: 1), 0xD9)
+        XCTAssertEqual(gb180302022OverridePuaAt(index: 17), 0xE864)
+        XCTAssertEqual(gb180302022OverrideByteAt(index: 17, byteIndex: 0), 0xFE)
+        XCTAssertEqual(gb180302022OverrideByteAt(index: 17, byteIndex: 1), 0xA0)
     }
 }
