@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootEnvSpec
+import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNpmTooling
 import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNodeJsEnvSpec
 import org.jetbrains.kotlin.gradle.targets.wasm.yarn.WasmYarnRootEnvSpec
 
@@ -330,6 +331,10 @@ rootProject.extensions.configure<YarnRootEnvSpec>("kotlinYarnSpec") {
 
 rootProject.extensions.configure<WasmYarnRootEnvSpec>("kotlinWasmYarnSpec") {
     version.set("1.22.22")
+}
+
+rootProject.extensions.configure<WasmNpmTooling>("wasmNpmTooling") {
+    installationDir.set(rootProject.layout.projectDirectory.dir(".kotlin/kotlin-npm-tooling/wasm"))
 }
 
 rootProject.extensions.configure<YarnRootExtension>("kotlinYarn") {

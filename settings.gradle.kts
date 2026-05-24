@@ -17,3 +17,14 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "encoding-rs-kotlin"
+
+val projectKotlinHome = rootDir.resolve(".kotlin").absolutePath
+val projectKonanDataDir = rootDir.resolve("tmp/konan").absolutePath
+
+System.setProperty("kotlin.user.home", projectKotlinHome)
+System.setProperty("konan.data.dir", projectKonanDataDir)
+
+gradle.beforeProject {
+    extensions.extraProperties["kotlin.user.home"] = projectKotlinHome
+    extensions.extraProperties["konan.data.dir"] = projectKonanDataDir
+}
