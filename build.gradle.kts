@@ -5,6 +5,7 @@ import java.nio.file.StandardCopyOption
 import java.util.zip.ZipInputStream
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.ClasspathNormalizer
+import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.testing.AbstractTestTask
@@ -534,10 +535,51 @@ tasks.register("setupAndroidSdk") {
     }
 }
 
+val swiftExportOutputDir = layout.buildDirectory.dir("swift-test")
+val swiftTestHarnessDir = layout.projectDirectory.dir("swift-test-harness")
+val gradleWrapperExecutable =
+    layout.projectDirectory.file(if (isWindowsHost) "gradlew.bat" else "gradlew").asFile
+
+val buildSwiftExportForSwiftTest = tasks.register<Exec>("buildSwiftExportForSwiftTest") {
+    group = "verification"
+    description = "Builds the Swift Export package used by swift test."
+    workingDir(layout.projectDirectory.asFile)
+    commandLine(
+        gradleWrapperExecutable.absolutePath,
+        "embedSwiftExportForXcode",
+        "--no-configuration-cache",
+        "--no-daemon",
+        "--console=plain",
+    )
+    doFirst {
+        val outputDir = swiftExportOutputDir.get().asFile.absolutePath
+        environment(
+            mapOf(
+                "BUILT_PRODUCTS_DIR" to outputDir,
+                "TARGET_BUILD_DIR" to outputDir,
+                "SDK_NAME" to "macosx",
+                "CONFIGURATION" to "Debug",
+                "ARCHS" to "arm64",
+                "FRAMEWORKS_FOLDER_PATH" to "Frameworks",
+                "MACOSX_DEPLOYMENT_TARGET" to "14.0",
+                "DEPLOYMENT_TARGET_SETTING_NAME" to "MACOSX_DEPLOYMENT_TARGET",
+            ),
+        )
+    }
+}
+
+val swiftTest = tasks.register<Exec>("swiftTest") {
+    group = "verification"
+    description = "Runs swift test against the Kotlin Swift Export package."
+    dependsOn(buildSwiftExportForSwiftTest)
+    workingDir(swiftTestHarnessDir)
+    commandLine("swift", "test")
+}
+
 tasks.register("test") {
     group = "verification"
     description =
-        "Runs the host-portable test suite (macOS + JS + WasmJS + Android unit). " +
+        "Runs the host-portable test suite (macOS + JS + WasmJS + Swift + Android unit). " +
         "Non-host native targets (mingwX64, linuxX64) only run on their own host."
 
     val defaultTestTasks = listOf(
@@ -549,6 +591,7 @@ tasks.register("test") {
         "assembleUnitTest",
     )
 
+    dependsOn(swiftTest)
     dependsOn(defaultTestTasks.mapNotNull { taskName -> tasks.findByName(taskName) })
 }
 
