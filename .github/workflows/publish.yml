@@ -19,7 +19,7 @@ permissions:
 jobs:
   publish:
     name: Publish to Maven Central
-    runs-on: macos-26
+    runs-on: macos-latest
 
     permissions:
       contents: read
