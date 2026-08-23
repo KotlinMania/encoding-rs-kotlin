@@ -50,11 +50,12 @@ public class Utf16Decoder(
             }
             val b = src[srcPos++].toInt() and 0xFF
             leadByte = null
-            val codeUnit = if (be) {
-                (lead shl 8) or b
-            } else {
-                (b shl 8) or lead
-            }
+            val codeUnit =
+                if (be) {
+                    (lead shl 8) or b
+                } else {
+                    (b shl 8) or lead
+                }
             val highBits = codeUnit and 0xFC00
             if (highBits == 0xD800) {
                 // High surrogate
@@ -134,7 +135,14 @@ public class Utf16Decoder(
 
         if (pendingBmp) {
             val codeUnit = leadSurrogate
-            val needed = if (codeUnit < 0x80) 1 else if (codeUnit < 0x800) 2 else 3
+            val needed =
+                if (codeUnit < 0x80) {
+                    1
+                } else if (codeUnit < 0x800) {
+                    2
+                } else {
+                    3
+                }
             if (dstPos + needed > dst.size) {
                 return Triple(DecoderResult.OutputFull, 0, 0)
             }
@@ -162,11 +170,12 @@ public class Utf16Decoder(
             }
             val b = src[srcPos++].toInt() and 0xFF
             leadByte = null
-            val codeUnit = if (be) {
-                (lead shl 8) or b
-            } else {
-                (b shl 8) or lead
-            }
+            val codeUnit =
+                if (be) {
+                    (lead shl 8) or b
+                } else {
+                    (b shl 8) or lead
+                }
             val highBits = codeUnit and 0xFC00
             if (highBits == 0xD800) {
                 // High surrogate
@@ -205,7 +214,14 @@ public class Utf16Decoder(
                 pendingBmp = true
                 return Triple(DecoderResult.Malformed(2u, 2u), srcPos, dstPos)
             }
-            val needed = if (codeUnit < 0x80) 1 else if (codeUnit < 0x800) 2 else 3
+            val needed =
+                if (codeUnit < 0x80) {
+                    1
+                } else if (codeUnit < 0x800) {
+                    2
+                } else {
+                    3
+                }
             if (dstPos + needed > dst.size) {
                 if (hadLeadByte) {
                     leadByte = lead

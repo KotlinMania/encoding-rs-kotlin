@@ -39,13 +39,28 @@ class XUserDefinedTest {
         decodeXUserDefined(byteArrayOf(0x80.toByte(), 0xFF.toByte()), "\uF780\uF7FF")
         decodeXUserDefined(
             byteArrayOf(
-                0x80.toByte(), 0xFF.toByte(), 0x61, 0x62,
-                0x80.toByte(), 0xFF.toByte(), 0x61, 0x62,
-                0x80.toByte(), 0xFF.toByte(), 0x61, 0x62,
-                0x80.toByte(), 0xFF.toByte(), 0x61, 0x62,
-                0x80.toByte(), 0xFF.toByte(), 0x61, 0x62,
+                0x80.toByte(),
+                0xFF.toByte(),
+                0x61,
+                0x62,
+                0x80.toByte(),
+                0xFF.toByte(),
+                0x61,
+                0x62,
+                0x80.toByte(),
+                0xFF.toByte(),
+                0x61,
+                0x62,
+                0x80.toByte(),
+                0xFF.toByte(),
+                0x61,
+                0x62,
+                0x80.toByte(),
+                0xFF.toByte(),
+                0x61,
+                0x62,
             ),
-            "\uF780\uF7FF\u0061\u0062\uF780\uF7FF\u0061\u0062\uF780\uF7FF\u0061\u0062\uF780\uF7FF\u0061\u0062\uF780\uF7FF\u0061\u0062"
+            "\uF780\uF7FF\u0061\u0062\uF780\uF7FF\u0061\u0062\uF780\uF7FF\u0061\u0062\uF780\uF7FF\u0061\u0062\uF780\uF7FF\u0061\u0062",
         )
     }
 
