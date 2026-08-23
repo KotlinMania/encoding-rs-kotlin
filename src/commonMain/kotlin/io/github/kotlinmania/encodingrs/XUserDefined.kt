@@ -15,18 +15,20 @@ public class UserDefinedDecoder {
         dst: CharArray,
         last: Boolean = false,
     ): Triple<DecoderResult, Int, Int> {
-        val (pending, length) = if (dst.size < src.size) {
-            Pair(DecoderResult.OutputFull, dst.size)
-        } else {
-            Pair(DecoderResult.InputEmpty, src.size)
-        }
+        val (pending, length) =
+            if (dst.size < src.size) {
+                Pair(DecoderResult.OutputFull, dst.size)
+            } else {
+                Pair(DecoderResult.InputEmpty, src.size)
+            }
         for (i in 0 until length) {
             val unit = src[i].toInt() and 0xFF
-            dst[i] = if (unit < 0x80) {
-                unit.toChar()
-            } else {
-                (unit + 0xF700).toChar()
-            }
+            dst[i] =
+                if (unit < 0x80) {
+                    unit.toChar()
+                } else {
+                    (unit + 0xF700).toChar()
+                }
         }
         return Triple(pending, length, length)
     }

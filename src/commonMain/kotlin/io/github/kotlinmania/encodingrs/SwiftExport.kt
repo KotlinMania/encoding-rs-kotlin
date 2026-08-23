@@ -1,5 +1,4 @@
-// port-lint: ignore
-// Swift Export scalar accessors for the upstream GB18030 override table.
+// port-lint: source gb18030_2022.rs
 package io.github.kotlinmania.encodingrs
 
 fun gb180302022OverrideCount(): Int = GB18030_2022_OVERRIDE_PUA.size

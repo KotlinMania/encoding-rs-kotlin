@@ -3,7 +3,6 @@ package io.github.kotlinmania.encodingrs
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class Utf16Test {
     private fun decodeUtf16le(bytes: ByteArray, expect: String) {

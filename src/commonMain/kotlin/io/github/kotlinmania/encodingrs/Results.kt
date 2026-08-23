@@ -1,3 +1,4 @@
+// port-lint: source lib.rs
 package io.github.kotlinmania.encodingrs
 
 /**
@@ -37,7 +38,10 @@ public sealed class DecoderResult {
      * The first integer indicates the length of the malformed byte sequence.
      * The second integer indicates the number of bytes that were consumed after the malformed sequence.
      */
-    public data class Malformed(public val length: UByte, public val consumedAfter: UByte) : DecoderResult() {
+    public data class Malformed(
+        public val length: UByte,
+        public val consumedAfter: UByte,
+    ) : DecoderResult() {
         public constructor(length: Int, consumedAfter: Int) : this(length.toUByte(), consumedAfter.toUByte())
     }
 }
@@ -60,7 +64,9 @@ public sealed class EncoderResult {
     /**
      * The encoder encountered an unmappable character.
      */
-    public data class Unmappable(public val character: Char) : EncoderResult() {
+    public data class Unmappable(
+        public val character: Char,
+    ) : EncoderResult() {
         public constructor(codePoint: Int) : this(codePoint.toChar())
     }
 

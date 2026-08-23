@@ -31,32 +31,50 @@ package io.github.kotlinmania.encodingrs
 /**
  * The private-use-area code points special-cased in the GB18030 encoder.
  */
-internal val GB18030_2022_OVERRIDE_PUA: UShortArray = ushortArrayOf(
-    0xE78Du, 0xE78Eu, 0xE78Fu, 0xE790u, 0xE791u, 0xE792u, 0xE793u, 0xE794u, 0xE795u,
-    0xE796u, 0xE81Eu, 0xE826u, 0xE82Bu, 0xE82Cu, 0xE832u, 0xE843u, 0xE854u, 0xE864u,
-)
+internal val GB18030_2022_OVERRIDE_PUA: UShortArray =
+    ushortArrayOf(
+        0xE78Du,
+        0xE78Eu,
+        0xE78Fu,
+        0xE790u,
+        0xE791u,
+        0xE792u,
+        0xE793u,
+        0xE794u,
+        0xE795u,
+        0xE796u,
+        0xE81Eu,
+        0xE826u,
+        0xE82Bu,
+        0xE82Cu,
+        0xE832u,
+        0xE843u,
+        0xE854u,
+        0xE864u,
+    )
 
 /**
  * The bytes corresponding to the private-use-area code points special-cased in
  * the GB18030 encoder.
  */
-internal val GB18030_2022_OVERRIDE_BYTES: Array<UByteArray> = arrayOf(
-    ubyteArrayOf(0xA6u, 0xD9u),
-    ubyteArrayOf(0xA6u, 0xDAu),
-    ubyteArrayOf(0xA6u, 0xDBu),
-    ubyteArrayOf(0xA6u, 0xDCu),
-    ubyteArrayOf(0xA6u, 0xDDu),
-    ubyteArrayOf(0xA6u, 0xDEu),
-    ubyteArrayOf(0xA6u, 0xDFu),
-    ubyteArrayOf(0xA6u, 0xECu),
-    ubyteArrayOf(0xA6u, 0xEDu),
-    ubyteArrayOf(0xA6u, 0xF3u),
-    ubyteArrayOf(0xFEu, 0x59u),
-    ubyteArrayOf(0xFEu, 0x61u),
-    ubyteArrayOf(0xFEu, 0x66u),
-    ubyteArrayOf(0xFEu, 0x67u),
-    ubyteArrayOf(0xFEu, 0x6Du),
-    ubyteArrayOf(0xFEu, 0x7Eu),
-    ubyteArrayOf(0xFEu, 0x90u),
-    ubyteArrayOf(0xFEu, 0xA0u),
-)
+internal val GB18030_2022_OVERRIDE_BYTES: Array<UByteArray> =
+    arrayOf(
+        ubyteArrayOf(0xA6u, 0xD9u),
+        ubyteArrayOf(0xA6u, 0xDAu),
+        ubyteArrayOf(0xA6u, 0xDBu),
+        ubyteArrayOf(0xA6u, 0xDCu),
+        ubyteArrayOf(0xA6u, 0xDDu),
+        ubyteArrayOf(0xA6u, 0xDEu),
+        ubyteArrayOf(0xA6u, 0xDFu),
+        ubyteArrayOf(0xA6u, 0xECu),
+        ubyteArrayOf(0xA6u, 0xEDu),
+        ubyteArrayOf(0xA6u, 0xF3u),
+        ubyteArrayOf(0xFEu, 0x59u),
+        ubyteArrayOf(0xFEu, 0x61u),
+        ubyteArrayOf(0xFEu, 0x66u),
+        ubyteArrayOf(0xFEu, 0x67u),
+        ubyteArrayOf(0xFEu, 0x6Du),
+        ubyteArrayOf(0xFEu, 0x7Eu),
+        ubyteArrayOf(0xFEu, 0x90u),
+        ubyteArrayOf(0xFEu, 0xA0u),
+    )
