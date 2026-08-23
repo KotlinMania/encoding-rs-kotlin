@@ -4,14 +4,14 @@ Based on AST analysis, here are the concrete next steps.
 
 ## Summary
 
-- **Files Present:** 1/22 (4.5%)
-- **Function parity:** 0/565 matched (target 1) — 0.0%
-- **Class/type parity:** 0/58 matched (target 1) — 0.0%
-- **Combined symbol parity:** 0/623 matched (target 2) — 0.0%
-- **Average inline-code cosine:** 0.00 (function body across 1 matched files)
-- **Average documentation cosine:** 0.77 (doc text across 1 matched files)
+- **Files Present:** 5/22 (22.7%)
+- **Function parity:** 45/563 matched (target 63) — 8.0%
+- **Class/type parity:** 4/58 matched (target 10) — 6.9%
+- **Combined symbol parity:** 49/621 matched (target 73) — 7.9%
+- **Average inline-code cosine:** 0.52 (function body across 5 matched files)
+- **Average documentation cosine:** 0.21 (doc text across 5 matched files)
 - **Cheat-zeroed Files:** 1
-- **Critical Issues:** 1 files with <0.60 function similarity
+- **Critical Issues:** 2 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
 
@@ -27,7 +27,56 @@ No missing high-value files detected.
 
 Every matched file is listed below with function and type symbol parity.
 
-### 1. gb18030_2022
+### 1. utf_16
+
+- **Target:** `encodingrs.Utf16`
+- **Similarity:** 0.56
+- **Dependents:** 0
+- **Priority Score:** 2204.4
+- **Functions:** 21/21 matched (target 23)
+- **Missing functions:** _none_
+- **Types:** 1/1 matched (target 2)
+- **Missing types:** _none_
+- **Tests:** 12/12 matched
+
+### 2. x_user_defined
+
+- **Target:** `encodingrs.XUserDefined`
+- **Similarity:** 0.61
+- **Dependents:** 0
+- **Priority Score:** 1403.9
+- **Functions:** 12/12 matched (target 15)
+- **Missing functions:** _none_
+- **Types:** 2/2 matched (target 3)
+- **Missing types:** _none_
+- **Tests:** 3/3 matched
+- **Lint issues:** 3
+
+### 3. replacement
+
+- **Target:** `encodingrs.Replacement`
+- **Similarity:** 0.71
+- **Dependents:** 0
+- **Priority Score:** 1102.9
+- **Functions:** 10/10 matched (target 11)
+- **Missing functions:** _none_
+- **Types:** 1/1 matched (target 2)
+- **Missing types:** _none_
+- **Tests:** 2/2 matched
+- **Lint issues:** 2
+
+### 4. ascii
+
+- **Target:** `encodingrs.Ascii`
+- **Similarity:** 0.73
+- **Dependents:** 0
+- **Priority Score:** 202.7
+- **Functions:** 2/2 matched (target 13)
+- **Missing functions:** _none_
+- **Types:** 0/0 matched (target 2)
+- **Missing types:** _none_
+
+### 5. gb18030_2022
 
 - **Target:** `encodingrs.Gb180302022 [ZERO]`
 - **Similarity:** 0.00
@@ -59,3 +108,4 @@ do not treat them as the next implementation target by default.
 | Source | Expected target | Deps | Source path | Expected path |
 |--------|-----------------|------|-------------|---------------|
 | `lib` | `Lib` | 0 | `lib.rs` | `Lib.kt` |
+
