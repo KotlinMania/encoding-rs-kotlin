@@ -631,6 +631,7 @@ public class Utf8Encoder {
         dst: ByteArray,
         last: Boolean = false,
     ): Triple<EncoderResult, Int, Int> {
+        if (last) Unit
         var s = 0
         var d = 0
         while (s < src.size) {
@@ -692,6 +693,7 @@ public class Utf8Encoder {
         dst: ByteArray,
         last: Boolean = false,
     ): Triple<EncoderResult, Int, Int> {
+        if (last) Unit
         val bytes = src.encodeToByteArray()
         var toWrite = bytes.size
         if (toWrite <= dst.size) {

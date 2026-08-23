@@ -17,6 +17,7 @@ public class SingleByteDecoder(
         dst: CharArray,
         last: Boolean = false,
     ): Triple<DecoderResult, Int, Int> {
+        if (last) Unit
         var srcPos = 0
         var dstPos = 0
         while (srcPos < src.size) {
@@ -47,6 +48,7 @@ public class SingleByteDecoder(
         dst: ByteArray,
         last: Boolean = false,
     ): Triple<DecoderResult, Int, Int> {
+        if (last) Unit
         var srcPos = 0
         var dstPos = 0
         while (srcPos < src.size) {

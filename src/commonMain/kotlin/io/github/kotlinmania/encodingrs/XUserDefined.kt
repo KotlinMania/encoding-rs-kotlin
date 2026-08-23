@@ -15,6 +15,7 @@ public class UserDefinedDecoder {
         dst: CharArray,
         last: Boolean = false,
     ): Triple<DecoderResult, Int, Int> {
+        if (last) Unit
         val (pending, length) =
             if (dst.size < src.size) {
                 Pair(DecoderResult.OutputFull, dst.size)
@@ -38,6 +39,7 @@ public class UserDefinedDecoder {
         dst: ByteArray,
         last: Boolean = false,
     ): Triple<DecoderResult, Int, Int> {
+        if (last) Unit
         var srcPos = 0
         var dstPos = 0
         while (srcPos < src.size) {
@@ -77,6 +79,7 @@ public class UserDefinedEncoder {
         dst: ByteArray,
         last: Boolean = false,
     ): Triple<EncoderResult, Int, Int> {
+        if (last) Unit
         var srcPos = 0
         var dstPos = 0
         while (srcPos < src.size) {
