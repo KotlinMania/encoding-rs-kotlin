@@ -136,6 +136,15 @@ public class Encoding internal constructor(
         }
     }
 
+    public fun encodeFromUtf16(chars: CharArray): Triple<ByteArray, Encoding, Boolean> {
+        val outputEnc = outputEncoding()
+        val encoder = outputEnc.newEncoder()
+        val maxLen = (encoder.maxBufferLengthFromUtf16WithoutReplacement(chars.size) ?: chars.size) + 64
+        val dst = ByteArray(maxLen)
+        val res = encoder.encodeFromUtf16(chars, dst, true)
+        return Triple(dst.copyOf(res.written), outputEnc, res.hadErrors)
+    }
+
     override fun toString(): String = name
 
     public companion object {
@@ -786,7 +795,7 @@ internal sealed class VariantEncoding {
     fun newVariantDecoder(): VariantDecoder =
         when (this) {
             is SingleByte -> VariantDecoder.SingleByte(SingleByteDecoder.new(table))
-            Utf8 -> VariantDecoder.Utf8
+            Utf8 -> VariantDecoder.Utf8(Utf8Decoder.new())
             Gb18030, Gbk -> VariantDecoder.Gb18030
             Big5 -> VariantDecoder.Big5
             EucJp -> VariantDecoder.EucJp
@@ -822,7 +831,9 @@ internal sealed class VariantDecoder {
         val decoder: SingleByteDecoder,
     ) : VariantDecoder()
 
-    data object Utf8 : VariantDecoder()
+    data class Utf8(
+        val decoder: Utf8Decoder,
+    ) : VariantDecoder()
 
     data object Gb18030 : VariantDecoder()
 
@@ -855,6 +866,7 @@ internal sealed class VariantDecoder {
     fun maxUtf16BufferLength(byteLength: Int): Int? =
         when (this) {
             is SingleByte -> decoder.maxUtf16BufferLength(byteLength)
+            is Utf8 -> decoder.maxUtf16BufferLength(byteLength)
             is UserDefined -> decoder.maxUtf16BufferLength(byteLength)
             is Replacement -> decoder.maxUtf16BufferLength(byteLength)
             is Utf16Be -> decoder.maxUtf16BufferLength(byteLength)
@@ -865,6 +877,7 @@ internal sealed class VariantDecoder {
     fun maxUtf8BufferLength(byteLength: Int): Int? =
         when (this) {
             is SingleByte -> decoder.maxUtf8BufferLength(byteLength)
+            is Utf8 -> decoder.maxUtf8BufferLength(byteLength)
             is UserDefined -> decoder.maxUtf8BufferLength(byteLength)
             is Replacement -> decoder.maxUtf8BufferLength(byteLength)
             is Utf16Be -> decoder.maxUtf8BufferLength(byteLength)
@@ -875,16 +888,11 @@ internal sealed class VariantDecoder {
     fun decodeToUtf16Raw(src: ByteArray, dst: CharArray, last: Boolean): Triple<DecoderResult, Int, Int> =
         when (this) {
             is SingleByte -> decoder.decodeToUtf16Raw(src, dst, last)
+            is Utf8 -> decoder.decodeToUtf16Raw(src, dst, last)
             is UserDefined -> decoder.decodeToUtf16Raw(src, dst, last)
             is Replacement -> decoder.decodeToUtf16Raw(src, dst, last)
             is Utf16Be -> decoder.decodeToUtf16Raw(src, dst, last)
             is Utf16Le -> decoder.decodeToUtf16Raw(src, dst, last)
-            Utf8 -> {
-                val (pending, read, written) =
-                    io.github.kotlinmania.encodingrs.Utf8
-                        .decodeUtf8ToUtf16(src, dst, last)
-                Triple(pending, read, written)
-            }
             else -> {
                 // fallback ASCII
                 var s = 0
@@ -941,52 +949,7 @@ internal sealed class VariantEncoder {
         when (this) {
             is SingleByte -> encoder.encodeFromUtf16Raw(src, dst, last)
             is UserDefined -> encoder.encodeFromUtf16Raw(src, dst, last)
-            Utf8 -> {
-                var s = 0
-                var d = 0
-                while (s < src.size) {
-                    val c = src[s]
-                    val code = c.code
-                    if (code <= 0x7F) {
-                        if (d >= dst.size) return Triple(EncoderResult.OutputFull, s, d)
-                        dst[d++] = code.toByte()
-                        s++
-                    } else if (code <= 0x07FF) {
-                        if (d + 2 > dst.size) return Triple(EncoderResult.OutputFull, s, d)
-                        dst[d++] = (0xC0 or (code shr 6)).toByte()
-                        dst[d++] = (0x80 or (code and 0x3F)).toByte()
-                        s++
-                    } else if (c.isHighSurrogate()) {
-                        if (s + 1 < src.size) {
-                            val next = src[s + 1]
-                            if (next.isLowSurrogate()) {
-                                val cp = 0x10000 + ((code - 0xD800) shl 10) + (next.code - 0xDC00)
-                                if (d + 4 > dst.size) return Triple(EncoderResult.OutputFull, s, d)
-                                dst[d++] = (0xF0 or (cp shr 18)).toByte()
-                                dst[d++] = (0x80 or ((cp shr 12) and 0x3F)).toByte()
-                                dst[d++] = (0x80 or ((cp shr 6) and 0x3F)).toByte()
-                                dst[d++] = (0x80 or (cp and 0x3F)).toByte()
-                                s += 2
-                            } else {
-                                return Triple(EncoderResult.Unmappable(c), s, d)
-                            }
-                        } else if (!last) {
-                            return Triple(EncoderResult.InputEmpty, s, d)
-                        } else {
-                            return Triple(EncoderResult.Unmappable(c), s, d)
-                        }
-                    } else if (c.isLowSurrogate()) {
-                        return Triple(EncoderResult.Unmappable(c), s, d)
-                    } else {
-                        if (d + 3 > dst.size) return Triple(EncoderResult.OutputFull, s, d)
-                        dst[d++] = (0xE0 or (code shr 12)).toByte()
-                        dst[d++] = (0x80 or ((code shr 6) and 0x3F)).toByte()
-                        dst[d++] = (0x80 or (code and 0x3F)).toByte()
-                        s++
-                    }
-                }
-                Triple(EncoderResult.InputEmpty, s, d)
-            }
+            Utf8 -> Utf8Encoder().encodeFromUtf16Raw(src, dst, last)
             Utf16Be -> {
                 var s = 0
                 var d = 0
@@ -1017,6 +980,12 @@ internal sealed class VariantEncoder {
                 }
                 Triple(EncoderResult.InputEmpty, s, d)
             }
+        }
+
+    fun encodeFromUtf8Raw(src: String, dst: ByteArray, last: Boolean): Triple<EncoderResult, Int, Int> =
+        when (this) {
+            Utf8 -> Utf8Encoder().encodeFromUtf8Raw(src, dst, last)
+            else -> encodeFromUtf16Raw(src.toCharArray(), dst, last)
         }
 }
 
@@ -1058,6 +1027,65 @@ public class Decoder internal constructor(
         val (result, read, written) = variant.decodeToUtf16Raw(input, dst, last)
         return Triple(result, read + bomOffset, written)
     }
+
+    public fun decodeToUtf16(
+        src: ByteArray,
+        dst: CharArray,
+        last: Boolean = false,
+    ): DecodeResult {
+        var totalRead = 0
+        var totalWritten = 0
+        var hadErrors = false
+        var input = src
+        var bomOffset = 0
+        if (sniffing == BomHandling.Sniff) {
+            val bom = Encoding.forBom(src)
+            if (bom != null) {
+                encoding = bom.first
+                variant = encoding.variant.newVariantDecoder()
+                bomOffset = bom.second
+                input = src.copyOfRange(bomOffset, src.size)
+                totalRead += bomOffset
+            }
+        } else if (sniffing == BomHandling.Remove) {
+            val bom = Encoding.forBom(src)
+            if (bom != null && bom.first === encoding) {
+                bomOffset = bom.second
+                input = src.copyOfRange(bomOffset, src.size)
+                totalRead += bomOffset
+            }
+        }
+
+        var inPos = 0
+        while (inPos < input.size || (last && inPos == input.size)) {
+            val currentSlice = input.copyOfRange(inPos, input.size)
+            val currentDst = CharArray(dst.size - totalWritten)
+            val (result, read, written) = variant.decodeToUtf16Raw(currentSlice, currentDst, last)
+            currentDst.copyInto(dst, destinationOffset = totalWritten, startIndex = 0, endIndex = written)
+            inPos += read
+            totalRead += read
+            totalWritten += written
+            when (result) {
+                is DecoderResult.InputEmpty -> {
+                    return DecodeResult(CoderResult.InputEmpty, totalRead, totalWritten, hadErrors)
+                }
+                is DecoderResult.OutputFull -> {
+                    return DecodeResult(CoderResult.OutputFull, totalRead, totalWritten, hadErrors)
+                }
+                is DecoderResult.Malformed -> {
+                    hadErrors = true
+                    if (totalWritten >= dst.size) {
+                        return DecodeResult(CoderResult.OutputFull, totalRead, totalWritten, hadErrors)
+                    }
+                    dst[totalWritten++] = '\uFFFD'
+                }
+            }
+            if (read == 0) {
+                break
+            }
+        }
+        return DecodeResult(CoderResult.InputEmpty, totalRead, totalWritten, hadErrors)
+    }
 }
 
 public class Encoder internal constructor(
@@ -1069,10 +1097,77 @@ public class Encoder internal constructor(
     public fun maxBufferLengthFromUtf16WithoutReplacement(u16Length: Int): Int? =
         variant.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
 
+    public fun maxBufferLengthFromUtf8WithoutReplacement(byteLength: Int): Int? =
+        byteLength
+
     public fun encodeFromUtf16Raw(
         src: CharArray,
         dst: ByteArray,
         last: Boolean = false,
     ): Triple<EncoderResult, Int, Int> =
         variant.encodeFromUtf16Raw(src, dst, last)
+
+    public fun encodeFromUtf8Raw(
+        src: String,
+        dst: ByteArray,
+        last: Boolean = false,
+    ): Triple<EncoderResult, Int, Int> =
+        variant.encodeFromUtf8Raw(src, dst, last)
+
+    public fun encodeFromUtf16WithoutReplacement(
+        src: CharArray,
+        dst: ByteArray,
+        last: Boolean = false,
+    ): Triple<EncoderResult, Int, Int> =
+        encodeFromUtf16Raw(src, dst, last)
+
+    public fun encodeFromUtf8WithoutReplacement(
+        src: String,
+        dst: ByteArray,
+        last: Boolean = false,
+    ): Triple<EncoderResult, Int, Int> =
+        encodeFromUtf8Raw(src, dst, last)
+
+    public fun encodeFromUtf16(
+        src: CharArray,
+        dst: ByteArray,
+        last: Boolean = false,
+    ): EncodeResult {
+        var totalRead = 0
+        var totalWritten = 0
+        var hadErrors = false
+        while (totalRead < src.size) {
+            val currentDst = ByteArray(dst.size - totalWritten)
+            val (result, read, written) =
+                encodeFromUtf16Raw(
+                    src.copyOfRange(totalRead, src.size),
+                    currentDst,
+                    last,
+                )
+            currentDst.copyInto(dst, destinationOffset = totalWritten, startIndex = 0, endIndex = written)
+            totalRead += read
+            totalWritten += written
+            when (result) {
+                is EncoderResult.InputEmpty -> {
+                    return EncodeResult(CoderResult.InputEmpty, totalRead, totalWritten, hadErrors)
+                }
+                is EncoderResult.OutputFull -> {
+                    return EncodeResult(CoderResult.OutputFull, totalRead, totalWritten, hadErrors)
+                }
+                is EncoderResult.Unmappable -> {
+                    hadErrors = true
+                    val codePoint = result.character.code
+                    val ref = "&#$codePoint;".encodeToByteArray()
+                    if (totalWritten + ref.size > dst.size) {
+                        return EncodeResult(CoderResult.OutputFull, totalRead, totalWritten, hadErrors)
+                    }
+                    for (i in ref.indices) {
+                        dst[totalWritten + i] = ref[i]
+                    }
+                    totalWritten += ref.size
+                }
+            }
+        }
+        return EncodeResult(CoderResult.InputEmpty, totalRead, totalWritten, hadErrors)
+    }
 }
