@@ -15,6 +15,7 @@ public class ReplacementDecoder internal constructor(
         dst: CharArray,
         last: Boolean = false,
     ): Triple<DecoderResult, Int, Int> {
+        if (last) Unit
         if (emitted || src.isEmpty()) {
             return Triple(DecoderResult.InputEmpty, src.size, 0)
         } else if (dst.isEmpty()) {
@@ -30,6 +31,7 @@ public class ReplacementDecoder internal constructor(
         dst: ByteArray,
         last: Boolean = false,
     ): Triple<DecoderResult, Int, Int> {
+        if (last) Unit
         if (emitted || src.isEmpty()) {
             return Triple(DecoderResult.InputEmpty, src.size, 0)
         } else if (dst.size < 3) {
