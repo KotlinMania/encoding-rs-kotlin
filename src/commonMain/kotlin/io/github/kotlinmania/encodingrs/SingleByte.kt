@@ -111,46 +111,49 @@ public class SingleByteEncoder(
 
     public fun maxBufferLengthFromUtf8WithoutReplacement(byteLength: Int): Int? = byteLength
 
-    public fun encodeChar(codeUnit: Char): Byte? {
-        val unit = codeUnit.code
-        if (unit <= 0x7F) {
-            return unit.toByte()
+    public fun encodeU16(codeUnit: Int): Byte? {
+        if (codeUnit <= 0x7F) {
+            return codeUnit.toByte()
         }
-        val offset = unit - runBmpOffset
+        val offset = codeUnit - runBmpOffset
         if (offset in 0 until runLength) {
             return (128 + runByteOffset + offset).toByte()
         }
         val tailStart = runByteOffset + runLength
         for (i in tailStart until 128) {
-            if (table[i] == codeUnit) {
+            if (table[i].code == codeUnit) {
                 return (128 + i).toByte()
             }
         }
         if (runByteOffset >= 64) {
             for (i in 64 until runByteOffset) {
-                if (table[i] == codeUnit) {
+                if (table[i].code == codeUnit) {
                     return (128 + i).toByte()
                 }
             }
             for (i in 32 until 64) {
-                if (table[i] == codeUnit) {
+                if (table[i].code == codeUnit) {
                     return (128 + i).toByte()
                 }
             }
         } else {
             for (i in 32 until runByteOffset) {
-                if (table[i] == codeUnit) {
+                if (table[i].code == codeUnit) {
                     return (128 + i).toByte()
                 }
             }
         }
         for (i in 0 until 32) {
-            if (table[i] == codeUnit) {
+            if (table[i].code == codeUnit) {
                 return (128 + i).toByte()
             }
         }
         return null
     }
+
+    public fun encodeU16(codeUnit: UShort): Byte? = encodeU16(codeUnit.toInt())
+
+    public fun encodeChar(codeUnit: Char): Byte? = encodeU16(codeUnit.code)
 
     public fun encodeFromUtf16Raw(
         src: CharArray,
@@ -181,13 +184,19 @@ public class SingleByteEncoder(
                     if (srcPos + 1 < src.size) {
                         val next = src[srcPos + 1]
                         if (next.isLowSurrogate()) {
-                            return Triple(EncoderResult.Unmappable(c), srcPos, dstPos)
+                            return Triple(EncoderResult.Unmappable('\uFFFD'), srcPos + 2, dstPos)
+                        } else {
+                            return Triple(EncoderResult.Unmappable('\uFFFD'), srcPos + 1, dstPos)
                         }
                     } else if (!last) {
                         return Triple(EncoderResult.InputEmpty, srcPos, dstPos)
+                    } else {
+                        return Triple(EncoderResult.Unmappable('\uFFFD'), srcPos + 1, dstPos)
                     }
+                } else if (c.isLowSurrogate()) {
+                    return Triple(EncoderResult.Unmappable('\uFFFD'), srcPos + 1, dstPos)
                 }
-                return Triple(EncoderResult.Unmappable(c), srcPos, dstPos)
+                return Triple(EncoderResult.Unmappable(c), srcPos + 1, dstPos)
             }
         }
         return Triple(EncoderResult.InputEmpty, srcPos, dstPos)

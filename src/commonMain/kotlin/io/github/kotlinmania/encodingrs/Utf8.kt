@@ -609,4 +609,105 @@ public class Utf8Decoder {
 
         return Triple(DecoderResult.InputEmpty, srcPos, dstPos)
     }
+
+    public companion object {
+        public fun new(): Utf8Decoder = Utf8Decoder()
+    }
+}
+
+public class Utf8Data(
+    public val table: IntArray,
+)
+
+public class Utf8Encoder {
+    public fun maxBufferLengthFromUtf16WithoutReplacement(u16Length: Int): Int? =
+        if (u16Length > Int.MAX_VALUE / 3) null else u16Length * 3
+
+    public fun maxBufferLengthFromUtf8WithoutReplacement(byteLength: Int): Int? =
+        byteLength
+
+    public fun encodeFromUtf16Raw(
+        src: CharArray,
+        dst: ByteArray,
+        last: Boolean = false,
+    ): Triple<EncoderResult, Int, Int> {
+        var s = 0
+        var d = 0
+        while (s < src.size) {
+            val c = src[s]
+            val code = c.code
+            if (code <= 0x7F) {
+                if (d >= dst.size) return Triple(EncoderResult.OutputFull, s, d)
+                dst[d++] = code.toByte()
+                s++
+            } else if (code <= 0x07FF) {
+                if (d + 2 > dst.size) return Triple(EncoderResult.OutputFull, s, d)
+                dst[d++] = (0xC0 or (code shr 6)).toByte()
+                dst[d++] = (0x80 or (code and 0x3F)).toByte()
+                s++
+            } else if (c.isHighSurrogate()) {
+                if (s + 1 < src.size) {
+                    val next = src[s + 1]
+                    if (next.isLowSurrogate()) {
+                        val cp = 0x10000 + ((code - 0xD800) shl 10) + (next.code - 0xDC00)
+                        if (d + 4 > dst.size) return Triple(EncoderResult.OutputFull, s, d)
+                        dst[d++] = (0xF0 or (cp shr 18)).toByte()
+                        dst[d++] = (0x80 or ((cp shr 12) and 0x3F)).toByte()
+                        dst[d++] = (0x80 or ((cp shr 6) and 0x3F)).toByte()
+                        dst[d++] = (0x80 or (cp and 0x3F)).toByte()
+                        s += 2
+                    } else {
+                        if (d + 3 > dst.size) return Triple(EncoderResult.OutputFull, s, d)
+                        dst[d++] = 0xEF.toByte()
+                        dst[d++] = 0xBF.toByte()
+                        dst[d++] = 0xBD.toByte()
+                        s++
+                    }
+                } else {
+                    if (d + 3 > dst.size) return Triple(EncoderResult.OutputFull, s, d)
+                    dst[d++] = 0xEF.toByte()
+                    dst[d++] = 0xBF.toByte()
+                    dst[d++] = 0xBD.toByte()
+                    s++
+                }
+            } else if (c.isLowSurrogate()) {
+                if (d + 3 > dst.size) return Triple(EncoderResult.OutputFull, s, d)
+                dst[d++] = 0xEF.toByte()
+                dst[d++] = 0xBF.toByte()
+                dst[d++] = 0xBD.toByte()
+                s++
+            } else {
+                if (d + 3 > dst.size) return Triple(EncoderResult.OutputFull, s, d)
+                dst[d++] = (0xE0 or (code shr 12)).toByte()
+                dst[d++] = (0x80 or ((code shr 6) and 0x3F)).toByte()
+                dst[d++] = (0x80 or (code and 0x3F)).toByte()
+                s++
+            }
+        }
+        return Triple(EncoderResult.InputEmpty, s, d)
+    }
+
+    public fun encodeFromUtf8Raw(
+        src: String,
+        dst: ByteArray,
+        last: Boolean = false,
+    ): Triple<EncoderResult, Int, Int> {
+        val bytes = src.encodeToByteArray()
+        var toWrite = bytes.size
+        if (toWrite <= dst.size) {
+            bytes.copyInto(dst, 0, 0, toWrite)
+            return Triple(EncoderResult.InputEmpty, toWrite, toWrite)
+        }
+        toWrite = dst.size
+        while (toWrite > 0 && (bytes[toWrite].toInt() and 0xC0) == 0x80) {
+            toWrite--
+        }
+        bytes.copyInto(dst, 0, 0, toWrite)
+        return Triple(EncoderResult.OutputFull, toWrite, toWrite)
+    }
+
+    public companion object {
+        public fun new(encoding: Encoding): Encoder =
+            Encoder(encoding, VariantEncoder.Utf8)
+    }
 }

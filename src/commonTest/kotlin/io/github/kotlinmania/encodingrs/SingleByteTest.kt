@@ -145,6 +145,41 @@ class SingleByteTest {
     }
 
     @Test
+    fun testEncodeUnpairedSurrogates() {
+        val (encoded1, _, hasErrors1) = Encoding.WINDOWS_1253.encodeFromUtf16(charArrayOf('\u0391', '\u03C5', '\uDCA9', '\u03C4', '\u03CC'))
+        assertTrue(hasErrors1)
+        assertEquals(
+            byteArrayOf(0xC1.toByte(), 0xF5.toByte(), 0x26, 0x23, 0x36, 0x35, 0x35, 0x33, 0x33, 0x3B, 0xF4.toByte(), 0xFC.toByte()).toList(),
+            encoded1.toList(),
+        )
+        val (encoded2, _, hasErrors2) = Encoding.WINDOWS_1253.encodeFromUtf16(charArrayOf('\u0391', '\u03C5', '\uD83D', '\u03C4', '\u03CC'))
+        assertTrue(hasErrors2)
+        assertEquals(
+            byteArrayOf(0xC1.toByte(), 0xF5.toByte(), 0x26, 0x23, 0x36, 0x35, 0x35, 0x33, 0x33, 0x3B, 0xF4.toByte(), 0xFC.toByte()).toList(),
+            encoded2.toList(),
+        )
+        val (encoded3, _, hasErrors3) = Encoding.WINDOWS_1253.encodeFromUtf16(charArrayOf('\u0391', '\u03C5', '\u03C4', '\u03CC', '\uD83D'))
+        assertTrue(hasErrors3)
+        assertEquals(
+            byteArrayOf(0xC1.toByte(), 0xF5.toByte(), 0xF4.toByte(), 0xFC.toByte(), 0x26, 0x23, 0x36, 0x35, 0x35, 0x33, 0x33, 0x3B).toList(),
+            encoded3.toList(),
+        )
+    }
+
+    @Test
+    fun testSingleByteFromTwoLowSurrogates() {
+        val output = ByteArray(40)
+        val encoder = Encoding.WINDOWS_1253.newEncoder()
+        val res = encoder.encodeFromUtf16(charArrayOf('\uDC00', '\uDEDE'), output, true)
+        assertEquals(CoderResult.InputEmpty, res.result)
+        assertEquals(2, res.read)
+        val expectation = "&#65533;&#65533;".encodeToByteArray()
+        assertEquals(expectation.size, res.written)
+        assertTrue(res.hadErrors)
+        assertEquals(expectation.toList(), output.copyOf(res.written).toList())
+    }
+
+    @Test
     fun testSingleByteDecode() {
         decodeSingleByte(Encoding.IBM866, Data.ibm866)
         decodeSingleByte(Encoding.ISO_8859_10, Data.iso885910)

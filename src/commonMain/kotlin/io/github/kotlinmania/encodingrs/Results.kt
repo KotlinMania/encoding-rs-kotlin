@@ -75,3 +75,23 @@ public sealed class EncoderResult {
             Unmappable(bmp.toInt().toChar())
     }
 }
+
+/**
+ * Result of an encode operation with replacement.
+ */
+public data class EncodeResult(
+    public val result: CoderResult,
+    public val read: Int,
+    public val written: Int,
+    public val hadErrors: Boolean,
+)
+
+/**
+ * Result of a decode operation with replacement.
+ */
+public data class DecodeResult(
+    public val result: CoderResult,
+    public val read: Int,
+    public val written: Int,
+    public val hadErrors: Boolean,
+)
