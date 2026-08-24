@@ -65,14 +65,16 @@ public sealed class EncoderResult {
      * The encoder encountered an unmappable character.
      */
     public data class Unmappable(
-        public val character: Char,
+        public val codePoint: Int,
     ) : EncoderResult() {
-        public constructor(codePoint: Int) : this(codePoint.toChar())
+        public val character: Char
+            get() = if (codePoint in 0..0xFFFF) codePoint.toChar() else '\uFFFD'
+        public constructor(character: Char) : this(character.code)
     }
 
     public companion object {
         public fun unmappableFromBmp(bmp: UShort): EncoderResult =
-            Unmappable(bmp.toInt().toChar())
+            Unmappable(bmp.toInt())
     }
 }
 
