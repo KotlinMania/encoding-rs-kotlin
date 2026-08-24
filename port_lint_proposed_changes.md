@@ -1,9 +1,32 @@
 # port-lint Proposed Changes
 
 **Generated:** 2026-08-24
-**Source:** tmp/encoding_rs/src
-**Target:** src/commonMain/kotlin
+**Source:** tmp/encoding_rs
+**Target:** src
 
 These are review proposals only. They are emitted when a Rust -> Kotlin pair matches only after fallback normalization, so the existing `port-lint` header is not an exact provenance match.
 
-_No fallback provenance matches detected._
+| Target file | Current header | Proposed header | Source path | Reason |
+|-------------|----------------|-----------------|-------------|--------|
+| `commonMain/kotlin/io/github/kotlinmania/encodingrs/Results.kt` | `// port-lint: source lib.rs` | `// port-lint: source lib.rs` | `lib.rs` | `port-lint provenance header matched only after fallback normalization: 'lib.rs' vs expected 'lib.rs'` |
+| `commonMain/kotlin/io/github/kotlinmania/encodingrs/Encoding.kt` | `// port-lint: source lib.rs` | `// port-lint: source lib.rs` | `lib.rs` | `port-lint provenance header matched only after fallback normalization: 'lib.rs' vs expected 'lib.rs'` |
+| `commonMain/kotlin/io/github/kotlinmania/encodingrs/Data.kt` | `// port-lint: source data.rs` | `// port-lint: source data.rs` | `data.rs` | `port-lint provenance header matched only after fallback normalization: 'data.rs' vs expected 'data.rs'` |
+| `commonMain/kotlin/io/github/kotlinmania/encodingrs/Mem.kt` | `// port-lint: source mem.rs` | `// port-lint: source mem.rs` | `mem.rs` | `port-lint provenance header matched only after fallback normalization: 'mem.rs' vs expected 'mem.rs'` |
+| `commonTest/kotlin/io/github/kotlinmania/encodingrs/MemTest.kt` | `// port-lint: tests mem.rs` | `// port-lint: tests mem.rs` | `mem.rs` | `port-lint provenance header matched only after fallback normalization: 'tests:mem.rs' vs expected 'mem.rs'` |
+| `commonMain/kotlin/io/github/kotlinmania/encodingrs/Handles.kt` | `// port-lint: source handles.rs` | `// port-lint: source handles.rs` | `handles.rs` | `port-lint provenance header matched only after fallback normalization: 'handles.rs' vs expected 'handles.rs'` |
+| `commonTest/kotlin/io/github/kotlinmania/encodingrs/HandlesTest.kt` | `// port-lint: tests handles.rs` | `// port-lint: tests handles.rs` | `handles.rs` | `port-lint provenance header matched only after fallback normalization: 'tests:handles.rs' vs expected 'handles.rs'` |
+| `commonMain/kotlin/io/github/kotlinmania/encodingrs/Utf8.kt` | `// port-lint: source utf_8.rs` | `// port-lint: source utf_8.rs` | `utf_8.rs` | `port-lint provenance header matched only after fallback normalization: 'utf_8.rs' vs expected 'utf_8.rs'` |
+| `commonTest/kotlin/io/github/kotlinmania/encodingrs/Utf8Test.kt` | `// port-lint: tests utf_8.rs` | `// port-lint: tests utf_8.rs` | `utf_8.rs` | `port-lint provenance header matched only after fallback normalization: 'tests:utf_8.rs' vs expected 'utf_8.rs'` |
+| `commonMain/kotlin/io/github/kotlinmania/encodingrs/SingleByte.kt` | `// port-lint: source single_byte.rs` | `// port-lint: source single_byte.rs` | `single_byte.rs` | `port-lint provenance header matched only after fallback normalization: 'single_byte.rs' vs expected 'single_byte.rs'` |
+| `commonTest/kotlin/io/github/kotlinmania/encodingrs/SingleByteTest.kt` | `// port-lint: tests single_byte.rs` | `// port-lint: tests single_byte.rs` | `single_byte.rs` | `port-lint provenance header matched only after fallback normalization: 'tests:single_byte.rs' vs expected 'single_byte.rs'` |
+| `commonMain/kotlin/io/github/kotlinmania/encodingrs/Utf16.kt` | `// port-lint: source utf_16.rs` | `// port-lint: source utf_16.rs` | `utf_16.rs` | `port-lint provenance header matched only after fallback normalization: 'utf_16.rs' vs expected 'utf_16.rs'` |
+| `commonTest/kotlin/io/github/kotlinmania/encodingrs/Utf16Test.kt` | `// port-lint: tests utf_16.rs` | `// port-lint: tests utf_16.rs` | `utf_16.rs` | `port-lint provenance header matched only after fallback normalization: 'tests:utf_16.rs' vs expected 'utf_16.rs'` |
+| `commonMain/kotlin/io/github/kotlinmania/encodingrs/XUserDefined.kt` | `// port-lint: source x_user_defined.rs` | `// port-lint: source x_user_defined.rs` | `x_user_defined.rs` | `port-lint provenance header matched only after fallback normalization: 'x_user_defined.rs' vs expected 'x_user_defined.rs'` |
+| `commonTest/kotlin/io/github/kotlinmania/encodingrs/XUserDefinedTest.kt` | `// port-lint: tests x_user_defined.rs` | `// port-lint: tests x_user_defined.rs` | `x_user_defined.rs` | `port-lint provenance header matched only after fallback normalization: 'tests:x_user_defined.rs' vs expected 'x_user_defined.rs'` |
+| `commonMain/kotlin/io/github/kotlinmania/encodingrs/Replacement.kt` | `// port-lint: source replacement.rs` | `// port-lint: source replacement.rs` | `replacement.rs` | `port-lint provenance header matched only after fallback normalization: 'replacement.rs' vs expected 'replacement.rs'` |
+| `commonTest/kotlin/io/github/kotlinmania/encodingrs/ReplacementTest.kt` | `// port-lint: tests replacement.rs` | `// port-lint: tests replacement.rs` | `replacement.rs` | `port-lint provenance header matched only after fallback normalization: 'tests:replacement.rs' vs expected 'replacement.rs'` |
+| `commonMain/kotlin/io/github/kotlinmania/encodingrs/Ascii.kt` | `// port-lint: source ascii.rs` | `// port-lint: source ascii.rs` | `ascii.rs` | `port-lint provenance header matched only after fallback normalization: 'ascii.rs' vs expected 'ascii.rs'` |
+| `commonTest/kotlin/io/github/kotlinmania/encodingrs/AsciiTest.kt` | `// port-lint: tests ascii.rs` | `// port-lint: tests ascii.rs` | `ascii.rs` | `port-lint provenance header matched only after fallback normalization: 'tests:ascii.rs' vs expected 'ascii.rs'` |
+| `commonMain/kotlin/io/github/kotlinmania/encodingrs/Gb180302022.kt` | `// port-lint: source gb18030_2022.rs` | `// port-lint: source gb18030_2022.rs` | `gb18030_2022.rs` | `port-lint provenance header matched only after fallback normalization: 'gb18030_2022.rs' vs expected 'gb18030_2022.rs'` |
+| `commonMain/kotlin/io/github/kotlinmania/encodingrs/SwiftExport.kt` | `// port-lint: source gb18030_2022.rs` | `// port-lint: source gb18030_2022.rs` | `gb18030_2022.rs` | `port-lint provenance header matched only after fallback normalization: 'gb18030_2022.rs' vs expected 'gb18030_2022.rs'` |
+| `commonTest/kotlin/io/github/kotlinmania/encodingrs/Gb180302022Test.kt` | `// port-lint: tests gb18030_2022.rs` | `// port-lint: tests gb18030_2022.rs` | `gb18030_2022.rs` | `port-lint provenance header matched only after fallback normalization: 'tests:gb18030_2022.rs' vs expected 'gb18030_2022.rs'` |
