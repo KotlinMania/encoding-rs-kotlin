@@ -3577,3 +3577,106 @@ public object Data {
             0x20AC.toChar(),
         )
 }
+
+internal fun CharArray.binarySearch(element: Char, fromIndex: Int = 0, toIndex: Int = size): Int {
+    var low = fromIndex
+    var high = toIndex - 1
+    while (low <= high) {
+        val mid = (low + high) ushr 1
+        val midVal = this[mid]
+        val cmp = midVal.compareTo(element)
+        if (cmp < 0) {
+            low = mid + 1
+        } else if (cmp > 0) {
+            high = mid - 1
+        } else {
+            return mid
+        }
+    }
+    return -(low + 1)
+}
+
+internal fun decodeToUtf8ViaUtf16(
+    decodeUtf16: (src: ByteArray, dst: CharArray, last: Boolean) -> Triple<DecoderResult, Int, Int>,
+    src: ByteArray,
+    dst: ByteArray,
+    last: Boolean,
+): Triple<DecoderResult, Int, Int> {
+    var srcRead = 0
+    var dstWritten = 0
+    val charBuf = CharArray(128)
+    while (srcRead < src.size || (last && srcRead == src.size)) {
+        val srcSlice = src.copyOfRange(srcRead, src.size)
+        val (res, read, writtenChars) = decodeUtf16(srcSlice, charBuf, last)
+        var cIdx = 0
+        while (cIdx < writtenChars) {
+            val c = charBuf[cIdx]
+            val code = c.code
+            if (code < 0x80) {
+                if (dstWritten >= dst.size) {
+                    return Triple(DecoderResult.OutputFull, srcRead, dstWritten)
+                }
+                dst[dstWritten++] = code.toByte()
+                cIdx++
+            } else if (code <= 0x07FF) {
+                if (dstWritten + 2 > dst.size) {
+                    return Triple(DecoderResult.OutputFull, srcRead, dstWritten)
+                }
+                dst[dstWritten++] = (0xC0 or (code shr 6)).toByte()
+                dst[dstWritten++] = (0x80 or (code and 0x3F)).toByte()
+                cIdx++
+            } else if (c.isHighSurrogate() && cIdx + 1 < writtenChars && charBuf[cIdx + 1].isLowSurrogate()) {
+                val low = charBuf[cIdx + 1]
+                val cp = 0x10000 + ((code - 0xD800) shl 10) + (low.code - 0xDC00)
+                if (dstWritten + 4 > dst.size) {
+                    return Triple(DecoderResult.OutputFull, srcRead, dstWritten)
+                }
+                dst[dstWritten++] = (0xF0 or (cp shr 18)).toByte()
+                dst[dstWritten++] = (0x80 or ((cp shr 12) and 0x3F)).toByte()
+                dst[dstWritten++] = (0x80 or ((cp shr 6) and 0x3F)).toByte()
+                dst[dstWritten++] = (0x80 or (cp and 0x3F)).toByte()
+                cIdx += 2
+            } else {
+                if (dstWritten + 3 > dst.size) {
+                    return Triple(DecoderResult.OutputFull, srcRead, dstWritten)
+                }
+                dst[dstWritten++] = (0xE0 or (code shr 12)).toByte()
+                dst[dstWritten++] = (0x80 or ((code shr 6) and 0x3F)).toByte()
+                dst[dstWritten++] = (0x80 or (code and 0x3F)).toByte()
+                cIdx++
+            }
+        }
+        srcRead += read
+        if (res is DecoderResult.Malformed || res is DecoderResult.OutputFull) {
+            return Triple(res, srcRead, dstWritten)
+        }
+        if (read == 0 && writtenChars == 0) {
+            break
+        }
+    }
+    return Triple(DecoderResult.InputEmpty, srcRead, dstWritten)
+}
+
+internal fun mapWithRanges(haystack: CharArray, other: CharArray, needle: Int, haystackLen: Int = haystack.size): Int {
+    val needleChar = needle.toChar()
+    val idx = haystack.binarySearch(needleChar, 0, haystackLen)
+    if (idx >= 0) {
+        return other[idx].code
+    }
+    val insertionPoint = -idx - 1
+    val i = insertionPoint - 1
+    return other[i].code + (needle - haystack[i].code)
+}
+
+internal fun mapWithUnsortedRanges(haystack: CharArray, other: CharArray, needle: Int): Int? {
+    for (i in 0 until haystack.size) {
+        val start = other[i].code
+        val end = other[i + 1].code
+        val length = end - start
+        val offset = (needle - haystack[i].code) and 0xFFFF
+        if (offset in 0 until length) {
+            return start + offset
+        }
+    }
+    return null
+}

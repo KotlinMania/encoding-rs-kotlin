@@ -186,19 +186,20 @@ public class SingleByteEncoder(
                     if (srcPos + 1 < src.size) {
                         val next = src[srcPos + 1]
                         if (next.isLowSurrogate()) {
-                            return Triple(EncoderResult.Unmappable('\uFFFD'), srcPos + 2, dstPos)
+                            val astral = ((c.code - 0xD800) shl 10) + (next.code - 0xDC00) + 0x10000
+                            return Triple(EncoderResult.Unmappable(astral), srcPos + 2, dstPos)
                         } else {
-                            return Triple(EncoderResult.Unmappable('\uFFFD'), srcPos + 1, dstPos)
+                            return Triple(EncoderResult.Unmappable(0xFFFD), srcPos + 1, dstPos)
                         }
                     } else if (!last) {
                         return Triple(EncoderResult.InputEmpty, srcPos, dstPos)
                     } else {
-                        return Triple(EncoderResult.Unmappable('\uFFFD'), srcPos + 1, dstPos)
+                        return Triple(EncoderResult.Unmappable(0xFFFD), srcPos + 1, dstPos)
                     }
                 } else if (c.isLowSurrogate()) {
-                    return Triple(EncoderResult.Unmappable('\uFFFD'), srcPos + 1, dstPos)
+                    return Triple(EncoderResult.Unmappable(0xFFFD), srcPos + 1, dstPos)
                 }
-                return Triple(EncoderResult.Unmappable(c), srcPos + 1, dstPos)
+                return Triple(EncoderResult.Unmappable(c.code), srcPos + 1, dstPos)
             }
         }
         return Triple(EncoderResult.InputEmpty, srcPos, dstPos)
@@ -226,42 +227,42 @@ public class SingleByteEncoder(
             if (b0 in 0xC2..0xDF) {
                 needed = 2
                 if (srcPos + 2 > src.size) {
-                    return if (last) Triple(EncoderResult.Unmappable('\uFFFD'), srcPos, dstPos) else Triple(EncoderResult.InputEmpty, srcPos, dstPos)
+                    return if (last) Triple(EncoderResult.Unmappable(0xFFFD), srcPos, dstPos) else Triple(EncoderResult.InputEmpty, srcPos, dstPos)
                 }
                 val b1 = src[srcPos + 1].toInt() and 0xFF
                 if (b1 !in 0x80..0xBF) {
-                    return Triple(EncoderResult.Unmappable('\uFFFD'), srcPos, dstPos)
+                    return Triple(EncoderResult.Unmappable(0xFFFD), srcPos, dstPos)
                 }
                 codePoint = ((b0 and 0x1F) shl 6) or (b1 and 0x3F)
             } else if (b0 in 0xE0..0xEF) {
                 needed = 3
                 if (srcPos + 3 > src.size) {
-                    return if (last) Triple(EncoderResult.Unmappable('\uFFFD'), srcPos, dstPos) else Triple(EncoderResult.InputEmpty, srcPos, dstPos)
+                    return if (last) Triple(EncoderResult.Unmappable(0xFFFD), srcPos, dstPos) else Triple(EncoderResult.InputEmpty, srcPos, dstPos)
                 }
                 val b1 = src[srcPos + 1].toInt() and 0xFF
                 val b2 = src[srcPos + 2].toInt() and 0xFF
                 if (b1 !in 0x80..0xBF || b2 !in 0x80..0xBF) {
-                    return Triple(EncoderResult.Unmappable('\uFFFD'), srcPos, dstPos)
+                    return Triple(EncoderResult.Unmappable(0xFFFD), srcPos, dstPos)
                 }
                 codePoint = ((b0 and 0x0F) shl 12) or ((b1 and 0x3F) shl 6) or (b2 and 0x3F)
             } else if (b0 in 0xF0..0xF4) {
                 needed = 4
                 if (srcPos + 4 > src.size) {
-                    return if (last) Triple(EncoderResult.Unmappable('\uFFFD'), srcPos, dstPos) else Triple(EncoderResult.InputEmpty, srcPos, dstPos)
+                    return if (last) Triple(EncoderResult.Unmappable(0xFFFD), srcPos, dstPos) else Triple(EncoderResult.InputEmpty, srcPos, dstPos)
                 }
                 val b1 = src[srcPos + 1].toInt() and 0xFF
                 val b2 = src[srcPos + 2].toInt() and 0xFF
                 val b3 = src[srcPos + 3].toInt() and 0xFF
                 if (b1 !in 0x80..0xBF || b2 !in 0x80..0xBF || b3 !in 0x80..0xBF) {
-                    return Triple(EncoderResult.Unmappable('\uFFFD'), srcPos, dstPos)
+                    return Triple(EncoderResult.Unmappable(0xFFFD), srcPos, dstPos)
                 }
                 codePoint = ((b0 and 0x07) shl 18) or ((b1 and 0x3F) shl 12) or ((b2 and 0x3F) shl 6) or (b3 and 0x3F)
             } else {
-                return Triple(EncoderResult.Unmappable('\uFFFD'), srcPos, dstPos)
+                return Triple(EncoderResult.Unmappable(0xFFFD), srcPos, dstPos)
             }
 
             if (codePoint > 0xFFFF) {
-                return Triple(EncoderResult.Unmappable(Char.MIN_HIGH_SURROGATE), srcPos, dstPos)
+                return Triple(EncoderResult.Unmappable(codePoint), srcPos + needed, dstPos)
             }
             val byte = encodeChar(codePoint.toChar())
             if (byte != null) {
@@ -271,7 +272,7 @@ public class SingleByteEncoder(
                 dst[dstPos++] = byte
                 srcPos += needed
             } else {
-                return Triple(EncoderResult.Unmappable(codePoint.toChar()), srcPos, dstPos)
+                return Triple(EncoderResult.Unmappable(codePoint), srcPos + needed, dstPos)
             }
         }
         return Triple(EncoderResult.InputEmpty, srcPos, dstPos)

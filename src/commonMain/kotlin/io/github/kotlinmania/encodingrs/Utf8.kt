@@ -610,6 +610,12 @@ public class Utf8Decoder {
         return Triple(DecoderResult.InputEmpty, srcPos, dstPos)
     }
 
+    public fun decodeToUtf8Raw(
+        src: ByteArray,
+        dst: ByteArray,
+        last: Boolean = false,
+    ): Triple<DecoderResult, Int, Int> = decodeToUtf8ViaUtf16(::decodeToUtf16Raw, src, dst, last)
+
     public companion object {
         public fun new(): Utf8Decoder = Utf8Decoder()
     }

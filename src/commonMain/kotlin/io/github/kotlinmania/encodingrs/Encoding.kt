@@ -120,13 +120,10 @@ public class Encoding internal constructor(
                 }
                 srcPos += inRead
                 if (r is EncoderResult.Unmappable) {
-                    val codePoint = r.character.code
+                    val codePoint = r.codePoint
                     val ref = "&#$codePoint;".encodeToByteArray()
                     for (b in ref) {
                         sb.add(b)
-                    }
-                    if (srcPos < chars.size && chars[srcPos] == r.character) {
-                        srcPos++
                     }
                 }
             }
@@ -794,12 +791,12 @@ internal sealed class VariantEncoding {
         when (this) {
             is SingleByte -> VariantDecoder.SingleByte(SingleByteDecoder.new(table))
             Utf8 -> VariantDecoder.Utf8(Utf8Decoder.new())
-            Gb18030, Gbk -> VariantDecoder.Gb18030
-            Big5 -> VariantDecoder.Big5
-            EucJp -> VariantDecoder.EucJp
-            Iso2022Jp -> VariantDecoder.Iso2022Jp
-            ShiftJis -> VariantDecoder.ShiftJis
-            EucKr -> VariantDecoder.EucKr
+            Gb18030, Gbk -> VariantDecoder.Gb18030(Gb18030Decoder.new())
+            Big5 -> VariantDecoder.Big5(Big5Decoder.new())
+            EucJp -> VariantDecoder.EucJp(EucJpDecoder.new())
+            Iso2022Jp -> VariantDecoder.Iso2022Jp(Iso2022JpDecoder.new())
+            ShiftJis -> VariantDecoder.ShiftJis(ShiftJisDecoder.new())
+            EucKr -> VariantDecoder.EucKr(EucKrDecoder.new())
             UserDefined -> VariantDecoder.UserDefined(UserDefinedDecoder.new())
             Replacement -> VariantDecoder.Replacement(ReplacementDecoder.new())
             Utf16Be -> VariantDecoder.Utf16Be(Utf16Decoder.new(false))
@@ -810,13 +807,13 @@ internal sealed class VariantEncoding {
         when (this) {
             is SingleByte -> Encoder(encoding, VariantEncoder.SingleByte(SingleByteEncoder.new(table, runBmpOffset, runByteOffset, runLength)))
             Utf8 -> Encoder(encoding, VariantEncoder.Utf8)
-            Gb18030 -> Encoder(encoding, VariantEncoder.Gb18030)
-            Gbk -> Encoder(encoding, VariantEncoder.Gbk)
-            Big5 -> Encoder(encoding, VariantEncoder.Big5)
-            EucJp -> Encoder(encoding, VariantEncoder.EucJp)
-            Iso2022Jp -> Encoder(encoding, VariantEncoder.Iso2022Jp)
-            ShiftJis -> Encoder(encoding, VariantEncoder.ShiftJis)
-            EucKr -> Encoder(encoding, VariantEncoder.EucKr)
+            Gb18030 -> Encoder(encoding, VariantEncoder.Gb18030(Gb18030Encoder(extended = true)))
+            Gbk -> Encoder(encoding, VariantEncoder.Gbk(Gb18030Encoder(extended = false)))
+            Big5 -> Encoder(encoding, VariantEncoder.Big5(Big5Encoder()))
+            EucJp -> Encoder(encoding, VariantEncoder.EucJp(EucJpEncoder()))
+            Iso2022Jp -> Encoder(encoding, VariantEncoder.Iso2022Jp(Iso2022JpEncoder()))
+            ShiftJis -> Encoder(encoding, VariantEncoder.ShiftJis(ShiftJisEncoder()))
+            EucKr -> Encoder(encoding, VariantEncoder.EucKr(EucKrEncoder()))
             UserDefined -> Encoder(encoding, VariantEncoder.UserDefined(UserDefinedEncoder()))
             Replacement -> Encoder(encoding, VariantEncoder.Replacement)
             Utf16Be -> Encoder(encoding, VariantEncoder.Utf16Be)
@@ -833,17 +830,29 @@ internal sealed class VariantDecoder {
         val decoder: Utf8Decoder,
     ) : VariantDecoder()
 
-    data object Gb18030 : VariantDecoder()
+    data class Gb18030(
+        val decoder: Gb18030Decoder,
+    ) : VariantDecoder()
 
-    data object Big5 : VariantDecoder()
+    data class Big5(
+        val decoder: Big5Decoder,
+    ) : VariantDecoder()
 
-    data object EucJp : VariantDecoder()
+    data class EucJp(
+        val decoder: EucJpDecoder,
+    ) : VariantDecoder()
 
-    data object Iso2022Jp : VariantDecoder()
+    data class Iso2022Jp(
+        val decoder: Iso2022JpDecoder,
+    ) : VariantDecoder()
 
-    data object ShiftJis : VariantDecoder()
+    data class ShiftJis(
+        val decoder: ShiftJisDecoder,
+    ) : VariantDecoder()
 
-    data object EucKr : VariantDecoder()
+    data class EucKr(
+        val decoder: EucKrDecoder,
+    ) : VariantDecoder()
 
     data class UserDefined(
         val decoder: UserDefinedDecoder,
@@ -865,41 +874,64 @@ internal sealed class VariantDecoder {
         when (this) {
             is SingleByte -> decoder.maxUtf16BufferLength(byteLength)
             is Utf8 -> decoder.maxUtf16BufferLength(byteLength)
+            is Gb18030 -> decoder.maxUtf16BufferLength(byteLength)
+            is Big5 -> decoder.maxUtf16BufferLength(byteLength)
+            is EucJp -> decoder.maxUtf16BufferLength(byteLength)
+            is Iso2022Jp -> decoder.maxUtf16BufferLength(byteLength)
+            is ShiftJis -> decoder.maxUtf16BufferLength(byteLength)
+            is EucKr -> decoder.maxUtf16BufferLength(byteLength)
             is UserDefined -> decoder.maxUtf16BufferLength(byteLength)
             is Replacement -> decoder.maxUtf16BufferLength(byteLength)
             is Utf16Be -> decoder.maxUtf16BufferLength(byteLength)
             is Utf16Le -> decoder.maxUtf16BufferLength(byteLength)
-            else -> byteLength
         }
 
     fun maxUtf8BufferLength(byteLength: Int): Int? =
         when (this) {
             is SingleByte -> decoder.maxUtf8BufferLength(byteLength)
             is Utf8 -> decoder.maxUtf8BufferLength(byteLength)
+            is Gb18030 -> decoder.maxUtf8BufferLength(byteLength)
+            is Big5 -> decoder.maxUtf8BufferLength(byteLength)
+            is EucJp -> decoder.maxUtf8BufferLength(byteLength)
+            is Iso2022Jp -> decoder.maxUtf8BufferLength(byteLength)
+            is ShiftJis -> decoder.maxUtf8BufferLength(byteLength)
+            is EucKr -> decoder.maxUtf8BufferLength(byteLength)
             is UserDefined -> decoder.maxUtf8BufferLength(byteLength)
             is Replacement -> decoder.maxUtf8BufferLength(byteLength)
             is Utf16Be -> decoder.maxUtf8BufferLength(byteLength)
             is Utf16Le -> decoder.maxUtf8BufferLength(byteLength)
-            else -> if (byteLength > Int.MAX_VALUE / 3) null else byteLength * 3
+        }
+
+    fun maxUtf8BufferLengthWithoutReplacement(byteLength: Int): Int? =
+        when (this) {
+            is SingleByte -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
+            is Utf8 -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
+            is Gb18030 -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
+            is Big5 -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
+            is EucJp -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
+            is Iso2022Jp -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
+            is ShiftJis -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
+            is EucKr -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
+            is UserDefined -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
+            is Replacement -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
+            is Utf16Be -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
+            is Utf16Le -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
         }
 
     fun decodeToUtf16Raw(src: ByteArray, dst: CharArray, last: Boolean): Triple<DecoderResult, Int, Int> =
         when (this) {
             is SingleByte -> decoder.decodeToUtf16Raw(src, dst, last)
             is Utf8 -> decoder.decodeToUtf16Raw(src, dst, last)
+            is Gb18030 -> decoder.decodeToUtf16Raw(src, dst, last)
+            is Big5 -> decoder.decodeToUtf16Raw(src, dst, last)
+            is EucJp -> decoder.decodeToUtf16Raw(src, dst, last)
+            is Iso2022Jp -> decoder.decodeToUtf16Raw(src, dst, last)
+            is ShiftJis -> decoder.decodeToUtf16Raw(src, dst, last)
+            is EucKr -> decoder.decodeToUtf16Raw(src, dst, last)
             is UserDefined -> decoder.decodeToUtf16Raw(src, dst, last)
             is Replacement -> decoder.decodeToUtf16Raw(src, dst, last)
             is Utf16Be -> decoder.decodeToUtf16Raw(src, dst, last)
             is Utf16Le -> decoder.decodeToUtf16Raw(src, dst, last)
-            else -> {
-                // fallback ASCII
-                var s = 0
-                var d = 0
-                while (s < src.size && d < dst.size) {
-                    dst[d++] = (src[s++].toInt() and 0xFF).toChar()
-                }
-                Triple(DecoderResult.InputEmpty, s, d)
-            }
         }
 }
 
@@ -910,19 +942,33 @@ internal sealed class VariantEncoder {
 
     data object Utf8 : VariantEncoder()
 
-    data object Gb18030 : VariantEncoder()
+    data class Gb18030(
+        val encoder: Gb18030Encoder,
+    ) : VariantEncoder()
 
-    data object Gbk : VariantEncoder()
+    data class Gbk(
+        val encoder: Gb18030Encoder,
+    ) : VariantEncoder()
 
-    data object Big5 : VariantEncoder()
+    data class Big5(
+        val encoder: Big5Encoder,
+    ) : VariantEncoder()
 
-    data object EucJp : VariantEncoder()
+    data class EucJp(
+        val encoder: EucJpEncoder,
+    ) : VariantEncoder()
 
-    data object Iso2022Jp : VariantEncoder()
+    data class Iso2022Jp(
+        val encoder: Iso2022JpEncoder,
+    ) : VariantEncoder()
 
-    data object ShiftJis : VariantEncoder()
+    data class ShiftJis(
+        val encoder: ShiftJisEncoder,
+    ) : VariantEncoder()
 
-    data object EucKr : VariantEncoder()
+    data class EucKr(
+        val encoder: EucKrEncoder,
+    ) : VariantEncoder()
 
     data class UserDefined(
         val encoder: UserDefinedEncoder,
@@ -939,8 +985,15 @@ internal sealed class VariantEncoder {
             is SingleByte -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
             is UserDefined -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
             Utf8 -> if (u16Length > Int.MAX_VALUE / 3) null else u16Length * 3
+            is Gb18030 -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
+            is Gbk -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
+            is Big5 -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
+            is EucJp -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
+            is Iso2022Jp -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
+            is ShiftJis -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
+            is EucKr -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
             Utf16Be, Utf16Le -> if (u16Length > Int.MAX_VALUE / 2) null else u16Length * 2
-            else -> u16Length
+            Replacement -> u16Length
         }
 
     fun encodeFromUtf16Raw(src: CharArray, dst: ByteArray, last: Boolean): Triple<EncoderResult, Int, Int> =
@@ -948,6 +1001,13 @@ internal sealed class VariantEncoder {
             is SingleByte -> encoder.encodeFromUtf16Raw(src, dst, last)
             is UserDefined -> encoder.encodeFromUtf16Raw(src, dst, last)
             Utf8 -> Utf8Encoder().encodeFromUtf16Raw(src, dst, last)
+            is Gb18030 -> encoder.encodeFromUtf16Raw(src, dst, last)
+            is Gbk -> encoder.encodeFromUtf16Raw(src, dst, last)
+            is Big5 -> encoder.encodeFromUtf16Raw(src, dst, last)
+            is EucJp -> encoder.encodeFromUtf16Raw(src, dst, last)
+            is Iso2022Jp -> encoder.encodeFromUtf16Raw(src, dst, last)
+            is ShiftJis -> encoder.encodeFromUtf16Raw(src, dst, last)
+            is EucKr -> encoder.encodeFromUtf16Raw(src, dst, last)
             Utf16Be -> {
                 var s = 0
                 var d = 0
@@ -970,7 +1030,7 @@ internal sealed class VariantEncoder {
                 }
                 Triple(EncoderResult.InputEmpty, s, d)
             }
-            else -> {
+            Replacement -> {
                 var s = 0
                 var d = 0
                 while (s < src.size && d < dst.size) {
@@ -999,6 +1059,31 @@ public class Decoder internal constructor(
 
     public fun maxUtf8BufferLength(byteLength: Int): Int? =
         variant.maxUtf8BufferLength(byteLength)
+
+    public fun maxUtf8BufferLengthWithoutReplacement(byteLength: Int): Int? =
+        variant.maxUtf8BufferLengthWithoutReplacement(byteLength)
+
+    public fun decodeToUtf8WithoutReplacement(
+        src: ByteArray,
+        dst: ByteArray,
+        last: Boolean = false,
+    ): Triple<DecoderResult, Int, Int> {
+        val tempDst = CharArray(dst.size)
+        val (result, read, written) = decodeToUtf16Raw(src, tempDst, last)
+        when (result) {
+            is DecoderResult.Malformed -> return Triple(result, read, 0)
+            is DecoderResult.OutputFull -> return Triple(result, read, 0)
+            is DecoderResult.InputEmpty -> {
+                val str = tempDst.concatToString(0, written)
+                val encoded = str.encodeToByteArray()
+                if (encoded.size > dst.size) {
+                    return Triple(DecoderResult.OutputFull, 0, 0)
+                }
+                encoded.copyInto(dst, 0, 0, encoded.size)
+                return Triple(DecoderResult.InputEmpty, read, encoded.size)
+            }
+        }
+    }
 
     public fun decodeToUtf16Raw(
         src: ByteArray,
@@ -1055,7 +1140,7 @@ public class Decoder internal constructor(
         }
 
         var inPos = 0
-        while (inPos < input.size || (last && inPos == input.size)) {
+        while (true) {
             val currentSlice = input.copyOfRange(inPos, input.size)
             val currentDst = CharArray(dst.size - totalWritten)
             val (result, read, written) = variant.decodeToUtf16Raw(currentSlice, currentDst, last)
@@ -1078,11 +1163,7 @@ public class Decoder internal constructor(
                     dst[totalWritten++] = '\uFFFD'
                 }
             }
-            if (read == 0) {
-                break
-            }
         }
-        return DecodeResult(CoderResult.InputEmpty, totalRead, totalWritten, hadErrors)
     }
 }
 
@@ -1154,7 +1235,7 @@ public class Encoder internal constructor(
                 }
                 is EncoderResult.Unmappable -> {
                     hadErrors = true
-                    val codePoint = result.character.code
+                    val codePoint = result.codePoint
                     val ref = "&#$codePoint;".encodeToByteArray()
                     if (totalWritten + ref.size > dst.size) {
                         return EncodeResult(CoderResult.OutputFull, totalRead, totalWritten, hadErrors)
