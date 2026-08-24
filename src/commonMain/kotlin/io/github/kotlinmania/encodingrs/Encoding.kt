@@ -8,8 +8,6 @@ public class Encoding internal constructor(
     public val name: String,
     internal val variant: VariantEncoding,
 ) {
-    public fun name(): String = name
-
     public fun isSingleByte(): Boolean =
         variant is VariantEncoding.SingleByte || variant is VariantEncoding.UserDefined
 
