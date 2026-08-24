@@ -4,14 +4,14 @@ Based on AST analysis, here are the concrete next steps.
 
 ## Summary
 
-- **Files Present:** 9/22 (40.9%)
-- **Function parity:** 116/669 matched (target 162) — 17.3%
-- **Class/type parity:** 16/69 matched (target 48) — 23.2%
-- **Combined symbol parity:** 132/738 matched (target 210) — 17.9%
-- **Average inline-code cosine:** 0.44 (function body across 9 matched files)
-- **Average documentation cosine:** 0.14 (doc text across 9 matched files)
+- **Files Present:** 11/22 (50.0%)
+- **Function parity:** 214/558 matched (target 355) — 38.4%
+- **Class/type parity:** 45/69 matched (target 88) — 65.2%
+- **Combined symbol parity:** 259/627 matched (target 443) — 41.3%
+- **Average inline-code cosine:** 0.47 (function body across 11 matched files)
+- **Average documentation cosine:** 0.17 (doc text across 11 matched files)
 - **Cheat-zeroed Files:** 2
-- **Critical Issues:** 5 files with <0.60 function similarity
+- **Critical Issues:** 6 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
 
@@ -50,7 +50,30 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/1 matched
 - **Missing types:** `SingleByteData`
 
-### 3. utf_8
+### 3. mem
+
+- **Target:** `encodingrs.Mem`
+- **Similarity:** 0.49
+- **Dependents:** 0
+- **Priority Score:** 208205.1
+- **Functions:** 61/81 matched (target 63)
+- **Missing functions:** `utf16_valid_up_to_alu`, `is_utf8_latin1_impl`, `test_convert_utf8_to_latin1_lossy_panics`, `test_convert_utf16_to_latin1_lossy_panics`, `test_is_utf8_bidi`, `test_is_utf16_bidi`, `test_check_str_for_latin1_and_bidi`, `test_check_utf8_for_latin1_and_bidi`, `test_check_utf16_for_latin1_and_bidi`, `reference_is_char_bidi`, `reference_is_utf16_code_unit_bidi`, `test_is_char_bidi_thoroughly`, `test_is_utf16_code_unit_bidi_thoroughly`, `test_is_str_bidi_thoroughly`, `test_is_utf8_bidi_thoroughly`, `test_is_utf16_bidi_thoroughly`, `test_is_utf8_bidi_edge_cases`, `test_decode_latin1`, `test_encode_latin1_lossy`, `test_convert_utf8_to_utf16_without_replacement`
+- **Types:** 1/1 matched (target 3)
+- **Missing types:** _none_
+- **Tests:** 25/35 matched
+
+### 4. handles
+
+- **Target:** `encodingrs.Handles`
+- **Similarity:** 0.72
+- **Dependents:** 0
+- **Priority Score:** 87302.8
+- **Functions:** 37/45 matched (target 130)
+- **Missing functions:** `new`, `simd_at`, `len`, `copy_unaligned_basic_latin_to_ascii_alu`, `swap_if_opposite_endian`, `copy_unaligned_basic_latin_to_ascii`, `convert_unaligned_utf16_to_utf8`, `copy_utf16_from`
+- **Types:** 28/28 matched (target 37)
+- **Missing types:** _none_
+
+### 5. utf_8
 
 - **Target:** `encodingrs.Utf8`
 - **Similarity:** 0.60
@@ -62,7 +85,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 8/8 matched
 
-### 4. single_byte
+### 6. single_byte
 
 - **Target:** `encodingrs.SingleByte`
 - **Similarity:** 0.59
@@ -74,7 +97,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 8/8 matched
 
-### 5. utf_16
+### 7. utf_16
 
 - **Target:** `encodingrs.Utf16`
 - **Similarity:** 0.56
@@ -86,7 +109,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 12/12 matched
 
-### 6. x_user_defined
+### 8. x_user_defined
 
 - **Target:** `encodingrs.XUserDefined`
 - **Similarity:** 0.61
@@ -98,7 +121,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 3/3 matched
 
-### 7. replacement
+### 9. replacement
 
 - **Target:** `encodingrs.Replacement`
 - **Similarity:** 0.71
@@ -110,7 +133,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 2/2 matched
 
-### 8. ascii
+### 10. ascii
 
 - **Target:** `encodingrs.Ascii`
 - **Similarity:** 0.73
@@ -121,7 +144,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched (target 2)
 - **Missing types:** _none_
 
-### 9. gb18030_2022
+### 11. gb18030_2022
 
 - **Target:** `encodingrs.Gb180302022 [ZERO]`
 - **Similarity:** 0.00
