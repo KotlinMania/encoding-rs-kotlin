@@ -4,6 +4,7 @@ package io.github.kotlinmania.encodingrs
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 class Gb18030Test {
     private fun decodeGb18030(bytes: ByteArray, expect: String) {
@@ -145,6 +146,21 @@ class Gb18030Test {
 
         // Non-change in GB18030-2022
         encodeGbk("\uE817", byteArrayOf(0xFE.toByte(), 0x52))
+    }
+
+    @Test
+    fun testGb18030DecodeAll() {
+        val (decoded, hadErrors) = Encoding.GB18030.decodeWithoutBomHandling(byteArrayOf(0x81.toByte(), 0x40))
+        assertEquals("\u4E02", decoded)
+        assertFalse(hadErrors)
+    }
+
+    @Test
+    fun testGb18030EncodeAll() {
+        val (encoded, encoding, hadErrors) = Encoding.GB18030.encode("\u4E02")
+        assertEquals(Encoding.GB18030, encoding)
+        assertFalse(hadErrors)
+        assertContentEquals(byteArrayOf(0x81.toByte(), 0x40), encoded)
     }
 
     @Test

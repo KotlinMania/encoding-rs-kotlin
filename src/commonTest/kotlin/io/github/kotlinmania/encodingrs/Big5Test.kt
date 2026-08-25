@@ -4,6 +4,7 @@ package io.github.kotlinmania.encodingrs
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class Big5Test {
@@ -89,6 +90,21 @@ class Big5Test {
 
         // prefer last
         encodeBig5("\u2550", byteArrayOf(0xF9.toByte(), 0xF9.toByte()))
+    }
+
+    @Test
+    fun testBig5DecodeAll() {
+        val (decoded, hadErrors) = Encoding.BIG5.decodeWithoutBomHandling(byteArrayOf(0x87.toByte(), 0x40.toByte()))
+        assertEquals("\u43F0", decoded)
+        assertFalse(hadErrors)
+    }
+
+    @Test
+    fun testBig5EncodeAll() {
+        val (encoded, encoding, hadErrors) = Encoding.BIG5.encode("\u3000")
+        assertEquals(Encoding.BIG5, encoding)
+        assertFalse(hadErrors)
+        assertContentEquals(byteArrayOf(0xA1.toByte(), 0x40.toByte()), encoded)
     }
 
     @Test

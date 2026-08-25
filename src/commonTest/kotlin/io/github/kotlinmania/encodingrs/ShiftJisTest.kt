@@ -4,6 +4,7 @@ package io.github.kotlinmania.encodingrs
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 class ShiftJisTest {
     private fun decodeShiftJis(bytes: ByteArray, expect: String) {
@@ -94,5 +95,20 @@ class ShiftJisTest {
         assertEquals(0xEF.toByte(), output[0])
         assertEquals(0xBD.toByte(), output[1])
         assertEquals(0xA1.toByte(), output[2])
+    }
+
+    @Test
+    fun testShiftJisDecodeAll() {
+        val (decoded, hadErrors) = Encoding.SHIFT_JIS.decodeWithoutBomHandling(byteArrayOf(0x81.toByte(), 0x40))
+        assertEquals("\u3000", decoded)
+        assertFalse(hadErrors)
+    }
+
+    @Test
+    fun testShiftJisEncodeAll() {
+        val (encoded, encoding, hadErrors) = Encoding.SHIFT_JIS.encode("\u3000")
+        assertEquals(Encoding.SHIFT_JIS, encoding)
+        assertFalse(hadErrors)
+        assertContentEquals(byteArrayOf(0x81.toByte(), 0x40), encoded)
     }
 }
