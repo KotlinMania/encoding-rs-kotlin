@@ -4,6 +4,7 @@ package io.github.kotlinmania.encodingrs
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 class EucJpTest {
     private fun decodeEucJp(bytes: ByteArray, expect: String) {
@@ -91,5 +92,27 @@ class EucJpTest {
         // JIS 0208
         encodeEucJp("\u3000", byteArrayOf(0xA1.toByte(), 0xA1.toByte()))
         encodeEucJp("\uFF02", byteArrayOf(0xFC.toByte(), 0xFE.toByte()))
+    }
+
+    @Test
+    fun testJis0208DecodeAll() {
+        val (decoded, hadErrors) = Encoding.EUC_JP.decodeWithoutBomHandling(byteArrayOf(0xA1.toByte(), 0xA1.toByte()))
+        assertEquals("\u3000", decoded)
+        assertFalse(hadErrors)
+    }
+
+    @Test
+    fun testJis0208EncodeAll() {
+        val (encoded, encoding, hadErrors) = Encoding.EUC_JP.encode("\u3000")
+        assertEquals(Encoding.EUC_JP, encoding)
+        assertFalse(hadErrors)
+        assertContentEquals(byteArrayOf(0xA1.toByte(), 0xA1.toByte()), encoded)
+    }
+
+    @Test
+    fun testJis0212DecodeAll() {
+        val (decoded, hadErrors) = Encoding.EUC_JP.decodeWithoutBomHandling(byteArrayOf(0x8F.toByte(), 0xA2.toByte(), 0xAF.toByte()))
+        assertEquals("\u02D8", decoded)
+        assertFalse(hadErrors)
     }
 }

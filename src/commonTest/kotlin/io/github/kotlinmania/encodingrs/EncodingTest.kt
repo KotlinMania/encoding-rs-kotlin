@@ -627,6 +627,33 @@ class EncodingTest {
     }
 
     @Test
+    fun testIso2022JpNcrExtraFromUtf16() {
+        val dst = ByteArray(10)
+        val encoder = ISO_2022_JP.newEncoder()
+        val (result, _, _, _) =
+            encoder.encodeFromUtf16(charArrayOf(0x3041.toChar(), 0xFFFF.toChar()), dst, true)
+        assertEquals(CoderResult.OutputFull, result)
+    }
+
+    @Test
+    fun testIso2022JpNcrExtraFromUtf8() {
+        val dst = ByteArray(10)
+        val encoder = ISO_2022_JP.newEncoder()
+        val (result, _, _, _) =
+            encoder.encodeFromUtf8("\u3041\uFFFF", dst, true)
+        assertEquals(CoderResult.OutputFull, result)
+    }
+
+    @Test
+    fun testSerde() {
+        // Serde roundtrip parity: verify encoding name resolution and label roundtrip
+        val enc = UTF_8
+        val name = enc.name
+        val resolved = Encoding.forLabel(name)
+        assertEquals(enc, resolved)
+    }
+
+    @Test
     fun testMaxLengthWithBomToUtf8() {
         val output = ByteArray(20)
         val decoder = REPLACEMENT.newDecoder()

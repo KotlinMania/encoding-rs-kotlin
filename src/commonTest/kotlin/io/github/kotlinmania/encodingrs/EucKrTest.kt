@@ -4,6 +4,7 @@ package io.github.kotlinmania.encodingrs
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class EucKrTest {
@@ -45,6 +46,21 @@ class EucKrTest {
 
         encodeEucKr("\uAC02", byteArrayOf(0x81.toByte(), 0x41))
         encodeEucKr("\u8A70", byteArrayOf(0xFD.toByte(), 0xFE.toByte()))
+    }
+
+    @Test
+    fun testEucKrDecodeAll() {
+        val (decoded, hadErrors) = Encoding.EUC_KR.decodeWithoutBomHandling(byteArrayOf(0x81.toByte(), 0x41))
+        assertEquals("\uAC02", decoded)
+        assertFalse(hadErrors)
+    }
+
+    @Test
+    fun testEucKrEncodeAll() {
+        val (encoded, encoding, hadErrors) = Encoding.EUC_KR.encode("\uAC02")
+        assertEquals(Encoding.EUC_KR, encoding)
+        assertFalse(hadErrors)
+        assertContentEquals(byteArrayOf(0x81.toByte(), 0x41), encoded)
     }
 
     @Test

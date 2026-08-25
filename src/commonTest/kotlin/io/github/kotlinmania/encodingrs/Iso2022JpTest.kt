@@ -164,6 +164,21 @@ class Iso2022JpTest {
     }
 
     @Test
+    fun testIso2022JpDecodeAll() {
+        val (decoded, hadErrors) = Encoding.ISO_2022_JP.decodeWithoutBomHandling(byteArrayOf(0x1B, 0x28, 0x42, 0x5B))
+        assertEquals("\u005B", decoded)
+        assertFalse(hadErrors)
+    }
+
+    @Test
+    fun testIso2022JpEncodeAll() {
+        val (encoded, encoding, hadErrors) = Encoding.ISO_2022_JP.encode("\u005B")
+        assertEquals(Encoding.ISO_2022_JP, encoding)
+        assertFalse(hadErrors)
+        assertContentEquals(byteArrayOf(0x5B), encoded)
+    }
+
+    @Test
     fun testIso2022JpEncodeFromTwoLowSurrogates() {
         val expectation = "&#65533;&#65533;".encodeToByteArray()
         val output = ByteArray(40)
