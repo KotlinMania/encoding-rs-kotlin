@@ -12,15 +12,31 @@ public class Encoding internal constructor(
         variant is VariantEncoding.SingleByte || variant is VariantEncoding.UserDefined
 
     public fun isAsciiCompatible(): Boolean =
-        this !== REPLACEMENT && this !== UTF_16BE && this !== UTF_16LE && this !== ISO_2022_JP
+        when (variant) {
+            is VariantEncoding.Replacement,
+            is VariantEncoding.Utf16Be,
+            is VariantEncoding.Utf16Le,
+            is VariantEncoding.Iso2022Jp -> false
+            else -> true
+        }
 
-    public fun canEncodeEverything(): Boolean = outputEncoding() === UTF_8
+    public fun isPotentiallyBorrowable(): Boolean =
+        when (variant) {
+            is VariantEncoding.Replacement,
+            is VariantEncoding.Utf16Be,
+            is VariantEncoding.Utf16Le,
+            is VariantEncoding.Iso2022Jp -> false
+            else -> true
+        }
+
+    public fun canEncodeEverything(): Boolean = outputEncoding().name == "UTF-8"
 
     public fun outputEncoding(): Encoding =
-        if (this === REPLACEMENT || this === UTF_16BE || this === UTF_16LE) {
-            UTF_8
-        } else {
-            this
+        when (variant) {
+            is VariantEncoding.Replacement,
+            is VariantEncoding.Utf16Be,
+            is VariantEncoding.Utf16Le -> UTF_8
+            else -> this
         }
 
     public fun newDecoder(): Decoder =
@@ -32,8 +48,10 @@ public class Encoding internal constructor(
     public fun newDecoderWithoutBomHandling(): Decoder =
         Decoder(this, variant.newVariantDecoder(), BomHandling.Off)
 
-    public fun newEncoder(): Encoder =
-        variant.newVariantEncoder(this)
+    public fun newEncoder(): Encoder {
+        val enc = outputEncoding()
+        return enc.variant.newEncoder(enc)
+    }
 
     public fun decode(bytes: ByteArray): Triple<String, Encoding, Boolean> {
         val bomMatch = forBom(bytes)
@@ -45,6 +63,20 @@ public class Encoding internal constructor(
             }
         val (str, hadErrors) = actualEncoding.decodeWithoutBomHandling(withoutBom)
         return Triple(str, actualEncoding, hadErrors)
+    }
+
+    public fun decodeWithBomRemoval(bytes: ByteArray): Pair<String, Boolean> {
+        val withoutBom =
+            if (this === UTF_8 && bytes.size >= 3 && (bytes[0].toInt() and 0xFF) == 0xEF && (bytes[1].toInt() and 0xFF) == 0xBB && (bytes[2].toInt() and 0xFF) == 0xBF) {
+                bytes.copyOfRange(3, bytes.size)
+            } else if ((this === UTF_16LE && bytes.size >= 2 && (bytes[0].toInt() and 0xFF) == 0xFF && (bytes[1].toInt() and 0xFF) == 0xFE) ||
+                (this === UTF_16BE && bytes.size >= 2 && (bytes[0].toInt() and 0xFF) == 0xFE && (bytes[1].toInt() and 0xFF) == 0xFF)
+            ) {
+                bytes.copyOfRange(2, bytes.size)
+            } else {
+                bytes
+            }
+        return decodeWithoutBomHandling(withoutBom)
     }
 
     public fun decodeWithoutBomHandling(bytes: ByteArray): Pair<String, Boolean> {
@@ -746,6 +778,10 @@ public class Encoding internal constructor(
             }
             return null
         }
+
+        public fun asciiValidUpTo(bytes: ByteArray): Int = Ascii.asciiValidUpTo(bytes)
+
+        public fun iso2022JpAsciiValidUpTo(bytes: ByteArray): Int = Ascii.iso2022JpAsciiValidUpTo(bytes)
     }
 }
 
@@ -755,313 +791,403 @@ internal enum class BomHandling {
     Remove,
 }
 
-internal sealed class VariantEncoding {
-    data class SingleByte(
-        val table: CharArray,
-        val runBmpOffset: Int,
-        val runByteOffset: Int,
-        val runLength: Int,
-    ) : VariantEncoding()
 
-    data object Utf8 : VariantEncoding()
-
-    data object Gb18030 : VariantEncoding()
-
-    data object Gbk : VariantEncoding()
-
-    data object Big5 : VariantEncoding()
-
-    data object EucJp : VariantEncoding()
-
-    data object Iso2022Jp : VariantEncoding()
-
-    data object ShiftJis : VariantEncoding()
-
-    data object EucKr : VariantEncoding()
-
-    data object UserDefined : VariantEncoding()
-
-    data object Replacement : VariantEncoding()
-
-    data object Utf16Be : VariantEncoding()
-
-    data object Utf16Le : VariantEncoding()
-
-    fun newVariantDecoder(): VariantDecoder =
-        when (this) {
-            is SingleByte -> VariantDecoder.SingleByte(SingleByteDecoder.new(table))
-            Utf8 -> VariantDecoder.Utf8(Utf8Decoder.new())
-            Gb18030, Gbk -> VariantDecoder.Gb18030(Gb18030Decoder.new())
-            Big5 -> VariantDecoder.Big5(Big5Decoder.new())
-            EucJp -> VariantDecoder.EucJp(EucJpDecoder.new())
-            Iso2022Jp -> VariantDecoder.Iso2022Jp(Iso2022JpDecoder.new())
-            ShiftJis -> VariantDecoder.ShiftJis(ShiftJisDecoder.new())
-            EucKr -> VariantDecoder.EucKr(EucKrDecoder.new())
-            UserDefined -> VariantDecoder.UserDefined(UserDefinedDecoder.new())
-            Replacement -> VariantDecoder.Replacement(ReplacementDecoder.new())
-            Utf16Be -> VariantDecoder.Utf16Be(Utf16Decoder.new(false))
-            Utf16Le -> VariantDecoder.Utf16Le(Utf16Decoder.new(true))
-        }
-
-    fun newVariantEncoder(encoding: Encoding): Encoder =
-        when (this) {
-            is SingleByte -> Encoder(encoding, VariantEncoder.SingleByte(SingleByteEncoder.new(table, runBmpOffset, runByteOffset, runLength)))
-            Utf8 -> Encoder(encoding, VariantEncoder.Utf8)
-            Gb18030 -> Encoder(encoding, VariantEncoder.Gb18030(Gb18030Encoder(extended = true)))
-            Gbk -> Encoder(encoding, VariantEncoder.Gbk(Gb18030Encoder(extended = false)))
-            Big5 -> Encoder(encoding, VariantEncoder.Big5(Big5Encoder()))
-            EucJp -> Encoder(encoding, VariantEncoder.EucJp(EucJpEncoder()))
-            Iso2022Jp -> Encoder(encoding, VariantEncoder.Iso2022Jp(Iso2022JpEncoder()))
-            ShiftJis -> Encoder(encoding, VariantEncoder.ShiftJis(ShiftJisEncoder()))
-            EucKr -> Encoder(encoding, VariantEncoder.EucKr(EucKrEncoder()))
-            UserDefined -> Encoder(encoding, VariantEncoder.UserDefined(UserDefinedEncoder()))
-            Replacement -> Encoder(encoding, VariantEncoder.Replacement)
-            Utf16Be -> Encoder(encoding, VariantEncoder.Utf16Be)
-            Utf16Le -> Encoder(encoding, VariantEncoder.Utf16Le)
-        }
-}
-
-internal sealed class VariantDecoder {
-    data class SingleByte(
-        val decoder: SingleByteDecoder,
-    ) : VariantDecoder()
-
-    data class Utf8(
-        val decoder: Utf8Decoder,
-    ) : VariantDecoder()
-
-    data class Gb18030(
-        val decoder: Gb18030Decoder,
-    ) : VariantDecoder()
-
-    data class Big5(
-        val decoder: Big5Decoder,
-    ) : VariantDecoder()
-
-    data class EucJp(
-        val decoder: EucJpDecoder,
-    ) : VariantDecoder()
-
-    data class Iso2022Jp(
-        val decoder: Iso2022JpDecoder,
-    ) : VariantDecoder()
-
-    data class ShiftJis(
-        val decoder: ShiftJisDecoder,
-    ) : VariantDecoder()
-
-    data class EucKr(
-        val decoder: EucKrDecoder,
-    ) : VariantDecoder()
-
-    data class UserDefined(
-        val decoder: UserDefinedDecoder,
-    ) : VariantDecoder()
-
-    data class Replacement(
-        val decoder: ReplacementDecoder,
-    ) : VariantDecoder()
-
-    data class Utf16Be(
-        val decoder: Utf16Decoder,
-    ) : VariantDecoder()
-
-    data class Utf16Le(
-        val decoder: Utf16Decoder,
-    ) : VariantDecoder()
-
-    fun maxUtf16BufferLength(byteLength: Int): Int? =
-        when (this) {
-            is SingleByte -> decoder.maxUtf16BufferLength(byteLength)
-            is Utf8 -> decoder.maxUtf16BufferLength(byteLength)
-            is Gb18030 -> decoder.maxUtf16BufferLength(byteLength)
-            is Big5 -> decoder.maxUtf16BufferLength(byteLength)
-            is EucJp -> decoder.maxUtf16BufferLength(byteLength)
-            is Iso2022Jp -> decoder.maxUtf16BufferLength(byteLength)
-            is ShiftJis -> decoder.maxUtf16BufferLength(byteLength)
-            is EucKr -> decoder.maxUtf16BufferLength(byteLength)
-            is UserDefined -> decoder.maxUtf16BufferLength(byteLength)
-            is Replacement -> decoder.maxUtf16BufferLength(byteLength)
-            is Utf16Be -> decoder.maxUtf16BufferLength(byteLength)
-            is Utf16Le -> decoder.maxUtf16BufferLength(byteLength)
-        }
-
-    fun maxUtf8BufferLength(byteLength: Int): Int? =
-        when (this) {
-            is SingleByte -> decoder.maxUtf8BufferLength(byteLength)
-            is Utf8 -> decoder.maxUtf8BufferLength(byteLength)
-            is Gb18030 -> decoder.maxUtf8BufferLength(byteLength)
-            is Big5 -> decoder.maxUtf8BufferLength(byteLength)
-            is EucJp -> decoder.maxUtf8BufferLength(byteLength)
-            is Iso2022Jp -> decoder.maxUtf8BufferLength(byteLength)
-            is ShiftJis -> decoder.maxUtf8BufferLength(byteLength)
-            is EucKr -> decoder.maxUtf8BufferLength(byteLength)
-            is UserDefined -> decoder.maxUtf8BufferLength(byteLength)
-            is Replacement -> decoder.maxUtf8BufferLength(byteLength)
-            is Utf16Be -> decoder.maxUtf8BufferLength(byteLength)
-            is Utf16Le -> decoder.maxUtf8BufferLength(byteLength)
-        }
-
-    fun maxUtf8BufferLengthWithoutReplacement(byteLength: Int): Int? =
-        when (this) {
-            is SingleByte -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
-            is Utf8 -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
-            is Gb18030 -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
-            is Big5 -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
-            is EucJp -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
-            is Iso2022Jp -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
-            is ShiftJis -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
-            is EucKr -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
-            is UserDefined -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
-            is Replacement -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
-            is Utf16Be -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
-            is Utf16Le -> decoder.maxUtf8BufferLengthWithoutReplacement(byteLength)
-        }
-
-    fun decodeToUtf16Raw(src: ByteArray, dst: CharArray, last: Boolean): Triple<DecoderResult, Int, Int> =
-        when (this) {
-            is SingleByte -> decoder.decodeToUtf16Raw(src, dst, last)
-            is Utf8 -> decoder.decodeToUtf16Raw(src, dst, last)
-            is Gb18030 -> decoder.decodeToUtf16Raw(src, dst, last)
-            is Big5 -> decoder.decodeToUtf16Raw(src, dst, last)
-            is EucJp -> decoder.decodeToUtf16Raw(src, dst, last)
-            is Iso2022Jp -> decoder.decodeToUtf16Raw(src, dst, last)
-            is ShiftJis -> decoder.decodeToUtf16Raw(src, dst, last)
-            is EucKr -> decoder.decodeToUtf16Raw(src, dst, last)
-            is UserDefined -> decoder.decodeToUtf16Raw(src, dst, last)
-            is Replacement -> decoder.decodeToUtf16Raw(src, dst, last)
-            is Utf16Be -> decoder.decodeToUtf16Raw(src, dst, last)
-            is Utf16Le -> decoder.decodeToUtf16Raw(src, dst, last)
-        }
-}
-
-internal sealed class VariantEncoder {
-    data class SingleByte(
-        val encoder: SingleByteEncoder,
-    ) : VariantEncoder()
-
-    data object Utf8 : VariantEncoder()
-
-    data class Gb18030(
-        val encoder: Gb18030Encoder,
-    ) : VariantEncoder()
-
-    data class Gbk(
-        val encoder: Gb18030Encoder,
-    ) : VariantEncoder()
-
-    data class Big5(
-        val encoder: Big5Encoder,
-    ) : VariantEncoder()
-
-    data class EucJp(
-        val encoder: EucJpEncoder,
-    ) : VariantEncoder()
-
-    data class Iso2022Jp(
-        val encoder: Iso2022JpEncoder,
-    ) : VariantEncoder()
-
-    data class ShiftJis(
-        val encoder: ShiftJisEncoder,
-    ) : VariantEncoder()
-
-    data class EucKr(
-        val encoder: EucKrEncoder,
-    ) : VariantEncoder()
-
-    data class UserDefined(
-        val encoder: UserDefinedEncoder,
-    ) : VariantEncoder()
-
-    data object Replacement : VariantEncoder()
-
-    data object Utf16Be : VariantEncoder()
-
-    data object Utf16Le : VariantEncoder()
-
-    fun maxBufferLengthFromUtf16WithoutReplacement(u16Length: Int): Int? =
-        when (this) {
-            is SingleByte -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
-            is UserDefined -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
-            Utf8 -> if (u16Length > Int.MAX_VALUE / 3) null else u16Length * 3
-            is Gb18030 -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
-            is Gbk -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
-            is Big5 -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
-            is EucJp -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
-            is Iso2022Jp -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
-            is ShiftJis -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
-            is EucKr -> encoder.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
-            Utf16Be, Utf16Le -> if (u16Length > Int.MAX_VALUE / 2) null else u16Length * 2
-            Replacement -> u16Length
-        }
-
-    fun encodeFromUtf16Raw(src: CharArray, dst: ByteArray, last: Boolean): Triple<EncoderResult, Int, Int> =
-        when (this) {
-            is SingleByte -> encoder.encodeFromUtf16Raw(src, dst, last)
-            is UserDefined -> encoder.encodeFromUtf16Raw(src, dst, last)
-            Utf8 -> Utf8Encoder().encodeFromUtf16Raw(src, dst, last)
-            is Gb18030 -> encoder.encodeFromUtf16Raw(src, dst, last)
-            is Gbk -> encoder.encodeFromUtf16Raw(src, dst, last)
-            is Big5 -> encoder.encodeFromUtf16Raw(src, dst, last)
-            is EucJp -> encoder.encodeFromUtf16Raw(src, dst, last)
-            is Iso2022Jp -> encoder.encodeFromUtf16Raw(src, dst, last)
-            is ShiftJis -> encoder.encodeFromUtf16Raw(src, dst, last)
-            is EucKr -> encoder.encodeFromUtf16Raw(src, dst, last)
-            Utf16Be -> {
-                var s = 0
-                var d = 0
-                while (s < src.size) {
-                    if (d + 2 > dst.size) return Triple(EncoderResult.OutputFull, s, d)
-                    val code = src[s++].code
-                    dst[d++] = (code shr 8).toByte()
-                    dst[d++] = (code and 0xFF).toByte()
-                }
-                Triple(EncoderResult.InputEmpty, s, d)
-            }
-            Utf16Le -> {
-                var s = 0
-                var d = 0
-                while (s < src.size) {
-                    if (d + 2 > dst.size) return Triple(EncoderResult.OutputFull, s, d)
-                    val code = src[s++].code
-                    dst[d++] = (code and 0xFF).toByte()
-                    dst[d++] = (code shr 8).toByte()
-                }
-                Triple(EncoderResult.InputEmpty, s, d)
-            }
-            Replacement -> {
-                var s = 0
-                var d = 0
-                while (s < src.size && d < dst.size) {
-                    dst[d++] = src[s++].code.toByte()
-                }
-                Triple(EncoderResult.InputEmpty, s, d)
-            }
-        }
-
-    fun encodeFromUtf8Raw(src: String, dst: ByteArray, last: Boolean): Triple<EncoderResult, Int, Int> =
-        when (this) {
-            Utf8 -> Utf8Encoder().encodeFromUtf8Raw(src, dst, last)
-            else -> encodeFromUtf16Raw(src.toCharArray(), dst, last)
-        }
+internal enum class DecoderLifeCycle {
+    AtStart,
+    AtUtf8Start,
+    AtUtf16BeStart,
+    AtUtf16LeStart,
+    SeenUtf8First,
+    SeenUtf8Second,
+    SeenUtf16BeFirst,
+    SeenUtf16LeFirst,
+    ConvertingWithPendingBB,
+    Converting,
+    Finished,
 }
 
 public class Decoder internal constructor(
     private var encoding: Encoding,
     private var variant: VariantDecoder,
-    private val sniffing: BomHandling,
+    sniffing: BomHandling,
 ) {
+    private var lifeCycle: DecoderLifeCycle =
+        when (sniffing) {
+            BomHandling.Off -> DecoderLifeCycle.Converting
+            BomHandling.Sniff -> DecoderLifeCycle.AtStart
+            BomHandling.Remove ->
+                when (encoding.name) {
+                    "UTF-8" -> DecoderLifeCycle.AtUtf8Start
+                    "UTF-16BE" -> DecoderLifeCycle.AtUtf16BeStart
+                    "UTF-16LE" -> DecoderLifeCycle.AtUtf16LeStart
+                    else -> DecoderLifeCycle.Converting
+                }
+        }
+
     public fun encoding(): Encoding = encoding
 
     public fun maxUtf16BufferLength(byteLength: Int): Int? =
-        variant.maxUtf16BufferLength(byteLength)
+        when (lifeCycle) {
+            DecoderLifeCycle.Converting,
+            DecoderLifeCycle.AtUtf8Start,
+            DecoderLifeCycle.AtUtf16LeStart,
+            DecoderLifeCycle.AtUtf16BeStart -> variant.maxUtf16BufferLength(byteLength)
+            DecoderLifeCycle.AtStart -> {
+                val utf8Bom = byteLength + 1
+                val utf16Bom = 1 + (byteLength + 1) / 2
+                val utfBom = maxOf(utf8Bom, utf16Bom)
+                val enc = encoding()
+                if (enc.name == "UTF-8" || enc.name == "UTF-16LE" || enc.name == "UTF-16BE") {
+                    utfBom
+                } else {
+                    val nonBom = variant.maxUtf16BufferLength(byteLength) ?: return null
+                    maxOf(utfBom, nonBom)
+                }
+            }
+            DecoderLifeCycle.SeenUtf8First,
+            DecoderLifeCycle.SeenUtf8Second -> {
+                val sum = byteLength + 2
+                val utf8Bom = sum + 1
+                if (encoding().name == "UTF-8") {
+                    utf8Bom
+                } else {
+                    val nonBom = variant.maxUtf16BufferLength(sum) ?: return null
+                    maxOf(utf8Bom, nonBom)
+                }
+            }
+            DecoderLifeCycle.ConvertingWithPendingBB -> variant.maxUtf16BufferLength(byteLength + 2)
+            DecoderLifeCycle.SeenUtf16LeFirst,
+            DecoderLifeCycle.SeenUtf16BeFirst -> {
+                val sum = byteLength + 2
+                val utf16Bom = 1 + (sum + 1) / 2
+                if (encoding().name == "UTF-16LE" || encoding().name == "UTF-16BE") {
+                    utf16Bom
+                } else {
+                    val nonBom = variant.maxUtf16BufferLength(sum) ?: return null
+                    maxOf(utf16Bom, nonBom)
+                }
+            }
+            DecoderLifeCycle.Finished -> error("Must not use a decoder that has finished.")
+        }
 
     public fun maxUtf8BufferLength(byteLength: Int): Int? =
-        variant.maxUtf8BufferLength(byteLength)
+        when (lifeCycle) {
+            DecoderLifeCycle.Converting,
+            DecoderLifeCycle.AtUtf8Start,
+            DecoderLifeCycle.AtUtf16LeStart,
+            DecoderLifeCycle.AtUtf16BeStart -> variant.maxUtf8BufferLength(byteLength)
+            DecoderLifeCycle.AtStart -> {
+                val utf8Bom = 3 + byteLength * 3
+                val utf16Bom = 1 + 3 * ((byteLength + 1) / 2)
+                val utfBom = maxOf(utf8Bom, utf16Bom)
+                val enc = encoding()
+                if (enc.name == "UTF-8" || enc.name == "UTF-16LE" || enc.name == "UTF-16BE") {
+                    utfBom
+                } else {
+                    val nonBom = variant.maxUtf8BufferLength(byteLength) ?: return null
+                    maxOf(utfBom, nonBom)
+                }
+            }
+            DecoderLifeCycle.SeenUtf8First,
+            DecoderLifeCycle.SeenUtf8Second -> {
+                val sum = byteLength + 2
+                val utf8Bom = 3 + sum * 3
+                if (encoding().name == "UTF-8") {
+                    utf8Bom
+                } else {
+                    val nonBom = variant.maxUtf8BufferLength(sum) ?: return null
+                    maxOf(utf8Bom, nonBom)
+                }
+            }
+            DecoderLifeCycle.ConvertingWithPendingBB -> variant.maxUtf8BufferLength(byteLength + 2)
+            DecoderLifeCycle.SeenUtf16LeFirst,
+            DecoderLifeCycle.SeenUtf16BeFirst -> {
+                val sum = byteLength + 2
+                val utf16Bom = 1 + 3 * ((sum + 1) / 2)
+                if (encoding().name == "UTF-16LE" || encoding().name == "UTF-16BE") {
+                    utf16Bom
+                } else {
+                    val nonBom = variant.maxUtf8BufferLength(sum) ?: return null
+                    maxOf(utf16Bom, nonBom)
+                }
+            }
+            DecoderLifeCycle.Finished -> error("Must not use a decoder that has finished.")
+        }
 
     public fun maxUtf8BufferLengthWithoutReplacement(byteLength: Int): Int? =
-        variant.maxUtf8BufferLengthWithoutReplacement(byteLength)
+        when (lifeCycle) {
+            DecoderLifeCycle.Converting,
+            DecoderLifeCycle.AtUtf8Start,
+            DecoderLifeCycle.AtUtf16LeStart,
+            DecoderLifeCycle.AtUtf16BeStart -> variant.maxUtf8BufferLengthWithoutReplacement(byteLength)
+            DecoderLifeCycle.AtStart -> {
+                val utf8Bom = byteLength + 3
+                val utf16Bom = 1 + 3 * ((byteLength + 1) / 2)
+                val utfBom = maxOf(utf8Bom, utf16Bom)
+                val enc = encoding()
+                if (enc.name == "UTF-8" || enc.name == "UTF-16LE" || enc.name == "UTF-16BE") {
+                    utfBom
+                } else {
+                    val nonBom = variant.maxUtf8BufferLengthWithoutReplacement(byteLength) ?: return null
+                    maxOf(utfBom, nonBom)
+                }
+            }
+            DecoderLifeCycle.SeenUtf8First,
+            DecoderLifeCycle.SeenUtf8Second -> {
+                val sum = byteLength + 2
+                val utf8Bom = sum + 3
+                if (encoding().name == "UTF-8") {
+                    utf8Bom
+                } else {
+                    val nonBom = variant.maxUtf8BufferLengthWithoutReplacement(sum) ?: return null
+                    maxOf(utf8Bom, nonBom)
+                }
+            }
+            DecoderLifeCycle.ConvertingWithPendingBB -> variant.maxUtf8BufferLengthWithoutReplacement(byteLength + 2)
+            DecoderLifeCycle.SeenUtf16LeFirst,
+            DecoderLifeCycle.SeenUtf16BeFirst -> {
+                val sum = byteLength + 2
+                val utf16Bom = 1 + 3 * ((sum + 1) / 2)
+                if (encoding().name == "UTF-16LE" || encoding().name == "UTF-16BE") {
+                    utf16Bom
+                } else {
+                    val nonBom = variant.maxUtf8BufferLengthWithoutReplacement(sum) ?: return null
+                    maxOf(utf16Bom, nonBom)
+                }
+            }
+            DecoderLifeCycle.Finished -> error("Must not use a decoder that has finished.")
+        }
+
+    public fun decodeToUtf16WithoutReplacement(
+        src: ByteArray,
+        dst: CharArray,
+        last: Boolean = false,
+    ): Triple<DecoderResult, Int, Int> {
+        var offset = 0
+        while (true) {
+            when (lifeCycle) {
+                DecoderLifeCycle.Converting -> {
+                    val currentSlice = if (offset == 0) src else src.copyOfRange(offset, src.size)
+                    val (res, read, written) = variant.decodeToUtf16Raw(currentSlice, dst, last)
+                    return Triple(res, read + offset, written)
+                }
+                DecoderLifeCycle.AtStart -> {
+                    if (src.isEmpty()) {
+                        return Triple(DecoderResult.InputEmpty, 0, 0)
+                    }
+                    when (src[0].toInt() and 0xFF) {
+                        0xEF -> {
+                            lifeCycle = DecoderLifeCycle.SeenUtf8First
+                            offset += 1
+                            continue
+                        }
+                        0xFE -> {
+                            lifeCycle = DecoderLifeCycle.SeenUtf16BeFirst
+                            offset += 1
+                            continue
+                        }
+                        0xFF -> {
+                            lifeCycle = DecoderLifeCycle.SeenUtf16LeFirst
+                            offset += 1
+                            continue
+                        }
+                        else -> {
+                            lifeCycle = DecoderLifeCycle.Converting
+                            continue
+                        }
+                    }
+                }
+                DecoderLifeCycle.AtUtf8Start -> {
+                    if (src.isEmpty()) {
+                        return Triple(DecoderResult.InputEmpty, 0, 0)
+                    }
+                    if ((src[0].toInt() and 0xFF) == 0xEF) {
+                        lifeCycle = DecoderLifeCycle.SeenUtf8First
+                        offset += 1
+                        continue
+                    } else {
+                        lifeCycle = DecoderLifeCycle.Converting
+                        continue
+                    }
+                }
+                DecoderLifeCycle.AtUtf16BeStart -> {
+                    if (src.isEmpty()) {
+                        return Triple(DecoderResult.InputEmpty, 0, 0)
+                    }
+                    if ((src[0].toInt() and 0xFF) == 0xFE) {
+                        lifeCycle = DecoderLifeCycle.SeenUtf16BeFirst
+                        offset += 1
+                        continue
+                    } else {
+                        lifeCycle = DecoderLifeCycle.Converting
+                        continue
+                    }
+                }
+                DecoderLifeCycle.AtUtf16LeStart -> {
+                    if (src.isEmpty()) {
+                        return Triple(DecoderResult.InputEmpty, 0, 0)
+                    }
+                    if ((src[0].toInt() and 0xFF) == 0xFF) {
+                        lifeCycle = DecoderLifeCycle.SeenUtf16LeFirst
+                        offset += 1
+                        continue
+                    } else {
+                        lifeCycle = DecoderLifeCycle.Converting
+                        continue
+                    }
+                }
+                DecoderLifeCycle.SeenUtf8First -> {
+                    if (offset >= src.size) {
+                        if (last) {
+                            return decodeToUtf16AfterOnePotentialBomByte(src, dst, last, offset, 0xEF.toByte())
+                        }
+                        return Triple(DecoderResult.InputEmpty, offset, 0)
+                    }
+                    if ((src[offset].toInt() and 0xFF) == 0xBB) {
+                        lifeCycle = DecoderLifeCycle.SeenUtf8Second
+                        offset += 1
+                        continue
+                    }
+                    return decodeToUtf16AfterOnePotentialBomByte(src, dst, last, offset, 0xEF.toByte())
+                }
+                DecoderLifeCycle.SeenUtf8Second -> {
+                    if (offset >= src.size) {
+                        if (last) {
+                            return decodeToUtf16AfterTwoPotentialBomBytes(src, dst, last, offset)
+                        }
+                        return Triple(DecoderResult.InputEmpty, offset, 0)
+                    }
+                    if ((src[offset].toInt() and 0xFF) == 0xBF) {
+                        lifeCycle = DecoderLifeCycle.Converting
+                        offset += 1
+                        if (encoding.name != "UTF-8") {
+                            encoding = UTF_8
+                            variant = UTF_8.variant.newVariantDecoder()
+                        }
+                        continue
+                    }
+                    return decodeToUtf16AfterTwoPotentialBomBytes(src, dst, last, offset)
+                }
+                DecoderLifeCycle.SeenUtf16BeFirst -> {
+                    if (offset >= src.size) {
+                        if (last) {
+                            return decodeToUtf16AfterOnePotentialBomByte(src, dst, last, offset, 0xFE.toByte())
+                        }
+                        return Triple(DecoderResult.InputEmpty, offset, 0)
+                    }
+                    if ((src[offset].toInt() and 0xFF) == 0xFF) {
+                        lifeCycle = DecoderLifeCycle.Converting
+                        offset += 1
+                        if (encoding.name != "UTF-16BE") {
+                            encoding = UTF_16BE
+                            variant = UTF_16BE.variant.newVariantDecoder()
+                        }
+                        continue
+                    }
+                    return decodeToUtf16AfterOnePotentialBomByte(src, dst, last, offset, 0xFE.toByte())
+                }
+                DecoderLifeCycle.SeenUtf16LeFirst -> {
+                    if (offset >= src.size) {
+                        if (last) {
+                            return decodeToUtf16AfterOnePotentialBomByte(src, dst, last, offset, 0xFF.toByte())
+                        }
+                        return Triple(DecoderResult.InputEmpty, offset, 0)
+                    }
+                    if ((src[offset].toInt() and 0xFF) == 0xFE) {
+                        lifeCycle = DecoderLifeCycle.Converting
+                        offset += 1
+                        if (encoding.name != "UTF-16LE") {
+                            encoding = UTF_16LE
+                            variant = UTF_16LE.variant.newVariantDecoder()
+                        }
+                        continue
+                    }
+                    return decodeToUtf16AfterOnePotentialBomByte(src, dst, last, offset, 0xFF.toByte())
+                }
+                DecoderLifeCycle.ConvertingWithPendingBB -> {
+                    return decodeToUtf16AfterOnePotentialBomByte(src, dst, last, 0, 0xBB.toByte())
+                }
+                DecoderLifeCycle.Finished -> error("Must not use a decoder that has finished.")
+            }
+        }
+    }
+
+    private fun decodeToUtf16AfterOnePotentialBomByte(
+        src: ByteArray,
+        dst: CharArray,
+        last: Boolean,
+        offset: Int,
+        firstByte: Byte,
+    ): Triple<DecoderResult, Int, Int> {
+        lifeCycle = DecoderLifeCycle.Converting
+        if (offset == 0) {
+            val first = byteArrayOf(firstByte)
+            var (firstResult, _, firstWritten) = variant.decodeToUtf16Raw(first, dst, false)
+            var outRead = 0
+            when (firstResult) {
+                is DecoderResult.InputEmpty -> {
+                    val subDst = dst.copyOfRange(firstWritten, dst.size)
+                    val (result, read, written) = variant.decodeToUtf16Raw(src, subDst, last)
+                    subDst.copyInto(dst, destinationOffset = firstWritten, startIndex = 0, endIndex = written)
+                    firstResult = result
+                    outRead = read
+                    firstWritten += written
+                }
+                is DecoderResult.Malformed -> {
+                    // Not read from src
+                }
+                is DecoderResult.OutputFull -> {
+                    error("Output buffer must have been too small.")
+                }
+            }
+            return Triple(firstResult, outRead, firstWritten)
+        }
+        return variant.decodeToUtf16Raw(src, dst, last)
+    }
+
+    private fun decodeToUtf16AfterTwoPotentialBomBytes(
+        src: ByteArray,
+        dst: CharArray,
+        last: Boolean,
+        offset: Int,
+    ): Triple<DecoderResult, Int, Int> {
+        lifeCycle = DecoderLifeCycle.Converting
+        if (offset == 0) {
+            val efBb = byteArrayOf(0xEF.toByte(), 0xBB.toByte())
+            var (firstResult, firstRead, firstWritten) = variant.decodeToUtf16Raw(efBb, dst, false)
+            var outRead = 0
+            when (firstResult) {
+                is DecoderResult.InputEmpty -> {
+                    val subDst = dst.copyOfRange(firstWritten, dst.size)
+                    val (result, read, written) = variant.decodeToUtf16Raw(src, subDst, last)
+                    subDst.copyInto(dst, destinationOffset = firstWritten, startIndex = 0, endIndex = written)
+                    firstResult = result
+                    outRead = read
+                    firstWritten += written
+                }
+                is DecoderResult.Malformed -> {
+                    if (firstRead == 1) {
+                        lifeCycle = DecoderLifeCycle.ConvertingWithPendingBB
+                    }
+                    outRead = 0
+                }
+                is DecoderResult.OutputFull -> {
+                    error("Output buffer must have been too small.")
+                }
+            }
+            return Triple(firstResult, outRead, firstWritten)
+        }
+        if (offset == 1) {
+            return decodeToUtf16AfterOnePotentialBomByte(src, dst, last, 0, 0xEF.toByte())
+        }
+        return variant.decodeToUtf16Raw(src, dst, last)
+    }
+
+    public fun decodeToUtf16Raw(
+        src: ByteArray,
+        dst: CharArray,
+        last: Boolean = false,
+    ): Triple<DecoderResult, Int, Int> = decodeToUtf16WithoutReplacement(src, dst, last)
 
     public fun decodeToUtf8WithoutReplacement(
         src: ByteArray,
@@ -1069,7 +1195,7 @@ public class Decoder internal constructor(
         last: Boolean = false,
     ): Triple<DecoderResult, Int, Int> {
         val tempDst = CharArray(dst.size)
-        val (result, read, written) = decodeToUtf16Raw(src, tempDst, last)
+        val (result, read, written) = decodeToUtf16WithoutReplacement(src, tempDst, last)
         when (result) {
             is DecoderResult.Malformed -> return Triple(result, read, 0)
             is DecoderResult.OutputFull -> return Triple(result, read, 0)
@@ -1085,32 +1211,6 @@ public class Decoder internal constructor(
         }
     }
 
-    public fun decodeToUtf16Raw(
-        src: ByteArray,
-        dst: CharArray,
-        last: Boolean = false,
-    ): Triple<DecoderResult, Int, Int> {
-        var input = src
-        var bomOffset = 0
-        if (sniffing == BomHandling.Sniff) {
-            val bom = Encoding.forBom(src)
-            if (bom != null) {
-                encoding = bom.first
-                variant = encoding.variant.newVariantDecoder()
-                bomOffset = bom.second
-                input = src.copyOfRange(bomOffset, src.size)
-            }
-        } else if (sniffing == BomHandling.Remove) {
-            val bom = Encoding.forBom(src)
-            if (bom != null && bom.first === encoding) {
-                bomOffset = bom.second
-                input = src.copyOfRange(bomOffset, src.size)
-            }
-        }
-        val (result, read, written) = variant.decodeToUtf16Raw(input, dst, last)
-        return Triple(result, read + bomOffset, written)
-    }
-
     public fun decodeToUtf16(
         src: ByteArray,
         dst: CharArray,
@@ -1119,33 +1219,11 @@ public class Decoder internal constructor(
         var totalRead = 0
         var totalWritten = 0
         var hadErrors = false
-        var input = src
-        var bomOffset = 0
-        if (sniffing == BomHandling.Sniff) {
-            val bom = Encoding.forBom(src)
-            if (bom != null) {
-                encoding = bom.first
-                variant = encoding.variant.newVariantDecoder()
-                bomOffset = bom.second
-                input = src.copyOfRange(bomOffset, src.size)
-                totalRead += bomOffset
-            }
-        } else if (sniffing == BomHandling.Remove) {
-            val bom = Encoding.forBom(src)
-            if (bom != null && bom.first === encoding) {
-                bomOffset = bom.second
-                input = src.copyOfRange(bomOffset, src.size)
-                totalRead += bomOffset
-            }
-        }
-
-        var inPos = 0
         while (true) {
-            val currentSlice = input.copyOfRange(inPos, input.size)
+            val currentSlice = if (totalRead == 0) src else src.copyOfRange(totalRead, src.size)
             val currentDst = CharArray(dst.size - totalWritten)
-            val (result, read, written) = variant.decodeToUtf16Raw(currentSlice, currentDst, last)
+            val (result, read, written) = decodeToUtf16WithoutReplacement(currentSlice, currentDst, last)
             currentDst.copyInto(dst, destinationOffset = totalWritten, startIndex = 0, endIndex = written)
-            inPos += read
             totalRead += read
             totalWritten += written
             when (result) {
@@ -1165,6 +1243,48 @@ public class Decoder internal constructor(
             }
         }
     }
+
+    public fun decodeToUtf8(
+        src: ByteArray,
+        dst: ByteArray,
+        last: Boolean = false,
+    ): DecodeResult {
+        var totalRead = 0
+        var totalWritten = 0
+        var hadErrors = false
+        while (true) {
+            val currentSlice = if (totalRead == 0) src else src.copyOfRange(totalRead, src.size)
+            val currentDst = ByteArray(dst.size - totalWritten)
+            val (result, read, written) = decodeToUtf8WithoutReplacement(currentSlice, currentDst, last)
+            currentDst.copyInto(dst, destinationOffset = totalWritten, startIndex = 0, endIndex = written)
+            totalRead += read
+            totalWritten += written
+            when (result) {
+                is DecoderResult.InputEmpty -> {
+                    return DecodeResult(CoderResult.InputEmpty, totalRead, totalWritten, hadErrors)
+                }
+                is DecoderResult.OutputFull -> {
+                    return DecodeResult(CoderResult.OutputFull, totalRead, totalWritten, hadErrors)
+                }
+                is DecoderResult.Malformed -> {
+                    hadErrors = true
+                    val replacement = byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte())
+                    if (totalWritten + 3 > dst.size) {
+                        return DecodeResult(CoderResult.OutputFull, totalRead, totalWritten, hadErrors)
+                    }
+                    replacement.copyInto(dst, destinationOffset = totalWritten)
+                    totalWritten += 3
+                }
+            }
+        }
+    }
+
+    public fun latin1ByteCompatibleUpTo(buffer: ByteArray): Int? =
+        when (lifeCycle) {
+            DecoderLifeCycle.Converting -> variant.latin1ByteCompatibleUpTo(buffer)
+            DecoderLifeCycle.Finished -> error("Must not use a decoder that has finished.")
+            else -> null
+        }
 }
 
 public class Encoder internal constructor(
@@ -1172,6 +1292,8 @@ public class Encoder internal constructor(
     private val variant: VariantEncoder,
 ) {
     public fun encoding(): Encoding = encoding
+
+    public fun hasPendingState(): Boolean = variant.hasPendingState()
 
     public fun maxBufferLengthFromUtf16WithoutReplacement(u16Length: Int): Int? =
         variant.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
@@ -1206,6 +1328,15 @@ public class Encoder internal constructor(
         last: Boolean = false,
     ): Triple<EncoderResult, Int, Int> =
         encodeFromUtf8Raw(src, dst, last)
+
+    public fun encodeFromUtf8(
+        src: String,
+        dst: ByteArray,
+        last: Boolean = false,
+    ): EncodeResult {
+        val chars = src.toCharArray()
+        return encodeFromUtf16(chars, dst, last)
+    }
 
     public fun encodeFromUtf16(
         src: CharArray,
@@ -1250,3 +1381,45 @@ public class Encoder internal constructor(
         return EncodeResult(CoderResult.InputEmpty, totalRead, totalWritten, hadErrors)
     }
 }
+
+public val BIG5: Encoding = Encoding.BIG5
+public val EUC_JP: Encoding = Encoding.EUC_JP
+public val EUC_KR: Encoding = Encoding.EUC_KR
+public val GB18030: Encoding = Encoding.GB18030
+public val GBK: Encoding = Encoding.GBK
+public val IBM866: Encoding = Encoding.IBM866
+public val ISO_2022_JP: Encoding = Encoding.ISO_2022_JP
+public val ISO_8859_10: Encoding = Encoding.ISO_8859_10
+public val ISO_8859_13: Encoding = Encoding.ISO_8859_13
+public val ISO_8859_14: Encoding = Encoding.ISO_8859_14
+public val ISO_8859_15: Encoding = Encoding.ISO_8859_15
+public val ISO_8859_16: Encoding = Encoding.ISO_8859_16
+public val ISO_8859_2: Encoding = Encoding.ISO_8859_2
+public val ISO_8859_3: Encoding = Encoding.ISO_8859_3
+public val ISO_8859_4: Encoding = Encoding.ISO_8859_4
+public val ISO_8859_5: Encoding = Encoding.ISO_8859_5
+public val ISO_8859_6: Encoding = Encoding.ISO_8859_6
+public val ISO_8859_7: Encoding = Encoding.ISO_8859_7
+public val ISO_8859_8: Encoding = Encoding.ISO_8859_8
+public val ISO_8859_8_I: Encoding = Encoding.ISO_8859_8_I
+public val KOI8_R: Encoding = Encoding.KOI8_R
+public val KOI8_U: Encoding = Encoding.KOI8_U
+public val MACINTOSH: Encoding = Encoding.MACINTOSH
+public val REPLACEMENT: Encoding = Encoding.REPLACEMENT
+public val SHIFT_JIS: Encoding = Encoding.SHIFT_JIS
+public val UTF_16BE: Encoding = Encoding.UTF_16BE
+public val UTF_16LE: Encoding = Encoding.UTF_16LE
+public val UTF_8: Encoding = Encoding.UTF_8
+public val WINDOWS_1250: Encoding = Encoding.WINDOWS_1250
+public val WINDOWS_1251: Encoding = Encoding.WINDOWS_1251
+public val WINDOWS_1252: Encoding = Encoding.WINDOWS_1252
+public val WINDOWS_1253: Encoding = Encoding.WINDOWS_1253
+public val WINDOWS_1254: Encoding = Encoding.WINDOWS_1254
+public val WINDOWS_1255: Encoding = Encoding.WINDOWS_1255
+public val WINDOWS_1256: Encoding = Encoding.WINDOWS_1256
+public val WINDOWS_1257: Encoding = Encoding.WINDOWS_1257
+public val WINDOWS_1258: Encoding = Encoding.WINDOWS_1258
+public val WINDOWS_874: Encoding = Encoding.WINDOWS_874
+public val X_MAC_CYRILLIC: Encoding = Encoding.X_MAC_CYRILLIC
+public val X_USER_DEFINED: Encoding = Encoding.X_USER_DEFINED
+
