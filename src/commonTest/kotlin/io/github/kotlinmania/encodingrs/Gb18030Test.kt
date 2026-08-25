@@ -152,11 +152,12 @@ class Gb18030Test {
         val encoder = Encoding.GB18030.newEncoder()
         val needed = encoder.maxBufferLengthFromUtf16WithoutReplacement(1)!!
         val output = ByteArray(needed)
-        val (result, read, written) = encoder.encodeFromUtf16WithoutReplacement(
-            charArrayOf('\u3000'),
-            output,
-            true
-        )
+        val (result, read, written) =
+            encoder.encodeFromUtf16WithoutReplacement(
+                charArrayOf('\u3000'),
+                output,
+                true,
+            )
         assertEquals(EncoderResult.InputEmpty, result)
         assertEquals(1, read)
         assertEquals(2, written)

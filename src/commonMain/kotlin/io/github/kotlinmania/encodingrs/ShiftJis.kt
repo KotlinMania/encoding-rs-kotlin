@@ -193,21 +193,22 @@ public class ShiftJisEncoder internal constructor() {
     private fun encodeKanji(bmp: Int): Pair<Int, Int>? {
         val level1 = jis0208Level1KanjiShiftJisEncode(bmp)
         if (level1 != null) return level1
-        val pointer = if (0x4EDD == bmp) {
-            23
-        } else {
-            val l2 = jis0208Level2AndAdditionalKanjiEncode(bmp)
-            if (l2 != null) {
-                4418 + l2
+        val pointer =
+            if (0x4EDD == bmp) {
+                23
             } else {
-                val pos = position(IBM_KANJI, 0, IBM_KANJI.size, bmp)
-                if (pos != null) {
-                    10744 + pos
+                val l2 = jis0208Level2AndAdditionalKanjiEncode(bmp)
+                if (l2 != null) {
+                    4418 + l2
                 } else {
-                    return null
+                    val pos = position(IBM_KANJI, 0, IBM_KANJI.size, bmp)
+                    if (pos != null) {
+                        10744 + pos
+                    } else {
+                        return null
+                    }
                 }
             }
-        }
         val lead = pointer / 188
         val leadOffset = if (lead < 0x1F) 0x81 else 0xC1
         val trail = pointer % 188
@@ -337,17 +338,18 @@ public class ShiftJisEncoder internal constructor() {
             }
 
             val bmpMinusRoman = bmp - 0x2170
-            val pointer = if (bmpMinusRoman in 0..(0x2179 - 0x2170)) {
-                10716 + bmpMinusRoman
-            } else {
-                jis0208RangeEncode(bmp)
-                    ?: if (bmp in 0xFA0E..0xFA2D || bmp == 0xF929 || bmp == 0xF9DC) {
-                        position(IBM_KANJI, 0, IBM_KANJI.size, bmp)?.let { 10744 + it }
-                    } else {
-                        null
-                    }
-                    ?: jis0208SymbolEncode(bmp)
-            }
+            val pointer =
+                if (bmpMinusRoman in 0..(0x2179 - 0x2170)) {
+                    10716 + bmpMinusRoman
+                } else {
+                    jis0208RangeEncode(bmp)
+                        ?: if (bmp in 0xFA0E..0xFA2D || bmp == 0xF929 || bmp == 0xF9DC) {
+                            position(IBM_KANJI, 0, IBM_KANJI.size, bmp)?.let { 10744 + it }
+                        } else {
+                            null
+                        }
+                        ?: jis0208SymbolEncode(bmp)
+                }
 
             if (pointer == null) {
                 return Triple(EncoderResult.Unmappable(bmp), srcPos + 1, dstPos)
