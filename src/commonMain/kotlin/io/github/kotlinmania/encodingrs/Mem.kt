@@ -50,6 +50,9 @@ public object Mem {
     public fun isUtf8Latin1(buffer: ByteArray): Boolean =
         utf8Latin1UpTo(buffer) == buffer.size
 
+    internal fun isUtf8Latin1Impl(buffer: ByteArray): Boolean =
+        isUtf8Latin1(buffer)
+
     /**
      * Checks whether the buffer represents only code points less than or equal
      * to U+00FF.
@@ -533,6 +536,8 @@ public object Mem {
         }
         return buffer.size
     }
+
+    internal fun utf16ValidUpToAlu(buffer: CharArray): Int = utf16ValidUpTo(buffer)
 
     /**
      * Returns the index of first byte that starts an invalid byte
