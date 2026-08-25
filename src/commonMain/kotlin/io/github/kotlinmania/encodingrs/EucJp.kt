@@ -3,16 +3,25 @@ package io.github.kotlinmania.encodingrs
 
 private sealed class EucJpPending {
     data object None : EucJpPending()
-    data class Jis0208Lead(val lead: Int) : EucJpPending()
+
+    data class Jis0208Lead(
+        val lead: Int,
+    ) : EucJpPending()
+
     data object Jis0212Shift : EucJpPending()
-    data class Jis0212Lead(val lead: Int) : EucJpPending()
+
+    data class Jis0212Lead(
+        val lead: Int,
+    ) : EucJpPending()
+
     data object HalfWidthKatakana : EucJpPending()
 
-    fun count(): Int = when (this) {
-        is None -> 0
-        is Jis0208Lead, is Jis0212Shift, is HalfWidthKatakana -> 1
-        is Jis0212Lead -> 2
-    }
+    fun count(): Int =
+        when (this) {
+            is None -> 0
+            is Jis0208Lead, is Jis0212Shift, is HalfWidthKatakana -> 1
+            is Jis0212Lead -> 2
+        }
 }
 
 public class EucJpDecoder internal constructor() {
@@ -397,22 +406,23 @@ public class EucJpEncoder internal constructor() {
                 }
             }
 
-            val pointer = jis0208RangeEncode(bmp)
-                ?: if (bmp in 0xFA0E..0xFA2D || bmp == 0xF929 || bmp == 0xF9DC) {
-                    position(IBM_KANJI, 0, IBM_KANJI.size, bmp)?.let {
-                        val lead = (it / 94) + 0xF9
-                        val trail = (it % 94) + 0xA1
-                        if (dstPos + 2 > dst.size) return Triple(EncoderResult.OutputFull, srcPos, dstPos)
-                        dst[dstPos++] = lead.toByte()
-                        dst[dstPos++] = trail.toByte()
-                        srcPos++
+            val pointer =
+                jis0208RangeEncode(bmp)
+                    ?: if (bmp in 0xFA0E..0xFA2D || bmp == 0xF929 || bmp == 0xF9DC) {
+                        position(IBM_KANJI, 0, IBM_KANJI.size, bmp)?.let {
+                            val lead = (it / 94) + 0xF9
+                            val trail = (it % 94) + 0xA1
+                            if (dstPos + 2 > dst.size) return Triple(EncoderResult.OutputFull, srcPos, dstPos)
+                            dst[dstPos++] = lead.toByte()
+                            dst[dstPos++] = trail.toByte()
+                            srcPos++
+                            null
+                        }
+                    } else {
                         null
                     }
-                } else {
-                    null
-                }
-                ?: ibmSymbolEncode(bmp)
-                ?: jis0208SymbolEncode(bmp)
+                    ?: ibmSymbolEncode(bmp)
+                    ?: jis0208SymbolEncode(bmp)
 
             if (pointer == null) {
                 if (bmp !in 0xFA0E..0xFA2D && bmp != 0xF929 && bmp != 0xF9DC) {

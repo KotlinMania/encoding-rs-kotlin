@@ -236,55 +236,163 @@ class MemTest {
 
     @Test
     fun testUtf16ValidUpTo() {
-        val valid = charArrayOf(
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-            0x2603.toChar(), 0xD83D.toChar(), 0xDCA9.toChar(), 0x00B6.toChar(),
-        )
+        val valid =
+            charArrayOf(
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0x2603.toChar(),
+                0xD83D.toChar(),
+                0xDCA9.toChar(),
+                0x00B6.toChar(),
+            )
         assertEquals(16, Mem.utf16ValidUpTo(valid))
 
-        val loneHigh = charArrayOf(
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-            0.toChar(), 0x2603.toChar(), 0xD83D.toChar(), 0x00B6.toChar(),
-        )
+        val loneHigh =
+            charArrayOf(
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0x2603.toChar(),
+                0xD83D.toChar(),
+                0x00B6.toChar(),
+            )
         assertEquals(14, Mem.utf16ValidUpTo(loneHigh))
 
-        val loneLow = charArrayOf(
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-            0.toChar(), 0x2603.toChar(), 0xDCA9.toChar(), 0x00B6.toChar(),
-        )
+        val loneLow =
+            charArrayOf(
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0x2603.toChar(),
+                0xDCA9.toChar(),
+                0x00B6.toChar(),
+            )
         assertEquals(14, Mem.utf16ValidUpTo(loneLow))
 
-        val loneHighAtEnd = charArrayOf(
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-            0.toChar(), 0x2603.toChar(), 0x00B6.toChar(), 0xD83D.toChar(),
-        )
+        val loneHighAtEnd =
+            charArrayOf(
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0x2603.toChar(),
+                0x00B6.toChar(),
+                0xD83D.toChar(),
+            )
         assertEquals(15, Mem.utf16ValidUpTo(loneHighAtEnd))
     }
 
     @Test
     fun testEnsureUtf16Validity() {
-        val src = charArrayOf(
-            0.toChar(), 0xD83D.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0xD83D.toChar(), 0xDCA9.toChar(),
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0xDCA9.toChar(),
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-        )
-        val reference = charArrayOf(
-            0.toChar(), 0xFFFD.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0xD83D.toChar(), 0xDCA9.toChar(),
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0xFFFD.toChar(),
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-            0.toChar(), 0.toChar(), 0.toChar(), 0.toChar(),
-        )
+        val src =
+            charArrayOf(
+                0.toChar(),
+                0xD83D.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0xD83D.toChar(),
+                0xDCA9.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0xDCA9.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+            )
+        val reference =
+            charArrayOf(
+                0.toChar(),
+                0xFFFD.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0xD83D.toChar(),
+                0xDCA9.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0xFFFD.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+                0.toChar(),
+            )
         Mem.ensureUtf16Validity(src)
         assertEquals(reference.concatToString(), src.concatToString())
     }

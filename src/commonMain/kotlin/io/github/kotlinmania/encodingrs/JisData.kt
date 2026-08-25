@@ -120,9 +120,7 @@ internal fun jis0208Level1KanjiIso2022JpEncode(bmp: Int): Pair<Int, Int>? {
     return Pair(lead, trail)
 }
 
-internal fun jis0208Level2AndAdditionalKanjiEncode(bmp: Int): Int? {
-    return position(JIS0208_LEVEL2_AND_ADDITIONAL_KANJI, bmp)
-}
+internal fun jis0208Level2AndAdditionalKanjiEncode(bmp: Int): Int? = position(JIS0208_LEVEL2_AND_ADDITIONAL_KANJI, bmp)
 
 internal fun jis0212AccentedDecode(pointer: Int): Int? {
     var i = 0

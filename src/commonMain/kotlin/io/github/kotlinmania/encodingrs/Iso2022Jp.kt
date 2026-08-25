@@ -20,17 +20,18 @@ public class Iso2022JpDecoder internal constructor() {
 
     public fun inNeutralState(): Boolean =
         decoderState == Iso2022JpDecoderState.Ascii &&
-        outputState == Iso2022JpDecoderState.Ascii &&
-        lead == 0 &&
-        !outputFlag &&
-        !pendingPrepended
+            outputState == Iso2022JpDecoderState.Ascii &&
+            lead == 0 &&
+            !outputFlag &&
+            !pendingPrepended
 
     private fun extraToInputFromState(byteLength: Int): Int {
         val leadVal = if (lead == 0 || pendingPrepended) 0 else 1
-        val escVal = when (decoderState) {
-            Iso2022JpDecoderState.Escape, Iso2022JpDecoderState.EscapeStart -> 1
-            else -> 0
-        }
+        val escVal =
+            when (decoderState) {
+                Iso2022JpDecoderState.Escape, Iso2022JpDecoderState.EscapeStart -> 1
+                else -> 0
+            }
         return byteLength + leadVal + escVal
     }
 

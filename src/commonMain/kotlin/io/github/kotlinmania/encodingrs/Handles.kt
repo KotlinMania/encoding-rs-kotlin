@@ -2,23 +2,43 @@
 package io.github.kotlinmania.encodingrs
 
 public sealed class Space<out T> {
-    public data class Available<T>(public val handle: T) : Space<T>()
-    public data class Full(public val consumedOrWritten: Int) : Space<Nothing>()
+    public data class Available<T>(
+        public val handle: T,
+    ) : Space<T>()
+
+    public data class Full(
+        public val consumedOrWritten: Int,
+    ) : Space<Nothing>()
 }
 
 public sealed class CopyAsciiResult<out T, out U> {
-    public data class Stop<T>(public val value: T) : CopyAsciiResult<T, Nothing>()
-    public data class GoOn<U>(public val value: U) : CopyAsciiResult<Nothing, U>()
+    public data class Stop<T>(
+        public val value: T,
+    ) : CopyAsciiResult<T, Nothing>()
+
+    public data class GoOn<U>(
+        public val value: U,
+    ) : CopyAsciiResult<Nothing, U>()
 }
 
 public sealed class NonAscii {
-    public data class BmpExclAscii(public val bmp: Char) : NonAscii()
-    public data class Astral(public val astral: Char) : NonAscii()
+    public data class BmpExclAscii(
+        public val bmp: Char,
+    ) : NonAscii()
+
+    public data class Astral(
+        public val astral: Char,
+    ) : NonAscii()
 }
 
 public sealed class Unicode {
-    public data class Ascii(public val byte: Byte) : Unicode()
-    public data class NonAsciiValue(public val nonAscii: NonAscii) : Unicode()
+    public data class Ascii(
+        public val byte: Byte,
+    ) : Unicode()
+
+    public data class NonAsciiValue(
+        public val nonAscii: NonAscii,
+    ) : Unicode()
 }
 
 public interface Endian {
@@ -113,7 +133,9 @@ public class ByteUnreadHandle(
     private val source: ByteSource,
 ) {
     public fun unread(): Int = source.unread()
+
     public fun consumed(): Int = source.consumed()
+
     public fun commit(): ByteSource = source
 }
 
@@ -576,18 +598,19 @@ public class Utf16Source(
                 dest.pos += i
                 if (dest.pos + 1 < dest.slice.size) {
                     pos += 1
-                    val nonAscii = if (c.isHighSurrogate()) {
-                        if (pos < slice.size && slice[pos].isLowSurrogate()) {
-                            val second = slice[pos++]
-                            NonAscii.Astral(second)
-                        } else {
+                    val nonAscii =
+                        if (c.isHighSurrogate()) {
+                            if (pos < slice.size && slice[pos].isLowSurrogate()) {
+                                val second = slice[pos++]
+                                NonAscii.Astral(second)
+                            } else {
+                                NonAscii.BmpExclAscii('\uFFFD')
+                            }
+                        } else if (c.isLowSurrogate()) {
                             NonAscii.BmpExclAscii('\uFFFD')
+                        } else {
+                            NonAscii.BmpExclAscii(c)
                         }
-                    } else if (c.isLowSurrogate()) {
-                        NonAscii.BmpExclAscii('\uFFFD')
-                    } else {
-                        NonAscii.BmpExclAscii(c)
-                    }
                     return CopyAsciiResult.GoOn(Pair(nonAscii, ByteTwoHandle(dest)))
                 } else {
                     return CopyAsciiResult.Stop(Triple(EncoderResult.OutputFull, pos, dest.pos))
@@ -614,18 +637,19 @@ public class Utf16Source(
                 dest.pos += i
                 if (dest.pos + 3 < dest.slice.size) {
                     pos += 1
-                    val nonAscii = if (c.isHighSurrogate()) {
-                        if (pos < slice.size && slice[pos].isLowSurrogate()) {
-                            val second = slice[pos++]
-                            NonAscii.Astral(second)
-                        } else {
+                    val nonAscii =
+                        if (c.isHighSurrogate()) {
+                            if (pos < slice.size && slice[pos].isLowSurrogate()) {
+                                val second = slice[pos++]
+                                NonAscii.Astral(second)
+                            } else {
+                                NonAscii.BmpExclAscii('\uFFFD')
+                            }
+                        } else if (c.isLowSurrogate()) {
                             NonAscii.BmpExclAscii('\uFFFD')
+                        } else {
+                            NonAscii.BmpExclAscii(c)
                         }
-                    } else if (c.isLowSurrogate()) {
-                        NonAscii.BmpExclAscii('\uFFFD')
-                    } else {
-                        NonAscii.BmpExclAscii(c)
-                    }
                     return CopyAsciiResult.GoOn(Pair(nonAscii, ByteFourHandle(dest)))
                 } else {
                     return CopyAsciiResult.Stop(Triple(EncoderResult.OutputFull, pos, dest.pos))
@@ -643,7 +667,9 @@ public class Utf16ReadHandle(
     private val source: Utf16Source,
 ) {
     public fun read(): Pair<Char, Utf16UnreadHandle> = Pair(source.read(), Utf16UnreadHandle(source))
+
     public fun readEnum(): Pair<Unicode, Utf16UnreadHandle> = Pair(source.readEnum(), Utf16UnreadHandle(source))
+
     public fun consumed(): Int = source.consumed()
 }
 
@@ -651,7 +677,9 @@ public class Utf16UnreadHandle(
     private val source: Utf16Source,
 ) {
     public fun unread(): Int = source.unread()
+
     public fun consumed(): Int = source.consumed()
+
     public fun commit(): Utf16Source = source
 }
 
@@ -735,26 +763,27 @@ public class Utf8Source(
             if (b >= 0x80) {
                 pos += i
                 dest.pos += i
-                val nonAscii = if (b < 0xE0) {
-                    val point = ((b and 0x1F) shl 6) or (slice[pos + 1].toInt() and 0x3F)
-                    pos += 2
-                    NonAscii.BmpExclAscii(point.toChar())
-                } else if (b < 0xF0) {
-                    val point =
-                        ((b and 0xF) shl 12) or
-                            ((slice[pos + 1].toInt() and 0x3F) shl 6) or
-                            (slice[pos + 2].toInt() and 0x3F)
-                    pos += 3
-                    NonAscii.BmpExclAscii(point.toChar())
-                } else {
-                    val point =
-                        ((b and 0x7) shl 18) or
-                            ((slice[pos + 1].toInt() and 0x3F) shl 12) or
-                            ((slice[pos + 2].toInt() and 0x3F) shl 6) or
-                            (slice[pos + 3].toInt() and 0x3F)
-                    pos += 4
-                    NonAscii.Astral(point.toChar())
-                }
+                val nonAscii =
+                    if (b < 0xE0) {
+                        val point = ((b and 0x1F) shl 6) or (slice[pos + 1].toInt() and 0x3F)
+                        pos += 2
+                        NonAscii.BmpExclAscii(point.toChar())
+                    } else if (b < 0xF0) {
+                        val point =
+                            ((b and 0xF) shl 12) or
+                                ((slice[pos + 1].toInt() and 0x3F) shl 6) or
+                                (slice[pos + 2].toInt() and 0x3F)
+                        pos += 3
+                        NonAscii.BmpExclAscii(point.toChar())
+                    } else {
+                        val point =
+                            ((b and 0x7) shl 18) or
+                                ((slice[pos + 1].toInt() and 0x3F) shl 12) or
+                                ((slice[pos + 2].toInt() and 0x3F) shl 6) or
+                                (slice[pos + 3].toInt() and 0x3F)
+                        pos += 4
+                        NonAscii.Astral(point.toChar())
+                    }
                 return CopyAsciiResult.GoOn(Pair(nonAscii, ByteOneHandle(dest)))
             }
             dest.slice[dest.pos + i] = b.toByte()
@@ -777,26 +806,27 @@ public class Utf8Source(
                 pos += i
                 dest.pos += i
                 if (dest.pos + 1 < dest.slice.size) {
-                    val nonAscii = if (b < 0xE0) {
-                        val point = ((b and 0x1F) shl 6) or (slice[pos + 1].toInt() and 0x3F)
-                        pos += 2
-                        NonAscii.BmpExclAscii(point.toChar())
-                    } else if (b < 0xF0) {
-                        val point =
-                            ((b and 0xF) shl 12) or
-                                ((slice[pos + 1].toInt() and 0x3F) shl 6) or
-                                (slice[pos + 2].toInt() and 0x3F)
-                        pos += 3
-                        NonAscii.BmpExclAscii(point.toChar())
-                    } else {
-                        val point =
-                            ((b and 0x7) shl 18) or
-                                ((slice[pos + 1].toInt() and 0x3F) shl 12) or
-                                ((slice[pos + 2].toInt() and 0x3F) shl 6) or
-                                (slice[pos + 3].toInt() and 0x3F)
-                        pos += 4
-                        NonAscii.Astral(point.toChar())
-                    }
+                    val nonAscii =
+                        if (b < 0xE0) {
+                            val point = ((b and 0x1F) shl 6) or (slice[pos + 1].toInt() and 0x3F)
+                            pos += 2
+                            NonAscii.BmpExclAscii(point.toChar())
+                        } else if (b < 0xF0) {
+                            val point =
+                                ((b and 0xF) shl 12) or
+                                    ((slice[pos + 1].toInt() and 0x3F) shl 6) or
+                                    (slice[pos + 2].toInt() and 0x3F)
+                            pos += 3
+                            NonAscii.BmpExclAscii(point.toChar())
+                        } else {
+                            val point =
+                                ((b and 0x7) shl 18) or
+                                    ((slice[pos + 1].toInt() and 0x3F) shl 12) or
+                                    ((slice[pos + 2].toInt() and 0x3F) shl 6) or
+                                    (slice[pos + 3].toInt() and 0x3F)
+                            pos += 4
+                            NonAscii.Astral(point.toChar())
+                        }
                     return CopyAsciiResult.GoOn(Pair(nonAscii, ByteTwoHandle(dest)))
                 } else {
                     return CopyAsciiResult.Stop(Triple(EncoderResult.OutputFull, pos, dest.pos))
@@ -822,26 +852,27 @@ public class Utf8Source(
                 pos += i
                 dest.pos += i
                 if (dest.pos + 3 < dest.slice.size) {
-                    val nonAscii = if (b < 0xE0) {
-                        val point = ((b and 0x1F) shl 6) or (slice[pos + 1].toInt() and 0x3F)
-                        pos += 2
-                        NonAscii.BmpExclAscii(point.toChar())
-                    } else if (b < 0xF0) {
-                        val point =
-                            ((b and 0xF) shl 12) or
-                                ((slice[pos + 1].toInt() and 0x3F) shl 6) or
-                                (slice[pos + 2].toInt() and 0x3F)
-                        pos += 3
-                        NonAscii.BmpExclAscii(point.toChar())
-                    } else {
-                        val point =
-                            ((b and 0x7) shl 18) or
-                                ((slice[pos + 1].toInt() and 0x3F) shl 12) or
-                                ((slice[pos + 2].toInt() and 0x3F) shl 6) or
-                                (slice[pos + 3].toInt() and 0x3F)
-                        pos += 4
-                        NonAscii.Astral(point.toChar())
-                    }
+                    val nonAscii =
+                        if (b < 0xE0) {
+                            val point = ((b and 0x1F) shl 6) or (slice[pos + 1].toInt() and 0x3F)
+                            pos += 2
+                            NonAscii.BmpExclAscii(point.toChar())
+                        } else if (b < 0xF0) {
+                            val point =
+                                ((b and 0xF) shl 12) or
+                                    ((slice[pos + 1].toInt() and 0x3F) shl 6) or
+                                    (slice[pos + 2].toInt() and 0x3F)
+                            pos += 3
+                            NonAscii.BmpExclAscii(point.toChar())
+                        } else {
+                            val point =
+                                ((b and 0x7) shl 18) or
+                                    ((slice[pos + 1].toInt() and 0x3F) shl 12) or
+                                    ((slice[pos + 2].toInt() and 0x3F) shl 6) or
+                                    (slice[pos + 3].toInt() and 0x3F)
+                            pos += 4
+                            NonAscii.Astral(point.toChar())
+                        }
                     return CopyAsciiResult.GoOn(Pair(nonAscii, ByteFourHandle(dest)))
                 } else {
                     return CopyAsciiResult.Stop(Triple(EncoderResult.OutputFull, pos, dest.pos))
@@ -859,7 +890,9 @@ public class Utf8ReadHandle(
     private val source: Utf8Source,
 ) {
     public fun read(): Pair<Char, Utf8UnreadHandle> = Pair(source.read(), Utf8UnreadHandle(source))
+
     public fun readEnum(): Pair<Unicode, Utf8UnreadHandle> = Pair(source.readEnum(), Utf8UnreadHandle(source))
+
     public fun consumed(): Int = source.consumed()
 }
 
@@ -867,7 +900,9 @@ public class Utf8UnreadHandle(
     private val source: Utf8Source,
 ) {
     public fun unread(): Int = source.unread()
+
     public fun consumed(): Int = source.consumed()
+
     public fun commit(): Utf8Source = source
 }
 
