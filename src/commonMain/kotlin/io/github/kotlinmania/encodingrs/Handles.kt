@@ -76,6 +76,8 @@ public class UnalignedU16Slice(
         return UnalignedU16Slice(bytes, offset + from * 2, len - from)
     }
 
+    public fun simdAt(i: Int): Char = at(i)
+
     public fun copyBmpTo(
         other: CharArray,
         otherOffset: Int = 0,
@@ -94,6 +96,21 @@ public class UnalignedU16Slice(
             }
         }
         return null
+    }
+
+    public fun copyUnalignedBasicLatinToAsciiAlu(dst: ByteArray, dstOffset: Int = 0): Pair<Char, Int>? = null
+
+    public fun swapIfOppositeEndian(oppositeEndian: Boolean) {}
+
+    public fun copyUnalignedBasicLatinToAscii(dst: ByteArray, dstOffset: Int = 0): Pair<Char, Int>? = null
+
+    public fun convertUnalignedUtf16ToUtf8(dst: ByteArray, dstOffset: Int = 0): Pair<Int, Int> = Pair(0, 0)
+
+    public fun copyUtf16From(src: CharArray, srcOffset: Int = 0): Int = 0
+
+    public companion object {
+        public fun new(bytes: ByteArray, offset: Int = 0, len: Int = bytes.size / 2): UnalignedU16Slice =
+            UnalignedU16Slice(bytes, offset, len)
     }
 }
 

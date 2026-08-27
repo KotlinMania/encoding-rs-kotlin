@@ -5,13 +5,13 @@ Based on AST analysis, here are the concrete next steps.
 ## Summary
 
 - **Files Present:** 22/22 (100.0%)
-- **Function parity:** 463/545 matched (target 629) — 85.0%
-- **Class/type parity:** 62/69 matched (target 123) — 89.9%
-- **Combined symbol parity:** 525/614 matched (target 752) — 85.5%
-- **Average inline-code cosine:** 0.59 (function body across 19 matched files)
-- **Average documentation cosine:** 0.10 (doc text across 19 matched files)
-- **Cheat-zeroed Files:** 3
-- **Critical Issues:** 10 files with <0.60 function similarity
+- **Function parity:** 543/545 matched (target 718) — 99.6%
+- **Class/type parity:** 69/69 matched (target 132) — 100.0%
+- **Combined symbol parity:** 612/614 matched (target 850) — 99.7%
+- **Average inline-code cosine:** 0.61 (function body across 20 matched files)
+- **Average documentation cosine:** 0.12 (doc text across 20 matched files)
+- **Cheat-zeroed Files:** 1
+- **Critical Issues:** 7 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
 
@@ -30,98 +30,28 @@ Every matched file is listed below with function and type symbol parity.
 ### 1. lib
 
 - **Target:** `encodingrs.Results`
-- **Similarity:** 0.43
+- **Similarity:** 0.63
 - **Dependents:** 0
-- **Priority Score:** 382605.7
-- **Functions:** 81/115 matched (target 95)
-- **Missing functions:** `name`, `new_variant_decoder`, `utf8_valid_up_to`, `eq`, `partial_cmp`, `cmp`, `hash`, `fmt`, `serialize`, `expecting`, `visit_str`, `deserialize`, `new`, `decode_to_str`, `decode_to_string`, `decode_to_str_without_replacement`, `decode_to_string_without_replacement`, `max_buffer_length_from_utf8_if_no_unmappables`, `encode_from_utf8_to_vec`, `encode_from_utf8_to_vec_without_replacement`, `max_buffer_length_from_utf16_if_no_unmappables`, `write_ncr`, `in_range16`, `in_range32`, `in_inclusive_range8`, `in_inclusive_range16`, `in_inclusive_range32`, `in_inclusive_range`, `checked_add`, `checked_add_opt`, `checked_mul`, `checked_div`, `checked_next_power_of_two`, `checked_min`
-- **Types:** 8/11 matched (target 15)
-- **Missing types:** `EncodingVisitor`, `Value`, `Demo`
+- **Priority Score:** 22603.7
+- **Functions:** 114/115 matched (target 131)
+- **Missing functions:** `name`
+- **Types:** 11/11 matched (target 18)
+- **Missing types:** _none_
 - **Tests:** 46/46 matched
 
-### 2. simd_funcs
-
-- **Target:** `encodingrs.SimdFuncs [STUB]`
-- **Similarity:** 0.00
-- **Dependents:** 0
-- **Priority Score:** 132210.0
-- **Functions:** 9/22 matched (target 9)
-- **Missing functions:** `load16_unaligned`, `load16_aligned`, `store16_unaligned`, `store16_aligned`, `load8_unaligned`, `load8_aligned`, `store8_unaligned`, `store8_aligned`, `simd_byte_swap`, `to_u16_lanes`, `contains_surrogates`, `is_u16x8_bidi`, `simd_unpack`
-- **Types:** 0/0 matched (target 2)
-- **Missing types:** _none_
-- **Tests:** 9/9 matched
-
-### 3. gb18030
-
-- **Target:** `encodingrs.Gb18030`
-- **Similarity:** 0.39
-- **Dependents:** 0
-- **Priority Score:** 102406.1
-- **Functions:** 13/21 matched (target 15)
-- **Missing functions:** `is_none`, `in_neutral_state`, `extra_from_state`, `max_utf16_buffer_length`, `max_utf8_buffer_length_without_replacement`, `max_utf8_buffer_length`, `gbk_encode_non_unified`, `encode_hanzi`
-- **Types:** 1/3 matched (target 5)
-- **Missing types:** `Gb18030Decoder`, `Gb18030Encoder`
-- **Tests:** 4/4 matched
-
-### 4. data
-
-- **Target:** `encodingrs.Data`
-- **Similarity:** 0.61
-- **Dependents:** 0
-- **Priority Score:** 94803.9
-- **Functions:** 38/47 matched (target 41)
-- **Missing functions:** `cp949_hangul_encode`, `ksx1001_unified_hangul_encode`, `ksx1001_compatibility_hangul_encode`, `gbk_hanzi_encode`, `jis0208_kanji_shift_jis_encode`, `shift_jis_to_euc_jp`, `jis0208_kanji_euc_jp_encode`, `shift_jis_to_iso_2022_jp`, `jis0208_kanji_iso_2022_jp_encode`
-- **Types:** 1/1 matched (target 2)
-- **Missing types:** _none_
-
-### 5. handles
+### 2. handles
 
 - **Target:** `encodingrs.Handles`
-- **Similarity:** 0.72
+- **Similarity:** 0.74
 - **Dependents:** 0
-- **Priority Score:** 87302.8
-- **Functions:** 37/45 matched (target 130)
-- **Missing functions:** `new`, `simd_at`, `len`, `copy_unaligned_basic_latin_to_ascii_alu`, `swap_if_opposite_endian`, `copy_unaligned_basic_latin_to_ascii`, `convert_unaligned_utf16_to_utf8`, `copy_utf16_from`
+- **Priority Score:** 17302.6
+- **Functions:** 44/45 matched (target 137)
+- **Missing functions:** `len`
 - **Types:** 28/28 matched (target 37)
 - **Missing types:** _none_
+- **Lint issues:** 1
 
-### 6. big5
-
-- **Target:** `encodingrs.Big5`
-- **Similarity:** 0.47
-- **Dependents:** 0
-- **Priority Score:** 71705.3
-- **Functions:** 10/15 matched (target 12)
-- **Missing functions:** `in_neutral_state`, `plus_one_if_lead`, `max_utf16_buffer_length`, `max_utf8_buffer_length_without_replacement`, `max_utf8_buffer_length`
-- **Types:** 0/2 matched (target 0)
-- **Missing types:** `Big5Decoder`, `Big5Encoder`
-- **Tests:** 2/2 matched
-
-### 7. utf_8
-
-- **Target:** `encodingrs.Utf8`
-- **Similarity:** 0.60
-- **Dependents:** 0
-- **Priority Score:** 43104.0
-- **Functions:** 24/28 matched (target 29)
-- **Missing functions:** `new_inner`, `extra_from_state`, `convert_utf16_to_utf8_partial_inner`, `convert_utf16_to_utf8_partial_tail`
-- **Types:** 3/3 matched (target 5)
-- **Missing types:** _none_
-- **Tests:** 8/8 matched
-
-### 8. euc_jp
-
-- **Target:** `encodingrs.EucJp`
-- **Similarity:** 0.59
-- **Dependents:** 0
-- **Priority Score:** 12104.1
-- **Functions:** 17/18 matched (target 20)
-- **Missing functions:** `is_none`
-- **Types:** 3/3 matched (target 9)
-- **Missing types:** _none_
-- **Tests:** 2/2 matched
-
-### 9. mem
+### 3. mem
 
 - **Target:** `encodingrs.Mem`
 - **Similarity:** 0.61
@@ -133,7 +63,30 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 35/35 matched
 
-### 10. iso_2022_jp
+### 4. data
+
+- **Target:** `encodingrs.Data`
+- **Similarity:** 0.69
+- **Dependents:** 0
+- **Priority Score:** 4803.1
+- **Functions:** 47/47 matched (target 50)
+- **Missing functions:** _none_
+- **Types:** 1/1 matched (target 2)
+- **Missing types:** _none_
+
+### 5. utf_8
+
+- **Target:** `encodingrs.Utf8`
+- **Similarity:** 0.69
+- **Dependents:** 0
+- **Priority Score:** 3103.1
+- **Functions:** 28/28 matched (target 33)
+- **Missing functions:** _none_
+- **Types:** 3/3 matched (target 5)
+- **Missing types:** _none_
+- **Tests:** 8/8 matched
+
+### 6. iso_2022_jp
 
 - **Target:** `encodingrs.Iso2022Jp`
 - **Similarity:** 0.67
@@ -145,7 +98,19 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 5/5 matched
 
-### 11. single_byte
+### 7. gb18030
+
+- **Target:** `encodingrs.Gb18030`
+- **Similarity:** 0.60
+- **Dependents:** 0
+- **Priority Score:** 2404.0
+- **Functions:** 21/21 matched (target 25)
+- **Missing functions:** _none_
+- **Types:** 3/3 matched (target 8)
+- **Missing types:** _none_
+- **Tests:** 4/4 matched
+
+### 8. single_byte
 
 - **Target:** `encodingrs.SingleByte`
 - **Similarity:** 0.59
@@ -157,7 +122,19 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 8/8 matched
 
-### 12. utf_16
+### 9. simd_funcs
+
+- **Target:** `encodingrs.SimdFuncs`
+- **Similarity:** 0.27
+- **Dependents:** 0
+- **Priority Score:** 2207.3
+- **Functions:** 22/22 matched (target 28)
+- **Missing functions:** _none_
+- **Types:** 0/0 matched (target 2)
+- **Missing types:** _none_
+- **Tests:** 9/9 matched
+
+### 10. utf_16
 
 - **Target:** `encodingrs.Utf16`
 - **Similarity:** 0.56
@@ -169,7 +146,19 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 12/12 matched
 
-### 13. euc_kr
+### 11. euc_jp
+
+- **Target:** `encodingrs.EucJp`
+- **Similarity:** 0.60
+- **Dependents:** 0
+- **Priority Score:** 2104.0
+- **Functions:** 18/18 matched (target 21)
+- **Missing functions:** _none_
+- **Types:** 3/3 matched (target 9)
+- **Missing types:** _none_
+- **Tests:** 2/2 matched
+
+### 12. euc_kr
 
 - **Target:** `encodingrs.EucKr`
 - **Similarity:** 0.67
@@ -181,7 +170,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 3/3 matched
 
-### 14. shift_jis
+### 13. shift_jis
 
 - **Target:** `encodingrs.ShiftJis`
 - **Similarity:** 0.71
@@ -192,6 +181,18 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 2/2 matched (target 3)
 - **Missing types:** _none_
 - **Tests:** 3/3 matched
+
+### 14. big5
+
+- **Target:** `encodingrs.Big5`
+- **Similarity:** 0.68
+- **Dependents:** 0
+- **Priority Score:** 1703.2
+- **Functions:** 15/15 matched (target 18)
+- **Missing functions:** _none_
+- **Types:** 2/2 matched (target 3)
+- **Missing types:** _none_
+- **Tests:** 2/2 matched
 
 ### 15. variant
 
@@ -253,9 +254,9 @@ Every matched file is listed below with function and type symbol parity.
 ### 20. test_labels_names
 
 - **Target:** `encodingrs.TestLabelsNames [STUB]`
-- **Similarity:** 0.00
+- **Similarity:** 0.69
 - **Dependents:** 0
-- **Priority Score:** 110.0
+- **Priority Score:** 103.1
 - **Functions:** 1/1 matched
 - **Missing functions:** _none_
 - **Types:** 0/0 matched (target 2)
@@ -268,7 +269,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Similarity:** 0.00
 - **Dependents:** 0
 - **Priority Score:** 10.0
-- **Functions:** 0/0 matched (target 4)
+- **Functions:** 0/0 matched (target 1)
 - **Missing functions:** _none_
 - **Types:** 0/0 matched (target 1)
 - **Missing types:** _none_

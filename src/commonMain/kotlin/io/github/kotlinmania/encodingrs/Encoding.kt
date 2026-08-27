@@ -4,10 +4,33 @@ package io.github.kotlinmania.encodingrs
 /**
  * An encoding as defined in the WHATWG Encoding Standard.
  */
-public class Encoding internal constructor(
+class Encoding internal constructor(
     public val name: String,
     internal val variant: VariantEncoding,
 ) {
+    internal fun newVariantDecoder(): VariantDecoder = variant.newVariantDecoder()
+
+    public override fun equals(other: Any?): Boolean =
+        other is Encoding && name == other.name
+
+    public override fun hashCode(): Int = name.hashCode()
+
+    public override fun toString(): String = name
+
+    public fun fmt(): String = name
+
+    public fun serialize(): String = name
+
+    public fun deserialize(s: String): Encoding? = Encoding.forLabel(s.encodeToByteArray())
+
+    public fun cmp(other: Encoding): Int = name.compareTo(other.name)
+
+    public fun partialCmp(other: Encoding): Int = cmp(other)
+
+    public fun eq(other: Encoding): Boolean = equals(other)
+
+    public fun hash(): Int = hashCode()
+
     public fun isSingleByte(): Boolean =
         variant is VariantEncoding.SingleByte || variant is VariantEncoding.UserDefined
 
@@ -171,8 +194,6 @@ public class Encoding internal constructor(
         val res = encoder.encodeFromUtf16(chars, dst, true)
         return Triple(dst.copyOf(res.written), outputEnc, res.hadErrors)
     }
-
-    override fun toString(): String = name
 
     public companion object {
         private const val LONGEST_LABEL_LENGTH: Int = 21
@@ -781,6 +802,9 @@ public class Encoding internal constructor(
 
         public fun asciiValidUpTo(bytes: ByteArray): Int = Ascii.asciiValidUpTo(bytes)
 
+        public fun utf8ValidUpTo(bytes: ByteArray): Int =
+            Utf8.convertUtf8ToUtf16UpToInvalid(bytes, CharArray(bytes.size)).first
+
         public fun iso2022JpAsciiValidUpTo(bytes: ByteArray): Int = Ascii.iso2022JpAsciiValidUpTo(bytes)
     }
 }
@@ -806,7 +830,7 @@ internal enum class DecoderLifeCycle {
     Finished,
 }
 
-public class Decoder internal constructor(
+class Decoder internal constructor(
     private var encoding: Encoding,
     private var variant: VariantDecoder,
     sniffing: BomHandling,
@@ -1279,15 +1303,63 @@ public class Decoder internal constructor(
         }
     }
 
+    public fun decodeToStr(
+        src: ByteArray,
+        dst: CharArray,
+        last: Boolean = false,
+    ): DecodeResult {
+        val bytes = dst.concatToString().encodeToByteArray()
+        return decodeToUtf8(src, bytes, last)
+    }
+
+    public fun decodeToString(
+        src: ByteArray,
+        dst: StringBuilder,
+        last: Boolean = false,
+    ): DecodeResult {
+        val out = ByteArray(maxUtf8BufferLength(src.size) ?: (src.size * 3 + 4))
+        val result = decodeToUtf8(src, out, last)
+        dst.append(out.decodeToString(0, result.written))
+        return result
+    }
+
+    public fun decodeToStrWithoutReplacement(
+        src: ByteArray,
+        dst: CharArray,
+        last: Boolean = false,
+    ): Triple<DecoderResult, Int, Int> {
+        val bytes = dst.concatToString().encodeToByteArray()
+        return decodeToUtf8WithoutReplacement(src, bytes, last)
+    }
+
+    public fun decodeToStringWithoutReplacement(
+        src: ByteArray,
+        dst: StringBuilder,
+        last: Boolean = false,
+    ): Pair<DecoderResult, Int> {
+        val out = ByteArray(maxUtf8BufferLengthWithoutReplacement(src.size) ?: (src.size * 3 + 4))
+        val (res, read, written) = decodeToUtf8WithoutReplacement(src, out, last)
+        dst.append(out.decodeToString(0, written))
+        return Pair(res, read)
+    }
+
     public fun latin1ByteCompatibleUpTo(buffer: ByteArray): Int? =
         when (lifeCycle) {
             DecoderLifeCycle.Converting -> variant.latin1ByteCompatibleUpTo(buffer)
             DecoderLifeCycle.Finished -> error("Must not use a decoder that has finished.")
             else -> null
         }
+
+    public companion object {
+        internal fun new(
+            encoding: Encoding,
+            decoder: VariantDecoder,
+            sniffing: BomHandling,
+        ): Decoder = Decoder(encoding, decoder, sniffing)
+    }
 }
 
-public class Encoder internal constructor(
+class Encoder internal constructor(
     private val encoding: Encoding,
     private val variant: VariantEncoder,
 ) {
@@ -1300,6 +1372,44 @@ public class Encoder internal constructor(
 
     public fun maxBufferLengthFromUtf8WithoutReplacement(byteLength: Int): Int? =
         byteLength
+
+    public fun maxBufferLengthFromUtf8IfNoUnmappables(byteLength: Int): Int? =
+        checkedAdd(
+            if (encoding.canEncodeEverything()) 0 else 12,
+            maxBufferLengthFromUtf8WithoutReplacement(byteLength),
+        )
+
+    public fun maxBufferLengthFromUtf16IfNoUnmappables(u16Length: Int): Int? =
+        checkedAdd(
+            if (encoding.canEncodeEverything()) 0 else 12,
+            maxBufferLengthFromUtf16WithoutReplacement(u16Length),
+        )
+
+    public fun encodeFromUtf8ToVec(
+        src: String,
+        dst: MutableList<Byte>,
+        last: Boolean = false,
+    ): Triple<CoderResult, Int, Boolean> {
+        val out = ByteArray(maxBufferLengthFromUtf8IfNoUnmappables(src.length) ?: (src.length * 3 + 4))
+        val res = encodeFromUtf8(src, out, last)
+        for (i in 0 until res.written) {
+            dst.add(out[i])
+        }
+        return Triple(res.result, res.read, res.hadErrors)
+    }
+
+    public fun encodeFromUtf8ToVecWithoutReplacement(
+        src: String,
+        dst: MutableList<Byte>,
+        last: Boolean = false,
+    ): Pair<EncoderResult, Int> {
+        val out = ByteArray(maxBufferLengthFromUtf8WithoutReplacement(src.length) ?: (src.length * 3 + 4))
+        val (res, read, written) = encodeFromUtf8WithoutReplacement(src, out, last)
+        for (i in 0 until written) {
+            dst.add(out[i])
+        }
+        return Pair(res, read)
+    }
 
     public fun encodeFromUtf16Raw(
         src: CharArray,
@@ -1380,6 +1490,13 @@ public class Encoder internal constructor(
         }
         return EncodeResult(CoderResult.InputEmpty, totalRead, totalWritten, hadErrors)
     }
+
+    public companion object {
+        internal fun new(
+            encoding: Encoding,
+            encoder: VariantEncoder,
+        ): Encoder = Encoder(encoding, encoder)
+    }
 }
 
 public val BIG5: Encoding = Encoding.BIG5
@@ -1422,4 +1539,99 @@ public val WINDOWS_1258: Encoding = Encoding.WINDOWS_1258
 public val WINDOWS_874: Encoding = Encoding.WINDOWS_874
 public val X_MAC_CYRILLIC: Encoding = Encoding.X_MAC_CYRILLIC
 public val X_USER_DEFINED: Encoding = Encoding.X_USER_DEFINED
+
+/**
+ * Visitor for deserializing Encoding references.
+ */
+public class EncodingVisitor {
+    public typealias Value = Encoding
+
+    public fun expecting(): String = "a valid encoding label"
+
+    public fun visitStr(value: String): Encoding? = Encoding.forLabel(value.encodeToByteArray())
+}
+
+/**
+ * Demo structure matching upstream serde tests.
+ */
+public data class Demo(
+    public val num: UInt,
+    public val name: String,
+    public val enc: Encoding,
+)
+
+/**
+ * Format an unmappable as NCR without heap allocation.
+ */
+internal fun writeNcr(unmappable: Char, dst: ByteArray, dstOffset: Int = 0): Int {
+    var number = unmappable.code
+    val len = when {
+        number >= 1_000_000 -> 10
+        number >= 100_000 -> 9
+        number >= 10_000 -> 8
+        number >= 1_000 -> 7
+        number >= 100 -> 6
+        else -> 5
+    }
+    var pos = dstOffset + len - 1
+    dst[pos--] = ';'.code.toByte()
+    while (true) {
+        val rightmost = number % 10
+        dst[pos--] = (rightmost + '0'.code).toByte()
+        if (number < 10) break
+        number /= 10
+    }
+    dst[dstOffset + 1] = '#'.code.toByte()
+    dst[dstOffset] = '&'.code.toByte()
+    return len
+}
+
+internal fun inRange16(i: Int, start: Int, end: Int): Boolean =
+    ((i - start) and 0xFFFF) < (end - start)
+
+internal fun inRange32(i: Long, start: Long, end: Long): Boolean =
+    ((i - start) and 0xFFFFFFFFL) < (end - start)
+
+internal fun inInclusiveRange8(i: Byte, start: Byte, end: Byte): Boolean =
+    ((i.toInt() - start.toInt()) and 0xFF) <= ((end.toInt() - start.toInt()) and 0xFF)
+
+internal fun inInclusiveRange16(i: Int, start: Int, end: Int): Boolean =
+    ((i - start) and 0xFFFF) <= (end - start)
+
+internal fun inInclusiveRange32(i: Long, start: Long, end: Long): Boolean =
+    ((i - start) and 0xFFFFFFFFL) <= (end - start)
+
+internal fun inInclusiveRange(i: Int, start: Int, end: Int): Boolean =
+    (i - start) in 0..(end - start)
+
+internal fun checkedAdd(num: Int, opt: Int?): Int? =
+    opt?.let { if (Int.MAX_VALUE - num < it) null else it + num }
+
+internal fun checkedAddOpt(one: Int?, other: Int?): Int? =
+    one?.let { checkedAdd(it, other) }
+
+internal fun checkedMul(num: Int, opt: Int?): Int? =
+    opt?.let { if (num != 0 && it > Int.MAX_VALUE / num) null else it * num }
+
+internal fun checkedDiv(opt: Int?, num: Int): Int? =
+    opt?.let { it / num }
+
+internal fun checkedNextPowerOfTwo(opt: Int?): Int? =
+    opt?.let {
+        var v = it - 1
+        v = v or (v ushr 1)
+        v = v or (v ushr 2)
+        v = v or (v ushr 4)
+        v = v or (v ushr 8)
+        v = v or (v ushr 16)
+        v + 1
+    }
+
+internal fun checkedMin(one: Int?, other: Int?): Int? =
+    when {
+        one != null && other != null -> minOf(one, other)
+        one != null -> one
+        else -> other
+    }
+
 
