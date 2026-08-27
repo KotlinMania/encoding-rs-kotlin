@@ -5,13 +5,13 @@ Based on AST analysis, here are the concrete next steps.
 ## Summary
 
 - **Files Present:** 22/22 (100.0%)
-- **Function parity:** 462/545 matched (target 628) — 84.8%
-- **Class/type parity:** 61/69 matched (target 122) — 88.4%
-- **Combined symbol parity:** 523/614 matched (target 750) — 85.2%
+- **Function parity:** 463/545 matched (target 629) — 85.0%
+- **Class/type parity:** 62/69 matched (target 123) — 89.9%
+- **Combined symbol parity:** 525/614 matched (target 752) — 85.5%
 - **Average inline-code cosine:** 0.59 (function body across 19 matched files)
 - **Average documentation cosine:** 0.10 (doc text across 19 matched files)
 - **Cheat-zeroed Files:** 3
-- **Critical Issues:** 11 files with <0.60 function similarity
+- **Critical Issues:** 10 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
 
@@ -51,18 +51,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 9/9 matched
 
-### 3. data
-
-- **Target:** `encodingrs.Data`
-- **Similarity:** 0.59
-- **Dependents:** 0
-- **Priority Score:** 114804.1
-- **Functions:** 37/47 matched (target 40)
-- **Missing functions:** `cp949_hangul_encode`, `ksx1001_unified_hangul_encode`, `ksx1001_compatibility_hangul_encode`, `gbk_hanzi_encode`, `jis0208_kanji_shift_jis_encode`, `shift_jis_to_euc_jp`, `jis0208_kanji_euc_jp_encode`, `shift_jis_to_iso_2022_jp`, `jis0208_kanji_iso_2022_jp_encode`, `mul_94`
-- **Types:** 0/1 matched
-- **Missing types:** `SingleByteData`
-
-### 4. gb18030
+### 3. gb18030
 
 - **Target:** `encodingrs.Gb18030`
 - **Similarity:** 0.39
@@ -73,6 +62,17 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 1/3 matched (target 5)
 - **Missing types:** `Gb18030Decoder`, `Gb18030Encoder`
 - **Tests:** 4/4 matched
+
+### 4. data
+
+- **Target:** `encodingrs.Data`
+- **Similarity:** 0.61
+- **Dependents:** 0
+- **Priority Score:** 94803.9
+- **Functions:** 38/47 matched (target 41)
+- **Missing functions:** `cp949_hangul_encode`, `ksx1001_unified_hangul_encode`, `ksx1001_compatibility_hangul_encode`, `gbk_hanzi_encode`, `jis0208_kanji_shift_jis_encode`, `shift_jis_to_euc_jp`, `jis0208_kanji_euc_jp_encode`, `shift_jis_to_iso_2022_jp`, `jis0208_kanji_iso_2022_jp_encode`
+- **Types:** 1/1 matched (target 2)
+- **Missing types:** _none_
 
 ### 5. handles
 
