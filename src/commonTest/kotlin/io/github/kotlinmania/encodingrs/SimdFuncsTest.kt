@@ -1,4 +1,4 @@
-// port-lint: tests simd_funcs.rs
+// port-lint: tests encoding_rs/src/simd_funcs.rs
 package io.github.kotlinmania.encodingrs
 
 import kotlin.test.Test

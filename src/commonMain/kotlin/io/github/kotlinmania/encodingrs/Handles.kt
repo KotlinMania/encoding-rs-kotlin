@@ -1,4 +1,4 @@
-// port-lint: source handles.rs
+// port-lint: source encoding_rs/src/handles.rs
 package io.github.kotlinmania.encodingrs
 
 public sealed class Space<out T> {
