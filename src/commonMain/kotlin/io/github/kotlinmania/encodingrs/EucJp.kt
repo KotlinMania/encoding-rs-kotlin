@@ -1,4 +1,4 @@
-// port-lint: source encoding_rs/src/euc_jp.rs
+// port-lint: source euc_jp.rs
 package io.github.kotlinmania.encodingrs
 
 private sealed class EucJpPending {
