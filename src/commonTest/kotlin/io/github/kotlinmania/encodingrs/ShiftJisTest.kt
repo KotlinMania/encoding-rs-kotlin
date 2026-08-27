@@ -1,4 +1,4 @@
-// port-lint: tests shift_jis.rs
+// port-lint: tests encoding_rs/src/shift_jis.rs
 package io.github.kotlinmania.encodingrs
 
 import kotlin.test.Test

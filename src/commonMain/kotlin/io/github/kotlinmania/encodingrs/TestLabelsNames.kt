@@ -1,4 +1,4 @@
-// port-lint: source test_labels_names.rs
+// port-lint: source encoding_rs/src/test_labels_names.rs
 package io.github.kotlinmania.encodingrs
 
 /**
