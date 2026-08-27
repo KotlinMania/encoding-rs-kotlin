@@ -3729,14 +3729,15 @@ public fun shiftJisToEucJp(tuple: Pair<Byte, Byte>): Pair<Byte, Byte> {
         lead -= 0xC1 - 0x81
     }
     lead = (lead shl 1) - 0x61
-    val trail = if ((shiftJisTrail.toInt() and 0xFF) >= 0x9F) {
-        lead += 1
-        (shiftJisTrail.toInt() and 0xFF) + (0xA1 - 0x9F)
-    } else if ((shiftJisTrail.toInt() and 0xFF) < 0x7F) {
-        (shiftJisTrail.toInt() and 0xFF) + (0xA1 - 0x40)
-    } else {
-        (shiftJisTrail.toInt() and 0xFF) + (0xA1 - 0x41)
-    }
+    val trail =
+        if ((shiftJisTrail.toInt() and 0xFF) >= 0x9F) {
+            lead += 1
+            (shiftJisTrail.toInt() and 0xFF) + (0xA1 - 0x9F)
+        } else if ((shiftJisTrail.toInt() and 0xFF) < 0x7F) {
+            (shiftJisTrail.toInt() and 0xFF) + (0xA1 - 0x40)
+        } else {
+            (shiftJisTrail.toInt() and 0xFF) + (0xA1 - 0x41)
+        }
     return Pair(lead.toByte(), trail.toByte())
 }
 
@@ -3756,14 +3757,15 @@ public fun shiftJisToIso2022Jp(tuple: Pair<Byte, Byte>): Pair<Byte, Byte> {
         lead -= 0xC1 - 0x81
     }
     lead = (lead shl 1) - 0xE1
-    val trail = if ((shiftJisTrail.toInt() and 0xFF) >= 0x9F) {
-        lead += 1
-        (shiftJisTrail.toInt() and 0xFF) + (0x21 - 0x9F)
-    } else if ((shiftJisTrail.toInt() and 0xFF) < 0x7F) {
-        (shiftJisTrail.toInt() and 0xFF) + (0x21 - 0x40)
-    } else {
-        (shiftJisTrail.toInt() and 0xFF) + (0x21 - 0x41)
-    }
+    val trail =
+        if ((shiftJisTrail.toInt() and 0xFF) >= 0x9F) {
+            lead += 1
+            (shiftJisTrail.toInt() and 0xFF) + (0x21 - 0x9F)
+        } else if ((shiftJisTrail.toInt() and 0xFF) < 0x7F) {
+            (shiftJisTrail.toInt() and 0xFF) + (0x21 - 0x40)
+        } else {
+            (shiftJisTrail.toInt() and 0xFF) + (0x21 - 0x41)
+        }
     return Pair(lead.toByte(), trail.toByte())
 }
 
@@ -3772,4 +3774,3 @@ public fun shiftJisToIso2022Jp(tuple: Pair<Byte, Byte>): Pair<Byte, Byte> {
  */
 public fun jis0208KanjiIso2022JpEncode(bmp: Int): Pair<Byte, Byte>? =
     jis0208KanjiShiftJisEncode(bmp)?.let { shiftJisToIso2022Jp(it) }
-
