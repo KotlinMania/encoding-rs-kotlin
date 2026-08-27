@@ -24,8 +24,10 @@ private sealed class EucJpPending {
         }
 }
 
-public class EucJpDecoder internal constructor() {
+class EucJpDecoder internal constructor() {
     private var pending: EucJpPending = EucJpPending.None
+
+    public fun isNone(): Boolean = inNeutralState()
 
     public fun inNeutralState(): Boolean = pending is EucJpPending.None
 
@@ -263,7 +265,7 @@ public class EucJpDecoder internal constructor() {
     }
 }
 
-public class EucJpEncoder internal constructor() {
+class EucJpEncoder internal constructor() {
     public fun maxBufferLengthFromUtf16WithoutReplacement(u16Length: Int): Int? =
         if (u16Length > Int.MAX_VALUE / 2) null else u16Length * 2
 

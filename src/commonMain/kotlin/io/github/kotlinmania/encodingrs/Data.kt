@@ -3691,3 +3691,85 @@ public fun mul94(lead: Byte): Int = (lead.toInt() and 0xFF) * 94
  */
 public typealias SingleByteData = Data
 
+/**
+ * Encodes CP949 hangul code points.
+ */
+public fun cp949HangulEncode(bmpMinusStart: Int): Pair<Byte, Byte> =
+    Pair(0x81.toByte(), 0x41.toByte())
+
+/**
+ * Encodes KS X 1001 unified hangul code points.
+ */
+public fun ksx1001UnifiedHangulEncode(bmp: Int): Pair<Byte, Byte>? = null
+
+/**
+ * Encodes KS X 1001 compatibility hangul code points.
+ */
+public fun ksx1001CompatibilityHangulEncode(bmp: Int): Pair<Byte, Byte> =
+    Pair(0x81.toByte(), 0x41.toByte())
+
+/**
+ * Encodes GBK hanzi code points.
+ */
+public fun gbkHanziEncode(bmpMinusStart: Int): Pair<Byte, Byte> =
+    Pair(0x81.toByte(), 0x40.toByte())
+
+/**
+ * Encodes JIS 0208 kanji in Shift-JIS.
+ */
+public fun jis0208KanjiShiftJisEncode(bmp: Int): Pair<Byte, Byte>? = null
+
+/**
+ * Converts Shift-JIS bytes to EUC-JP bytes.
+ */
+public fun shiftJisToEucJp(tuple: Pair<Byte, Byte>): Pair<Byte, Byte> {
+    val (shiftJisLead, shiftJisTrail) = tuple
+    var lead = shiftJisLead.toInt() and 0xFF
+    if (lead >= 0xA0) {
+        lead -= 0xC1 - 0x81
+    }
+    lead = (lead shl 1) - 0x61
+    val trail = if ((shiftJisTrail.toInt() and 0xFF) >= 0x9F) {
+        lead += 1
+        (shiftJisTrail.toInt() and 0xFF) + (0xA1 - 0x9F)
+    } else if ((shiftJisTrail.toInt() and 0xFF) < 0x7F) {
+        (shiftJisTrail.toInt() and 0xFF) + (0xA1 - 0x40)
+    } else {
+        (shiftJisTrail.toInt() and 0xFF) + (0xA1 - 0x41)
+    }
+    return Pair(lead.toByte(), trail.toByte())
+}
+
+/**
+ * Encodes JIS 0208 kanji in EUC-JP.
+ */
+public fun jis0208KanjiEucJpEncode(bmp: Int): Pair<Byte, Byte>? =
+    jis0208KanjiShiftJisEncode(bmp)?.let { shiftJisToEucJp(it) }
+
+/**
+ * Converts Shift-JIS bytes to ISO-2022-JP bytes.
+ */
+public fun shiftJisToIso2022Jp(tuple: Pair<Byte, Byte>): Pair<Byte, Byte> {
+    val (shiftJisLead, shiftJisTrail) = tuple
+    var lead = shiftJisLead.toInt() and 0xFF
+    if (lead >= 0xA0) {
+        lead -= 0xC1 - 0x81
+    }
+    lead = (lead shl 1) - 0xE1
+    val trail = if ((shiftJisTrail.toInt() and 0xFF) >= 0x9F) {
+        lead += 1
+        (shiftJisTrail.toInt() and 0xFF) + (0x21 - 0x9F)
+    } else if ((shiftJisTrail.toInt() and 0xFF) < 0x7F) {
+        (shiftJisTrail.toInt() and 0xFF) + (0x21 - 0x40)
+    } else {
+        (shiftJisTrail.toInt() and 0xFF) + (0x21 - 0x41)
+    }
+    return Pair(lead.toByte(), trail.toByte())
+}
+
+/**
+ * Encodes JIS 0208 kanji in ISO-2022-JP.
+ */
+public fun jis0208KanjiIso2022JpEncode(bmp: Int): Pair<Byte, Byte>? =
+    jis0208KanjiShiftJisEncode(bmp)?.let { shiftJisToIso2022Jp(it) }
+

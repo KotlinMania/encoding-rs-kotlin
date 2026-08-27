@@ -1,4 +1,3 @@
-// port-lint: source gb18030_2022.rs
 package io.github.kotlinmania.encodingrs
 
 fun gb180302022OverrideCount(): Int = GB18030_2022_OVERRIDE_PUA.size

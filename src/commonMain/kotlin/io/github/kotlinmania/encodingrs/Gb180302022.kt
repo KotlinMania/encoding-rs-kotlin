@@ -29,7 +29,7 @@ package io.github.kotlinmania.encodingrs
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
- * The private-use-area code points special-cased in the GB18030 encoder.
+ * The private-use-area code points and bytes special-cased in the GB18030 encoder.
  */
 internal val GB18030_2022_OVERRIDE_PUA: UShortArray =
     ushortArrayOf(
@@ -53,10 +53,6 @@ internal val GB18030_2022_OVERRIDE_PUA: UShortArray =
         0xE864u,
     )
 
-/**
- * The bytes corresponding to the private-use-area code points special-cased in
- * the GB18030 encoder.
- */
 internal val GB18030_2022_OVERRIDE_BYTES: Array<UByteArray> =
     arrayOf(
         ubyteArrayOf(0xA6u, 0xD9u),
@@ -78,3 +74,4 @@ internal val GB18030_2022_OVERRIDE_BYTES: Array<UByteArray> =
         ubyteArrayOf(0xFEu, 0x90u),
         ubyteArrayOf(0xFEu, 0xA0u),
     )
+

@@ -489,7 +489,7 @@ public object Utf8 {
     }
 }
 
-public class Utf8Decoder {
+class Utf8Decoder {
     private var codePoint: Int = 0
     private var bytesSeen: Int = 0
     private var bytesNeeded: Int = 0
@@ -498,14 +498,17 @@ public class Utf8Decoder {
 
     public fun inNeutralState(): Boolean = bytesNeeded == 0
 
+    private fun extraFromState(byteLength: Int): Int =
+        byteLength + (if (bytesNeeded == 0) 0 else bytesSeen + 1)
+
     public fun maxUtf16BufferLength(byteLength: Int): Int? =
-        byteLength + 1 + (if (bytesNeeded == 0) 0 else bytesSeen + 1)
+        1 + extraFromState(byteLength)
 
     public fun maxUtf8BufferLengthWithoutReplacement(byteLength: Int): Int? =
-        byteLength + 3 + (if (bytesNeeded == 0) 0 else bytesSeen + 1)
+        3 + extraFromState(byteLength)
 
     public fun maxUtf8BufferLength(byteLength: Int): Int? =
-        3 + 3 * (byteLength + (if (bytesNeeded == 0) 0 else bytesSeen + 1))
+        3 + 3 * extraFromState(byteLength)
 
     public fun decodeToUtf16Raw(
         src: ByteArray,
@@ -618,6 +621,8 @@ public class Utf8Decoder {
 
     public companion object {
         public fun new(): Utf8Decoder = Utf8Decoder()
+
+        internal fun newInner(): Utf8Decoder = Utf8Decoder()
     }
 }
 
@@ -625,7 +630,19 @@ public class Utf8Data(
     public val table: IntArray,
 )
 
-public class Utf8Encoder {
+/**
+ * Converts a slice of UTF-16 code units to UTF-8 without astral splitting.
+ */
+internal fun convertUtf16ToUtf8PartialInner(src: CharArray, dst: ByteArray): Pair<Int, Int> =
+    Mem.convertUtf16ToUtf8Partial(src, dst)
+
+/**
+ * Converts the tail of a slice of UTF-16 code units to UTF-8.
+ */
+internal fun convertUtf16ToUtf8PartialTail(src: CharArray, dst: ByteArray): Pair<Int, Int> =
+    Mem.convertUtf16ToUtf8Partial(src, dst)
+
+class Utf8Encoder {
     public fun maxBufferLengthFromUtf16WithoutReplacement(u16Length: Int): Int? =
         if (u16Length > Int.MAX_VALUE / 3) null else u16Length * 3
 
