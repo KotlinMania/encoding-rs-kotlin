@@ -1,4 +1,4 @@
-// port-lint: tests encoding_rs/src/iso_2022_jp.rs
+// port-lint: tests iso_2022_jp.rs
 package io.github.kotlinmania.encodingrs
 
 import kotlin.test.Test

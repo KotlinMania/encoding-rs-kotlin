@@ -8,9 +8,9 @@ Based on AST analysis, here are the concrete next steps.
 - **Function parity:** 462/545 matched (target 628) — 84.8%
 - **Class/type parity:** 61/69 matched (target 122) — 88.4%
 - **Combined symbol parity:** 523/614 matched (target 750) — 85.2%
-- **Average inline-code cosine:** 0.60 (function body across 18 matched files)
-- **Average documentation cosine:** 0.10 (doc text across 18 matched files)
-- **Cheat-zeroed Files:** 4
+- **Average inline-code cosine:** 0.59 (function body across 19 matched files)
+- **Average documentation cosine:** 0.10 (doc text across 19 matched files)
+- **Cheat-zeroed Files:** 3
 - **Critical Issues:** 11 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
@@ -27,19 +27,19 @@ No missing high-value files detected.
 
 Every matched file is listed below with function and type symbol parity.
 
-### 1. encoding_rs.lib
+### 1. lib
 
-- **Target:** `encodingrs.Results [STUB]`
-- **Similarity:** 0.00
+- **Target:** `encodingrs.Results`
+- **Similarity:** 0.43
 - **Dependents:** 0
-- **Priority Score:** 382610.0
+- **Priority Score:** 382605.7
 - **Functions:** 81/115 matched (target 95)
 - **Missing functions:** `name`, `new_variant_decoder`, `utf8_valid_up_to`, `eq`, `partial_cmp`, `cmp`, `hash`, `fmt`, `serialize`, `expecting`, `visit_str`, `deserialize`, `new`, `decode_to_str`, `decode_to_string`, `decode_to_str_without_replacement`, `decode_to_string_without_replacement`, `max_buffer_length_from_utf8_if_no_unmappables`, `encode_from_utf8_to_vec`, `encode_from_utf8_to_vec_without_replacement`, `max_buffer_length_from_utf16_if_no_unmappables`, `write_ncr`, `in_range16`, `in_range32`, `in_inclusive_range8`, `in_inclusive_range16`, `in_inclusive_range32`, `in_inclusive_range`, `checked_add`, `checked_add_opt`, `checked_mul`, `checked_div`, `checked_next_power_of_two`, `checked_min`
 - **Types:** 8/11 matched (target 15)
 - **Missing types:** `EncodingVisitor`, `Value`, `Demo`
 - **Tests:** 46/46 matched
 
-### 2. encoding_rs.simd_funcs
+### 2. simd_funcs
 
 - **Target:** `encodingrs.SimdFuncs [STUB]`
 - **Similarity:** 0.00
@@ -51,7 +51,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 9/9 matched
 
-### 3. encoding_rs.data
+### 3. data
 
 - **Target:** `encodingrs.Data`
 - **Similarity:** 0.59
@@ -62,7 +62,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/1 matched
 - **Missing types:** `SingleByteData`
 
-### 4. encoding_rs.gb18030
+### 4. gb18030
 
 - **Target:** `encodingrs.Gb18030`
 - **Similarity:** 0.39
@@ -74,7 +74,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** `Gb18030Decoder`, `Gb18030Encoder`
 - **Tests:** 4/4 matched
 
-### 5. encoding_rs.handles
+### 5. handles
 
 - **Target:** `encodingrs.Handles`
 - **Similarity:** 0.72
@@ -85,7 +85,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 28/28 matched (target 37)
 - **Missing types:** _none_
 
-### 6. encoding_rs.big5
+### 6. big5
 
 - **Target:** `encodingrs.Big5`
 - **Similarity:** 0.47
@@ -97,7 +97,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** `Big5Decoder`, `Big5Encoder`
 - **Tests:** 2/2 matched
 
-### 7. encoding_rs.utf_8
+### 7. utf_8
 
 - **Target:** `encodingrs.Utf8`
 - **Similarity:** 0.60
@@ -109,7 +109,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 8/8 matched
 
-### 8. encoding_rs.euc_jp
+### 8. euc_jp
 
 - **Target:** `encodingrs.EucJp`
 - **Similarity:** 0.59
@@ -121,7 +121,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 2/2 matched
 
-### 9. encoding_rs.mem
+### 9. mem
 
 - **Target:** `encodingrs.Mem`
 - **Similarity:** 0.61
@@ -133,7 +133,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 35/35 matched
 
-### 10. encoding_rs.iso_2022_jp
+### 10. iso_2022_jp
 
 - **Target:** `encodingrs.Iso2022Jp`
 - **Similarity:** 0.67
@@ -145,7 +145,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 5/5 matched
 
-### 11. encoding_rs.single_byte
+### 11. single_byte
 
 - **Target:** `encodingrs.SingleByte`
 - **Similarity:** 0.59
@@ -157,7 +157,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 8/8 matched
 
-### 12. encoding_rs.utf_16
+### 12. utf_16
 
 - **Target:** `encodingrs.Utf16`
 - **Similarity:** 0.56
@@ -169,7 +169,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 12/12 matched
 
-### 13. encoding_rs.euc_kr
+### 13. euc_kr
 
 - **Target:** `encodingrs.EucKr`
 - **Similarity:** 0.67
@@ -181,7 +181,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 3/3 matched
 
-### 14. encoding_rs.shift_jis
+### 14. shift_jis
 
 - **Target:** `encodingrs.ShiftJis`
 - **Similarity:** 0.71
@@ -193,7 +193,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 3/3 matched
 
-### 15. encoding_rs.variant
+### 15. variant
 
 - **Target:** `encodingrs.Variant`
 - **Similarity:** 0.72
@@ -204,7 +204,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 3/3 matched (target 16)
 - **Missing types:** _none_
 
-### 16. encoding_rs.testing
+### 16. testing
 
 - **Target:** `encodingrs.Testing`
 - **Similarity:** 0.82
@@ -215,7 +215,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched (target 2)
 - **Missing types:** _none_
 
-### 17. encoding_rs.x_user_defined
+### 17. x_user_defined
 
 - **Target:** `encodingrs.XUserDefined`
 - **Similarity:** 0.61
@@ -227,7 +227,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 3/3 matched
 
-### 18. encoding_rs.replacement
+### 18. replacement
 
 - **Target:** `encodingrs.Replacement`
 - **Similarity:** 0.71
@@ -239,7 +239,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 2/2 matched
 
-### 19. encoding_rs.ascii
+### 19. ascii
 
 - **Target:** `encodingrs.Ascii`
 - **Similarity:** 0.73
@@ -250,7 +250,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched (target 2)
 - **Missing types:** _none_
 
-### 20. encoding_rs.test_labels_names
+### 20. test_labels_names
 
 - **Target:** `encodingrs.TestLabelsNames [STUB]`
 - **Similarity:** 0.00
@@ -262,7 +262,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 1/1 matched
 
-### 21. encoding_rs.gb18030_2022
+### 21. gb18030_2022
 
 - **Target:** `encodingrs.Gb180302022 [ZERO]`
 - **Similarity:** 0.00
@@ -273,7 +273,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched (target 1)
 - **Missing types:** _none_
 
-### 22. encoding_rs.macros
+### 22. macros
 
 - **Target:** `encodingrs.Macros [STUB]`
 - **Similarity:** 1.00

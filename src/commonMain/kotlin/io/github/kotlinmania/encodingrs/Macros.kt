@@ -1,4 +1,4 @@
-// port-lint: source encoding_rs/src/macros.rs
+// port-lint: source macros.rs
 package io.github.kotlinmania.encodingrs
 
 /**

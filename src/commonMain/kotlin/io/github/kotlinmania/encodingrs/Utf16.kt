@@ -1,4 +1,4 @@
-// port-lint: source encoding_rs/src/utf_16.rs
+// port-lint: source utf_16.rs
 package io.github.kotlinmania.encodingrs
 
 /**
