@@ -3680,3 +3680,14 @@ internal fun mapWithUnsortedRanges(haystack: CharArray, other: CharArray, needle
     }
     return null
 }
+
+/**
+ * Multiply lead byte by 94.
+ */
+public fun mul94(lead: Byte): Int = (lead.toInt() and 0xFF) * 94
+
+/**
+ * Typealias for single byte data table.
+ */
+public typealias SingleByteData = Data
+
