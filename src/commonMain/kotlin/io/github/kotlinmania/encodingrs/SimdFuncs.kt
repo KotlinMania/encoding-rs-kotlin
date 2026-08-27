@@ -120,7 +120,10 @@ object SimdFuncs {
                 code in 0xFE70..0xFEFE ||
                 code in 0xD802..0xD803 ||
                 code in 0xD83A..0xD83B ||
-                code == 0x200F || code == 0x202B || code == 0x202E || code == 0x2067
+                code == 0x200F ||
+                code == 0x202B ||
+                code == 0x202E ||
+                code == 0x2067
             ) {
                 return true
             }
@@ -206,4 +209,3 @@ object SimdFuncs {
         return mask
     }
 }
-

@@ -506,218 +506,555 @@ class MemTest {
         assertFalse(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x0062.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertFalse(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x03B1.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertFalse(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x3041.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertFalse(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xD801.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertFalse(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xFE00.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertFalse(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x202C.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertFalse(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xFEFF.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x0590.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x08FF.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x061C.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xFB1D.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xFB50.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xFDFF.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xFE70.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xFEFE.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x200F.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x202B.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x202E.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x2067.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xD802.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xD803.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xD83A.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xD83B.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertTrue(
             Mem.isUtf16Bidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
-                    0x0590.toChar(), 0x3041.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                    0x0590.toChar(),
+                    0x3041.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
     }
 
@@ -779,241 +1116,578 @@ class MemTest {
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x0062.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertNotEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x03B1.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertNotEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x3041.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertNotEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xD801.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertNotEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xFE00.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertNotEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x202C.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertNotEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xFEFF.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x0590.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x08FF.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x061C.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xFB1D.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xFB50.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xFDFF.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xFE70.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xFEFE.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x200F.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x202B.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x202E.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0x2067.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xD802.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xD803.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xD83A.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
                     0xD83B.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
         assertEquals(
             Latin1Bidi.Bidi,
             Mem.checkUtf16ForLatin1AndBidi(
                 charArrayOf(
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar(),
-                    0x0590.toChar(), 0x3041.toChar(),
-                    0x62.toChar(), 0x63.toChar(), 0x64.toChar(), 0x65.toChar(), 0x66.toChar(), 0x67.toChar(), 0x68.toChar(), 0x69.toChar()
-                )
-            )
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                    0x0590.toChar(),
+                    0x3041.toChar(),
+                    0x62.toChar(),
+                    0x63.toChar(),
+                    0x64.toChar(),
+                    0x65.toChar(),
+                    0x66.toChar(),
+                    0x67.toChar(),
+                    0x68.toChar(),
+                    0x69.toChar(),
+                ),
+            ),
         )
     }
 
@@ -1027,7 +1701,8 @@ class MemTest {
             0x200F,
             0x202B,
             0x202E,
-            0x2067 -> true
+            0x2067,
+            -> true
             else -> false
         }
 
@@ -1043,7 +1718,8 @@ class MemTest {
             0x200F,
             0x202B,
             0x202E,
-            0x2067 -> true
+            0x2067,
+            -> true
             else -> false
         }
 
@@ -1214,4 +1890,3 @@ class MemTest {
         }
     }
 }
-

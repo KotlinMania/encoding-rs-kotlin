@@ -39,7 +39,8 @@ class Encoding internal constructor(
             is VariantEncoding.Replacement,
             is VariantEncoding.Utf16Be,
             is VariantEncoding.Utf16Le,
-            is VariantEncoding.Iso2022Jp -> false
+            is VariantEncoding.Iso2022Jp,
+            -> false
             else -> true
         }
 
@@ -48,7 +49,8 @@ class Encoding internal constructor(
             is VariantEncoding.Replacement,
             is VariantEncoding.Utf16Be,
             is VariantEncoding.Utf16Le,
-            is VariantEncoding.Iso2022Jp -> false
+            is VariantEncoding.Iso2022Jp,
+            -> false
             else -> true
         }
 
@@ -58,7 +60,8 @@ class Encoding internal constructor(
         when (variant) {
             is VariantEncoding.Replacement,
             is VariantEncoding.Utf16Be,
-            is VariantEncoding.Utf16Le -> UTF_8
+            is VariantEncoding.Utf16Le,
+            -> UTF_8
             else -> this
         }
 
@@ -815,7 +818,6 @@ internal enum class BomHandling {
     Remove,
 }
 
-
 internal enum class DecoderLifeCycle {
     AtStart,
     AtUtf8Start,
@@ -855,7 +857,8 @@ class Decoder internal constructor(
             DecoderLifeCycle.Converting,
             DecoderLifeCycle.AtUtf8Start,
             DecoderLifeCycle.AtUtf16LeStart,
-            DecoderLifeCycle.AtUtf16BeStart -> variant.maxUtf16BufferLength(byteLength)
+            DecoderLifeCycle.AtUtf16BeStart,
+            -> variant.maxUtf16BufferLength(byteLength)
             DecoderLifeCycle.AtStart -> {
                 val utf8Bom = byteLength + 1
                 val utf16Bom = 1 + (byteLength + 1) / 2
@@ -869,7 +872,8 @@ class Decoder internal constructor(
                 }
             }
             DecoderLifeCycle.SeenUtf8First,
-            DecoderLifeCycle.SeenUtf8Second -> {
+            DecoderLifeCycle.SeenUtf8Second,
+            -> {
                 val sum = byteLength + 2
                 val utf8Bom = sum + 1
                 if (encoding().name == "UTF-8") {
@@ -881,7 +885,8 @@ class Decoder internal constructor(
             }
             DecoderLifeCycle.ConvertingWithPendingBB -> variant.maxUtf16BufferLength(byteLength + 2)
             DecoderLifeCycle.SeenUtf16LeFirst,
-            DecoderLifeCycle.SeenUtf16BeFirst -> {
+            DecoderLifeCycle.SeenUtf16BeFirst,
+            -> {
                 val sum = byteLength + 2
                 val utf16Bom = 1 + (sum + 1) / 2
                 if (encoding().name == "UTF-16LE" || encoding().name == "UTF-16BE") {
@@ -899,7 +904,8 @@ class Decoder internal constructor(
             DecoderLifeCycle.Converting,
             DecoderLifeCycle.AtUtf8Start,
             DecoderLifeCycle.AtUtf16LeStart,
-            DecoderLifeCycle.AtUtf16BeStart -> variant.maxUtf8BufferLength(byteLength)
+            DecoderLifeCycle.AtUtf16BeStart,
+            -> variant.maxUtf8BufferLength(byteLength)
             DecoderLifeCycle.AtStart -> {
                 val utf8Bom = 3 + byteLength * 3
                 val utf16Bom = 1 + 3 * ((byteLength + 1) / 2)
@@ -913,7 +919,8 @@ class Decoder internal constructor(
                 }
             }
             DecoderLifeCycle.SeenUtf8First,
-            DecoderLifeCycle.SeenUtf8Second -> {
+            DecoderLifeCycle.SeenUtf8Second,
+            -> {
                 val sum = byteLength + 2
                 val utf8Bom = 3 + sum * 3
                 if (encoding().name == "UTF-8") {
@@ -925,7 +932,8 @@ class Decoder internal constructor(
             }
             DecoderLifeCycle.ConvertingWithPendingBB -> variant.maxUtf8BufferLength(byteLength + 2)
             DecoderLifeCycle.SeenUtf16LeFirst,
-            DecoderLifeCycle.SeenUtf16BeFirst -> {
+            DecoderLifeCycle.SeenUtf16BeFirst,
+            -> {
                 val sum = byteLength + 2
                 val utf16Bom = 1 + 3 * ((sum + 1) / 2)
                 if (encoding().name == "UTF-16LE" || encoding().name == "UTF-16BE") {
@@ -943,7 +951,8 @@ class Decoder internal constructor(
             DecoderLifeCycle.Converting,
             DecoderLifeCycle.AtUtf8Start,
             DecoderLifeCycle.AtUtf16LeStart,
-            DecoderLifeCycle.AtUtf16BeStart -> variant.maxUtf8BufferLengthWithoutReplacement(byteLength)
+            DecoderLifeCycle.AtUtf16BeStart,
+            -> variant.maxUtf8BufferLengthWithoutReplacement(byteLength)
             DecoderLifeCycle.AtStart -> {
                 val utf8Bom = byteLength + 3
                 val utf16Bom = 1 + 3 * ((byteLength + 1) / 2)
@@ -957,7 +966,8 @@ class Decoder internal constructor(
                 }
             }
             DecoderLifeCycle.SeenUtf8First,
-            DecoderLifeCycle.SeenUtf8Second -> {
+            DecoderLifeCycle.SeenUtf8Second,
+            -> {
                 val sum = byteLength + 2
                 val utf8Bom = sum + 3
                 if (encoding().name == "UTF-8") {
@@ -969,7 +979,8 @@ class Decoder internal constructor(
             }
             DecoderLifeCycle.ConvertingWithPendingBB -> variant.maxUtf8BufferLengthWithoutReplacement(byteLength + 2)
             DecoderLifeCycle.SeenUtf16LeFirst,
-            DecoderLifeCycle.SeenUtf16BeFirst -> {
+            DecoderLifeCycle.SeenUtf16BeFirst,
+            -> {
                 val sum = byteLength + 2
                 val utf16Bom = 1 + 3 * ((sum + 1) / 2)
                 if (encoding().name == "UTF-16LE" || encoding().name == "UTF-16BE") {
@@ -1565,14 +1576,15 @@ public data class Demo(
  */
 internal fun writeNcr(unmappable: Char, dst: ByteArray, dstOffset: Int = 0): Int {
     var number = unmappable.code
-    val len = when {
-        number >= 1_000_000 -> 10
-        number >= 100_000 -> 9
-        number >= 10_000 -> 8
-        number >= 1_000 -> 7
-        number >= 100 -> 6
-        else -> 5
-    }
+    val len =
+        when {
+            number >= 1_000_000 -> 10
+            number >= 100_000 -> 9
+            number >= 10_000 -> 8
+            number >= 1_000 -> 7
+            number >= 100 -> 6
+            else -> 5
+        }
     var pos = dstOffset + len - 1
     dst[pos--] = ';'.code.toByte()
     while (true) {
@@ -1633,5 +1645,3 @@ internal fun checkedMin(one: Int?, other: Int?): Int? =
         one != null -> one
         else -> other
     }
-
-

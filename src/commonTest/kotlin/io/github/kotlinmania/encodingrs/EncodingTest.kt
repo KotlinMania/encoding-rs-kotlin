@@ -8,7 +8,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class EncodingTest {
-
     private fun sniffToUtf16(
         initialEncoding: Encoding,
         expectedEncoding: Encoding,
@@ -419,41 +418,46 @@ class EncodingTest {
 
     @Test
     fun testDecodeBomfulValidUtf8ToCowWithoutBomHandlingAndWithoutReplacement() {
-        val res = UTF_8.decodeWithoutBomHandlingAndWithoutReplacement(
-            byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte(), 0xE2.toByte(), 0x82.toByte(), 0xAC.toByte(), 0xC3.toByte(), 0xA4.toByte()),
-        )
+        val res =
+            UTF_8.decodeWithoutBomHandlingAndWithoutReplacement(
+                byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte(), 0xE2.toByte(), 0x82.toByte(), 0xAC.toByte(), 0xC3.toByte(), 0xA4.toByte()),
+            )
         assertEquals("\uFEFF\u20AC\u00E4", res)
     }
 
     @Test
     fun testDecodeBomfulInvalidUtf8ToCowWithoutBomHandlingAndWithoutReplacement() {
-        val res = UTF_8.decodeWithoutBomHandlingAndWithoutReplacement(
-            byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte(), 0xE2.toByte(), 0x82.toByte(), 0xAC.toByte(), 0x80.toByte(), 0xC3.toByte(), 0xA4.toByte()),
-        )
+        val res =
+            UTF_8.decodeWithoutBomHandlingAndWithoutReplacement(
+                byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte(), 0xE2.toByte(), 0x82.toByte(), 0xAC.toByte(), 0x80.toByte(), 0xC3.toByte(), 0xA4.toByte()),
+            )
         assertNull(res)
     }
 
     @Test
     fun testDecodeValidWindows1257ToCowWithoutBomHandlingAndWithoutReplacement() {
-        val res = WINDOWS_1257.decodeWithoutBomHandlingAndWithoutReplacement(
-            byteArrayOf(0x61, 0x62, 0x63, 0x80.toByte(), 0xE4.toByte()),
-        )
+        val res =
+            WINDOWS_1257.decodeWithoutBomHandlingAndWithoutReplacement(
+                byteArrayOf(0x61, 0x62, 0x63, 0x80.toByte(), 0xE4.toByte()),
+            )
         assertEquals("abc\u20AC\u00E4", res)
     }
 
     @Test
     fun testDecodeInvalidWindows1257ToCowWithoutBomHandlingAndWithoutReplacement() {
-        val res = WINDOWS_1257.decodeWithoutBomHandlingAndWithoutReplacement(
-            byteArrayOf(0x61, 0x62, 0x63, 0x80.toByte(), 0xA1.toByte(), 0xE4.toByte()),
-        )
+        val res =
+            WINDOWS_1257.decodeWithoutBomHandlingAndWithoutReplacement(
+                byteArrayOf(0x61, 0x62, 0x63, 0x80.toByte(), 0xA1.toByte(), 0xE4.toByte()),
+            )
         assertNull(res)
     }
 
     @Test
     fun testDecodeAsciiOnlyWindows1257ToCowWithoutBomHandlingAndWithoutReplacement() {
-        val res = WINDOWS_1257.decodeWithoutBomHandlingAndWithoutReplacement(
-            byteArrayOf(0x61, 0x62, 0x63),
-        )
+        val res =
+            WINDOWS_1257.decodeWithoutBomHandlingAndWithoutReplacement(
+                byteArrayOf(0x61, 0x62, 0x63),
+            )
         assertEquals("abc", res)
     }
 

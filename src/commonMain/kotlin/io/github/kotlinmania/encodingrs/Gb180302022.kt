@@ -74,4 +74,3 @@ internal val GB18030_2022_OVERRIDE_BYTES: Array<UByteArray> =
         ubyteArrayOf(0xFEu, 0x90u),
         ubyteArrayOf(0xFEu, 0xA0u),
     )
-

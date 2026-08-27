@@ -36,7 +36,6 @@ class Gb18030Decoder internal constructor(
     private var pendingAscii: Int? = null,
     private var pendingHighSurrogate: Char? = null,
 ) {
-
     public fun isNone(): Boolean = inNeutralState()
 
     public fun inNeutralState(): Boolean =
