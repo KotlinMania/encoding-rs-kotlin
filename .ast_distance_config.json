@@ -15,5 +15,5 @@
     "todos": true,
     "lint": true
   },
-  "reexport_modules": []
+  "reexport_modules": ["macros", "gb18030_2022"]
 }
