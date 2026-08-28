@@ -5,12 +5,12 @@ Based on AST analysis, here are the concrete next steps.
 ## Summary
 
 - **Files Present:** 22/22 (100.0%)
-- **Function parity:** 543/545 matched (target 718) — 99.6%
-- **Class/type parity:** 69/69 matched (target 132) — 100.0%
-- **Combined symbol parity:** 612/614 matched (target 850) — 99.7%
+- **Function parity:** 543/545 matched (target 717) — 99.6%
+- **Class/type parity:** 69/69 matched (target 130) — 100.0%
+- **Combined symbol parity:** 612/614 matched (target 847) — 99.7%
 - **Average inline-code cosine:** 0.61 (function body across 20 matched files)
 - **Average documentation cosine:** 0.12 (doc text across 20 matched files)
-- **Cheat-zeroed Files:** 1
+- **Cheat-zeroed Files:** 0
 - **Critical Issues:** 7 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
@@ -263,28 +263,6 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 1/1 matched
 
-### 21. gb18030_2022
-
-- **Target:** `encodingrs.Gb180302022 [ZERO]`
-- **Similarity:** 0.00
-- **Dependents:** 0
-- **Priority Score:** 10.0
-- **Functions:** 0/0 matched (target 1)
-- **Missing functions:** _none_
-- **Types:** 0/0 matched (target 1)
-- **Missing types:** _none_
-
-### 22. macros
-
-- **Target:** `encodingrs.Macros [STUB]`
-- **Similarity:** 1.00
-- **Dependents:** 0
-- **Priority Score:** 0.0
-- **Functions:** 0/0 matched
-- **Missing functions:** _none_
-- **Types:** 0/0 matched (target 1)
-- **Missing types:** _none_
-
 ## Success Criteria
 
 For each file to be considered "complete":
@@ -293,4 +271,18 @@ For each file to be considered "complete":
 - All tests ported
 - Documentation ported
 - port-lint header present
+
+## Reexport / Wiring Modules
+
+These files match `reexport_modules` patterns in `.ast_distance_config.json`. They are filtered out of
+normal priority and missing-file ladders because they are wiring
+modules, not direct logic ports. Consult them for call-site routing;
+do not treat them as the next implementation target by default.
+
+### Matched
+
+| Source | Target | Path |
+|--------|--------|------|
+| `gb18030_2022` | `encodingrs.Gb180302022` | `gb18030_2022` |
+| `macros` | `encodingrs.Macros` | `macros` |
 
