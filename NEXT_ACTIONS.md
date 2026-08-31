@@ -8,10 +8,10 @@ Based on AST analysis, here are the concrete next steps.
 - **Function parity:** 543/545 matched (target 717) — 99.6%
 - **Class/type parity:** 69/69 matched (target 130) — 100.0%
 - **Combined symbol parity:** 612/614 matched (target 847) — 99.7%
-- **Average inline-code cosine:** 0.61 (function body across 20 matched files)
-- **Average documentation cosine:** 0.12 (doc text across 20 matched files)
-- **Cheat-zeroed Files:** 0
-- **Critical Issues:** 7 files with <0.60 function similarity
+- **Average inline-code cosine:** 0.61 (function body across 19 matched files)
+- **Average documentation cosine:** 0.11 (doc text across 19 matched files)
+- **Cheat-zeroed Files:** 1
+- **Critical Issues:** 8 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
 
@@ -27,19 +27,19 @@ No missing high-value files detected.
 
 Every matched file is listed below with function and type symbol parity.
 
-### 1. lib
+### 1. encoding_rs.lib
 
-- **Target:** `encodingrs.Results`
-- **Similarity:** 0.63
+- **Target:** `encodingrs.Results [STUB]`
+- **Similarity:** 0.00
 - **Dependents:** 0
-- **Priority Score:** 22603.7
+- **Priority Score:** 22610.0
 - **Functions:** 114/115 matched (target 131)
 - **Missing functions:** `name`
 - **Types:** 11/11 matched (target 18)
 - **Missing types:** _none_
 - **Tests:** 46/46 matched
 
-### 2. handles
+### 2. encoding_rs.handles
 
 - **Target:** `encodingrs.Handles`
 - **Similarity:** 0.74
@@ -51,7 +51,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Lint issues:** 1
 
-### 3. mem
+### 3. encoding_rs.mem
 
 - **Target:** `encodingrs.Mem`
 - **Similarity:** 0.61
@@ -63,7 +63,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 35/35 matched
 
-### 4. data
+### 4. encoding_rs.data
 
 - **Target:** `encodingrs.Data`
 - **Similarity:** 0.69
@@ -74,7 +74,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 1/1 matched (target 2)
 - **Missing types:** _none_
 
-### 5. utf_8
+### 5. encoding_rs.utf_8
 
 - **Target:** `encodingrs.Utf8`
 - **Similarity:** 0.69
@@ -86,7 +86,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 8/8 matched
 
-### 6. iso_2022_jp
+### 6. encoding_rs.iso_2022_jp
 
 - **Target:** `encodingrs.Iso2022Jp`
 - **Similarity:** 0.67
@@ -98,7 +98,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 5/5 matched
 
-### 7. gb18030
+### 7. encoding_rs.gb18030
 
 - **Target:** `encodingrs.Gb18030`
 - **Similarity:** 0.60
@@ -110,7 +110,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 4/4 matched
 
-### 8. single_byte
+### 8. encoding_rs.single_byte
 
 - **Target:** `encodingrs.SingleByte`
 - **Similarity:** 0.59
@@ -122,7 +122,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 8/8 matched
 
-### 9. simd_funcs
+### 9. encoding_rs.simd_funcs
 
 - **Target:** `encodingrs.SimdFuncs`
 - **Similarity:** 0.27
@@ -134,7 +134,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 9/9 matched
 
-### 10. utf_16
+### 10. encoding_rs.utf_16
 
 - **Target:** `encodingrs.Utf16`
 - **Similarity:** 0.56
@@ -146,7 +146,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 12/12 matched
 
-### 11. euc_jp
+### 11. encoding_rs.euc_jp
 
 - **Target:** `encodingrs.EucJp`
 - **Similarity:** 0.60
@@ -158,7 +158,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 2/2 matched
 
-### 12. euc_kr
+### 12. encoding_rs.euc_kr
 
 - **Target:** `encodingrs.EucKr`
 - **Similarity:** 0.67
@@ -170,7 +170,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 3/3 matched
 
-### 13. shift_jis
+### 13. encoding_rs.shift_jis
 
 - **Target:** `encodingrs.ShiftJis`
 - **Similarity:** 0.71
@@ -182,7 +182,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 3/3 matched
 
-### 14. big5
+### 14. encoding_rs.big5
 
 - **Target:** `encodingrs.Big5`
 - **Similarity:** 0.68
@@ -194,7 +194,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 2/2 matched
 
-### 15. variant
+### 15. encoding_rs.variant
 
 - **Target:** `encodingrs.Variant`
 - **Similarity:** 0.72
@@ -205,7 +205,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 3/3 matched (target 16)
 - **Missing types:** _none_
 
-### 16. testing
+### 16. encoding_rs.testing
 
 - **Target:** `encodingrs.Testing`
 - **Similarity:** 0.82
@@ -216,7 +216,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched (target 2)
 - **Missing types:** _none_
 
-### 17. x_user_defined
+### 17. encoding_rs.x_user_defined
 
 - **Target:** `encodingrs.XUserDefined`
 - **Similarity:** 0.61
@@ -228,7 +228,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 3/3 matched
 
-### 18. replacement
+### 18. encoding_rs.replacement
 
 - **Target:** `encodingrs.Replacement`
 - **Similarity:** 0.71
@@ -240,7 +240,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 2/2 matched
 
-### 19. ascii
+### 19. encoding_rs.ascii
 
 - **Target:** `encodingrs.Ascii`
 - **Similarity:** 0.73
@@ -251,7 +251,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched (target 2)
 - **Missing types:** _none_
 
-### 20. test_labels_names
+### 20. encoding_rs.test_labels_names
 
 - **Target:** `encodingrs.TestLabelsNames [STUB]`
 - **Similarity:** 0.69
@@ -283,6 +283,6 @@ do not treat them as the next implementation target by default.
 
 | Source | Target | Path |
 |--------|--------|------|
-| `gb18030_2022` | `encodingrs.Gb180302022` | `gb18030_2022` |
-| `macros` | `encodingrs.Macros` | `macros` |
+| `encoding_rs.gb18030_2022` | `encodingrs.Gb180302022` | `encoding_rs/src/gb18030_2022` |
+| `encoding_rs.macros` | `encodingrs.Macros` | `encoding_rs/src/macros` |
 
