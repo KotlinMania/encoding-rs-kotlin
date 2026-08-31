@@ -1,4 +1,4 @@
-// port-lint: source testing.rs
+// port-lint: source encoding_rs/src/testing.rs
 package io.github.kotlinmania.encodingrs
 
 internal object Testing {
