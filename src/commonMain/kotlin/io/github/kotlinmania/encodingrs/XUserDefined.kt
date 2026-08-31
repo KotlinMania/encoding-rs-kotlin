@@ -1,4 +1,4 @@
-// port-lint: source x_user_defined.rs
+// port-lint: source encoding_rs/src/x_user_defined.rs
 package io.github.kotlinmania.encodingrs
 
 public class UserDefinedDecoder {

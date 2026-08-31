@@ -1,4 +1,4 @@
-// port-lint: source single_byte.rs
+// port-lint: source encoding_rs/src/single_byte.rs
 package io.github.kotlinmania.encodingrs
 
 public class SingleByteDecoder(
