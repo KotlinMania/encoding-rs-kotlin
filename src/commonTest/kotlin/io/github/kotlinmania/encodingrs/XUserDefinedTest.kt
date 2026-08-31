@@ -1,4 +1,4 @@
-// port-lint: tests encoding_rs/src/x_user_defined.rs
+// port-lint: tests x_user_defined.rs
 package io.github.kotlinmania.encodingrs
 
 import kotlin.test.Test
