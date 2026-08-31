@@ -1,4 +1,4 @@
-// port-lint: source encoding_rs/src/utf_8.rs
+// port-lint: source utf_8.rs
 package io.github.kotlinmania.encodingrs
 
 public object Utf8 {

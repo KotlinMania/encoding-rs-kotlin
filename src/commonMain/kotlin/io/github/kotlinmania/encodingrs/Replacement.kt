@@ -1,4 +1,4 @@
-// port-lint: source encoding_rs/src/replacement.rs
+// port-lint: source replacement.rs
 package io.github.kotlinmania.encodingrs
 
 public class ReplacementDecoder internal constructor(

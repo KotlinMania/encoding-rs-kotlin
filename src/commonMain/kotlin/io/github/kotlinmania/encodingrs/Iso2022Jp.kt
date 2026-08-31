@@ -1,4 +1,4 @@
-// port-lint: source encoding_rs/src/iso_2022_jp.rs
+// port-lint: source iso_2022_jp.rs
 package io.github.kotlinmania.encodingrs
 
 private enum class Iso2022JpDecoderState {

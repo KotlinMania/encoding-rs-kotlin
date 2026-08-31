@@ -1,4 +1,4 @@
-// port-lint: source encoding_rs/src/data.rs
+// port-lint: source data.rs
 package io.github.kotlinmania.encodingrs
 
 /**

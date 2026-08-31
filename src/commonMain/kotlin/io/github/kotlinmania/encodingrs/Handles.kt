@@ -1,4 +1,4 @@
-// port-lint: source encoding_rs/src/handles.rs
+// port-lint: source handles.rs
 package io.github.kotlinmania.encodingrs
 
 public sealed class Space<out T> {
@@ -100,7 +100,13 @@ public class UnalignedU16Slice(
 
     public fun copyUnalignedBasicLatinToAsciiAlu(dst: ByteArray, dstOffset: Int = 0): Pair<Char, Int>? = null
 
-    public fun swapIfOppositeEndian(oppositeEndian: Boolean) {}
+    public fun swapIfOppositeEndian(unit: Char, oppositeEndian: Boolean): Char {
+        if (oppositeEndian) {
+            val code = unit.code
+            return (((code and 0xFF) shl 8) or (code ushr 8)).toChar()
+        }
+        return unit
+    }
 
     public fun copyUnalignedBasicLatinToAscii(dst: ByteArray, dstOffset: Int = 0): Pair<Char, Int>? = null
 

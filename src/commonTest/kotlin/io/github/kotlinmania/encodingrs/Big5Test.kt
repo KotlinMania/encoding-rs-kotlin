@@ -1,4 +1,4 @@
-// port-lint: tests encoding_rs/src/big5.rs
+// port-lint: tests big5.rs
 package io.github.kotlinmania.encodingrs
 
 import kotlin.test.Test
