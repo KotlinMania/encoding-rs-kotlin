@@ -5,10 +5,10 @@ Based on AST analysis, here are the concrete next steps.
 ## Summary
 
 - **Files Present:** 22/22 (100.0%)
-- **Function parity:** 545/545 matched (target 719) — 100.0%
+- **Function parity:** 543/545 matched (target 717) — 99.6%
 - **Class/type parity:** 69/69 matched (target 130) — 100.0%
-- **Combined symbol parity:** 614/614 matched (target 849) — 100.0%
-- **Average inline-code cosine:** 0.62 (function body across 20 matched files)
+- **Combined symbol parity:** 612/614 matched (target 847) — 99.7%
+- **Average inline-code cosine:** 0.61 (function body across 20 matched files)
 - **Average documentation cosine:** 0.12 (doc text across 20 matched files)
 - **Cheat-zeroed Files:** 0
 - **Critical Issues:** 7 files with <0.60 function similarity
@@ -30,16 +30,27 @@ Every matched file is listed below with function and type symbol parity.
 ### 1. lib
 
 - **Target:** `encodingrs.Results`
-- **Similarity:** 0.64
+- **Similarity:** 0.63
 - **Dependents:** 0
-- **Priority Score:** 12603.6
-- **Functions:** 115/115 matched (target 132)
-- **Missing functions:** _none_
+- **Priority Score:** 22603.7
+- **Functions:** 114/115 matched (target 131)
+- **Missing functions:** `name`
 - **Types:** 11/11 matched (target 18)
 - **Missing types:** _none_
 - **Tests:** 46/46 matched
 
-### 2. mem
+### 2. handles
+
+- **Target:** `encodingrs.Handles`
+- **Similarity:** 0.74
+- **Dependents:** 0
+- **Priority Score:** 17302.6
+- **Functions:** 44/45 matched (target 137)
+- **Missing functions:** `len`
+- **Types:** 28/28 matched (target 37)
+- **Missing types:** _none_
+
+### 3. mem
 
 - **Target:** `encodingrs.Mem`
 - **Similarity:** 0.61
@@ -50,17 +61,6 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 1/1 matched (target 3)
 - **Missing types:** _none_
 - **Tests:** 35/35 matched
-
-### 3. handles
-
-- **Target:** `encodingrs.Handles`
-- **Similarity:** 0.75
-- **Dependents:** 0
-- **Priority Score:** 7302.5
-- **Functions:** 45/45 matched (target 138)
-- **Missing functions:** _none_
-- **Types:** 28/28 matched (target 37)
-- **Missing types:** _none_
 
 ### 4. data
 
