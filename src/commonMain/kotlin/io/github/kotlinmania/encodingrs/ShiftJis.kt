@@ -1,4 +1,4 @@
-// port-lint: source shift_jis.rs
+// port-lint: source encoding_rs/src/shift_jis.rs
 package io.github.kotlinmania.encodingrs
 
 public class ShiftJisDecoder internal constructor(

@@ -1,4 +1,4 @@
-// port-lint: source big5.rs
+// port-lint: source encoding_rs/src/big5.rs
 package io.github.kotlinmania.encodingrs
 
 class Big5Decoder internal constructor(

@@ -1,4 +1,4 @@
-// port-lint: tests single_byte.rs
+// port-lint: tests encoding_rs/src/single_byte.rs
 package io.github.kotlinmania.encodingrs
 
 import kotlin.test.Test

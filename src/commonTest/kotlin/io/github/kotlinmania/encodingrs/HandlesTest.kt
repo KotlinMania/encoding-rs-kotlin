@@ -1,4 +1,4 @@
-// port-lint: tests handles.rs
+// port-lint: tests encoding_rs/src/handles.rs
 package io.github.kotlinmania.encodingrs
 
 import kotlin.test.Test
