@@ -1,4 +1,4 @@
-// port-lint: source encoding_rs/src/euc_kr.rs
+// port-lint: source euc_kr.rs
 package io.github.kotlinmania.encodingrs
 
 public class EucKrDecoder internal constructor(

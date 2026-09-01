@@ -1,4 +1,4 @@
-// port-lint: source encoding_rs/src/mem.rs
+// port-lint: source mem.rs
 package io.github.kotlinmania.encodingrs
 
 /**

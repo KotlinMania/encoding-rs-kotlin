@@ -1,4 +1,4 @@
-// port-lint: source encoding_rs/src/simd_funcs.rs
+// port-lint: source simd_funcs.rs
 package io.github.kotlinmania.encodingrs
 
 /**

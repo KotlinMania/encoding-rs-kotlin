@@ -1,4 +1,4 @@
-// port-lint: tests encoding_rs/src/replacement.rs
+// port-lint: tests replacement.rs
 package io.github.kotlinmania.encodingrs
 
 import kotlin.test.Test

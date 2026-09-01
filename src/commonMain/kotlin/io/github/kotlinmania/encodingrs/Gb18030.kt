@@ -1,4 +1,4 @@
-// port-lint: source encoding_rs/src/gb18030.rs
+// port-lint: source gb18030.rs
 package io.github.kotlinmania.encodingrs
 
 public sealed class Gb18030Pending {

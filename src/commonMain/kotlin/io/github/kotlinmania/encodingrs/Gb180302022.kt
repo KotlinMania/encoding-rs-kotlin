@@ -1,4 +1,4 @@
-// port-lint: source encoding_rs/src/gb18030_2022.rs
+// port-lint: source gb18030_2022.rs
 package io.github.kotlinmania.encodingrs
 
 // Copyright WHATWG (Apple, Google, Mozilla, Microsoft).
