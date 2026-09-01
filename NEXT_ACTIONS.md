@@ -27,9 +27,9 @@ No missing high-value files detected.
 
 Every matched file is listed below with function and type symbol parity.
 
-### 1. lib
+### 1. encoding_rs.lib
 
-- **Target:** `encodingrs.Results [STUB] [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.Results [STUB]`
 - **Similarity:** 0.00
 - **Dependents:** 0
 - **Priority Score:** 22610.0
@@ -38,17 +38,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 11/11 matched (target 18)
 - **Missing types:** _none_
 - **Tests:** 46/46 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/lib.rs` vs expected `lib.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/lib.rs` vs expected `lib.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/lib.rs` vs expected `lib.rs`
-- **Proposed provenance header:** `// port-lint: source lib.rs` (current: `// port-lint: source encoding_rs/src/lib.rs`)
-- **Proposed provenance header:** `// port-lint: source lib.rs` (current: `// port-lint: source encoding_rs/src/lib.rs`)
-- **Proposed provenance header:** `// port-lint: tests lib.rs` (current: `// port-lint: tests encoding_rs/src/lib.rs`)
-- **Lint issues:** 3
 
-### 2. handles
+### 2. encoding_rs.handles
 
-- **Target:** `encodingrs.Handles [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.Handles`
 - **Similarity:** 0.74
 - **Dependents:** 0
 - **Priority Score:** 17302.6
@@ -56,15 +49,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** `len`
 - **Types:** 28/28 matched (target 37)
 - **Missing types:** _none_
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/handles.rs` vs expected `handles.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/handles.rs` vs expected `handles.rs`
-- **Proposed provenance header:** `// port-lint: source handles.rs` (current: `// port-lint: source encoding_rs/src/handles.rs`)
-- **Proposed provenance header:** `// port-lint: tests handles.rs` (current: `// port-lint: tests encoding_rs/src/handles.rs`)
-- **Lint issues:** 2
 
-### 3. mem
+### 3. encoding_rs.mem
 
-- **Target:** `encodingrs.Mem [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.Mem`
 - **Similarity:** 0.61
 - **Dependents:** 0
 - **Priority Score:** 8203.9
@@ -73,15 +61,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 1/1 matched (target 3)
 - **Missing types:** _none_
 - **Tests:** 35/35 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/mem.rs` vs expected `mem.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/mem.rs` vs expected `mem.rs`
-- **Proposed provenance header:** `// port-lint: source mem.rs` (current: `// port-lint: source encoding_rs/src/mem.rs`)
-- **Proposed provenance header:** `// port-lint: tests mem.rs` (current: `// port-lint: tests encoding_rs/src/mem.rs`)
-- **Lint issues:** 2
 
-### 4. data
+### 4. encoding_rs.data
 
-- **Target:** `encodingrs.Data [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.Data`
 - **Similarity:** 0.69
 - **Dependents:** 0
 - **Priority Score:** 4803.1
@@ -89,21 +72,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** _none_
 - **Types:** 1/1 matched (target 2)
 - **Missing types:** _none_
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/data.rs` vs expected `data.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/data.rs` vs expected `data.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/data.rs` vs expected `data.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/data.rs` vs expected `data.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/data.rs` vs expected `data.rs`
-- **Proposed provenance header:** `// port-lint: source data.rs` (current: `// port-lint: source encoding_rs/src/data.rs`)
-- **Proposed provenance header:** `// port-lint: source data.rs` (current: `// port-lint: source encoding_rs/src/data.rs`)
-- **Proposed provenance header:** `// port-lint: source data.rs` (current: `// port-lint: source encoding_rs/src/data.rs`)
-- **Proposed provenance header:** `// port-lint: source data.rs` (current: `// port-lint: source encoding_rs/src/data.rs`)
-- **Proposed provenance header:** `// port-lint: source data.rs` (current: `// port-lint: source encoding_rs/src/data.rs`)
-- **Lint issues:** 5
 
-### 5. utf_8
+### 5. encoding_rs.utf_8
 
-- **Target:** `encodingrs.Utf8 [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.Utf8`
 - **Similarity:** 0.69
 - **Dependents:** 0
 - **Priority Score:** 3103.1
@@ -112,15 +84,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 3/3 matched (target 5)
 - **Missing types:** _none_
 - **Tests:** 8/8 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/utf_8.rs` vs expected `utf_8.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/utf_8.rs` vs expected `utf_8.rs`
-- **Proposed provenance header:** `// port-lint: source utf_8.rs` (current: `// port-lint: source encoding_rs/src/utf_8.rs`)
-- **Proposed provenance header:** `// port-lint: tests utf_8.rs` (current: `// port-lint: tests encoding_rs/src/utf_8.rs`)
-- **Lint issues:** 2
 
-### 6. iso_2022_jp
+### 6. encoding_rs.iso_2022_jp
 
-- **Target:** `encodingrs.Iso2022Jp [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.Iso2022Jp`
 - **Similarity:** 0.67
 - **Dependents:** 0
 - **Priority Score:** 2603.3
@@ -129,15 +96,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 4/4 matched (target 5)
 - **Missing types:** _none_
 - **Tests:** 5/5 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/iso_2022_jp.rs` vs expected `iso_2022_jp.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/iso_2022_jp.rs` vs expected `iso_2022_jp.rs`
-- **Proposed provenance header:** `// port-lint: source iso_2022_jp.rs` (current: `// port-lint: source encoding_rs/src/iso_2022_jp.rs`)
-- **Proposed provenance header:** `// port-lint: tests iso_2022_jp.rs` (current: `// port-lint: tests encoding_rs/src/iso_2022_jp.rs`)
-- **Lint issues:** 2
 
-### 7. gb18030
+### 7. encoding_rs.gb18030
 
-- **Target:** `encodingrs.Gb18030 [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.Gb18030`
 - **Similarity:** 0.60
 - **Dependents:** 0
 - **Priority Score:** 2404.0
@@ -146,15 +108,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 3/3 matched (target 8)
 - **Missing types:** _none_
 - **Tests:** 4/4 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/gb18030.rs` vs expected `gb18030.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/gb18030.rs` vs expected `gb18030.rs`
-- **Proposed provenance header:** `// port-lint: source gb18030.rs` (current: `// port-lint: source encoding_rs/src/gb18030.rs`)
-- **Proposed provenance header:** `// port-lint: tests gb18030.rs` (current: `// port-lint: tests encoding_rs/src/gb18030.rs`)
-- **Lint issues:** 2
 
-### 8. single_byte
+### 8. encoding_rs.single_byte
 
-- **Target:** `encodingrs.SingleByte [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.SingleByte`
 - **Similarity:** 0.59
 - **Dependents:** 0
 - **Priority Score:** 2304.1
@@ -163,15 +120,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 2/2 matched (target 3)
 - **Missing types:** _none_
 - **Tests:** 8/8 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/single_byte.rs` vs expected `single_byte.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/single_byte.rs` vs expected `single_byte.rs`
-- **Proposed provenance header:** `// port-lint: source single_byte.rs` (current: `// port-lint: source encoding_rs/src/single_byte.rs`)
-- **Proposed provenance header:** `// port-lint: tests single_byte.rs` (current: `// port-lint: tests encoding_rs/src/single_byte.rs`)
-- **Lint issues:** 2
 
-### 9. simd_funcs
+### 9. encoding_rs.simd_funcs
 
-- **Target:** `encodingrs.SimdFuncs [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.SimdFuncs`
 - **Similarity:** 0.27
 - **Dependents:** 0
 - **Priority Score:** 2207.3
@@ -180,15 +132,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched (target 2)
 - **Missing types:** _none_
 - **Tests:** 9/9 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/simd_funcs.rs` vs expected `simd_funcs.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/simd_funcs.rs` vs expected `simd_funcs.rs`
-- **Proposed provenance header:** `// port-lint: source simd_funcs.rs` (current: `// port-lint: source encoding_rs/src/simd_funcs.rs`)
-- **Proposed provenance header:** `// port-lint: tests simd_funcs.rs` (current: `// port-lint: tests encoding_rs/src/simd_funcs.rs`)
-- **Lint issues:** 2
 
-### 10. utf_16
+### 10. encoding_rs.utf_16
 
-- **Target:** `encodingrs.Utf16 [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.Utf16`
 - **Similarity:** 0.56
 - **Dependents:** 0
 - **Priority Score:** 2204.4
@@ -197,15 +144,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 1/1 matched (target 2)
 - **Missing types:** _none_
 - **Tests:** 12/12 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/utf_16.rs` vs expected `utf_16.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/utf_16.rs` vs expected `utf_16.rs`
-- **Proposed provenance header:** `// port-lint: source utf_16.rs` (current: `// port-lint: source encoding_rs/src/utf_16.rs`)
-- **Proposed provenance header:** `// port-lint: tests utf_16.rs` (current: `// port-lint: tests encoding_rs/src/utf_16.rs`)
-- **Lint issues:** 2
 
-### 11. euc_jp
+### 11. encoding_rs.euc_jp
 
-- **Target:** `encodingrs.EucJp [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.EucJp`
 - **Similarity:** 0.60
 - **Dependents:** 0
 - **Priority Score:** 2104.0
@@ -214,15 +156,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 3/3 matched (target 9)
 - **Missing types:** _none_
 - **Tests:** 2/2 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/euc_jp.rs` vs expected `euc_jp.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/euc_jp.rs` vs expected `euc_jp.rs`
-- **Proposed provenance header:** `// port-lint: source euc_jp.rs` (current: `// port-lint: source encoding_rs/src/euc_jp.rs`)
-- **Proposed provenance header:** `// port-lint: tests euc_jp.rs` (current: `// port-lint: tests encoding_rs/src/euc_jp.rs`)
-- **Lint issues:** 2
 
-### 12. euc_kr
+### 12. encoding_rs.euc_kr
 
-- **Target:** `encodingrs.EucKr [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.EucKr`
 - **Similarity:** 0.67
 - **Dependents:** 0
 - **Priority Score:** 2003.3
@@ -231,15 +168,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 2/2 matched (target 3)
 - **Missing types:** _none_
 - **Tests:** 3/3 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/euc_kr.rs` vs expected `euc_kr.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/euc_kr.rs` vs expected `euc_kr.rs`
-- **Proposed provenance header:** `// port-lint: source euc_kr.rs` (current: `// port-lint: source encoding_rs/src/euc_kr.rs`)
-- **Proposed provenance header:** `// port-lint: tests euc_kr.rs` (current: `// port-lint: tests encoding_rs/src/euc_kr.rs`)
-- **Lint issues:** 2
 
-### 13. shift_jis
+### 13. encoding_rs.shift_jis
 
-- **Target:** `encodingrs.ShiftJis [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.ShiftJis`
 - **Similarity:** 0.71
 - **Dependents:** 0
 - **Priority Score:** 1802.9
@@ -248,15 +180,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 2/2 matched (target 3)
 - **Missing types:** _none_
 - **Tests:** 3/3 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/shift_jis.rs` vs expected `shift_jis.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/shift_jis.rs` vs expected `shift_jis.rs`
-- **Proposed provenance header:** `// port-lint: source shift_jis.rs` (current: `// port-lint: source encoding_rs/src/shift_jis.rs`)
-- **Proposed provenance header:** `// port-lint: tests shift_jis.rs` (current: `// port-lint: tests encoding_rs/src/shift_jis.rs`)
-- **Lint issues:** 2
 
-### 14. big5
+### 14. encoding_rs.big5
 
-- **Target:** `encodingrs.Big5 [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.Big5`
 - **Similarity:** 0.68
 - **Dependents:** 0
 - **Priority Score:** 1703.2
@@ -265,15 +192,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 2/2 matched (target 3)
 - **Missing types:** _none_
 - **Tests:** 2/2 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/big5.rs` vs expected `big5.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/big5.rs` vs expected `big5.rs`
-- **Proposed provenance header:** `// port-lint: source big5.rs` (current: `// port-lint: source encoding_rs/src/big5.rs`)
-- **Proposed provenance header:** `// port-lint: tests big5.rs` (current: `// port-lint: tests encoding_rs/src/big5.rs`)
-- **Lint issues:** 2
 
-### 15. variant
+### 15. encoding_rs.variant
 
-- **Target:** `encodingrs.Variant [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.Variant`
 - **Similarity:** 0.72
 - **Dependents:** 0
 - **Priority Score:** 1702.8
@@ -281,13 +203,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** _none_
 - **Types:** 3/3 matched (target 16)
 - **Missing types:** _none_
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/variant.rs` vs expected `variant.rs`
-- **Proposed provenance header:** `// port-lint: source variant.rs` (current: `// port-lint: source encoding_rs/src/variant.rs`)
-- **Lint issues:** 1
 
-### 16. testing
+### 16. encoding_rs.testing
 
-- **Target:** `encodingrs.Testing [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.Testing`
 - **Similarity:** 0.82
 - **Dependents:** 0
 - **Priority Score:** 1601.8
@@ -295,15 +214,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** _none_
 - **Types:** 0/0 matched (target 2)
 - **Missing types:** _none_
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/testing.rs` vs expected `testing.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/testing.rs` vs expected `testing.rs`
-- **Proposed provenance header:** `// port-lint: source testing.rs` (current: `// port-lint: source encoding_rs/src/testing.rs`)
-- **Proposed provenance header:** `// port-lint: tests testing.rs` (current: `// port-lint: tests encoding_rs/src/testing.rs`)
-- **Lint issues:** 2
 
-### 17. x_user_defined
+### 17. encoding_rs.x_user_defined
 
-- **Target:** `encodingrs.XUserDefined [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.XUserDefined`
 - **Similarity:** 0.61
 - **Dependents:** 0
 - **Priority Score:** 1403.9
@@ -312,15 +226,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 2/2 matched (target 3)
 - **Missing types:** _none_
 - **Tests:** 3/3 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/x_user_defined.rs` vs expected `x_user_defined.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/x_user_defined.rs` vs expected `x_user_defined.rs`
-- **Proposed provenance header:** `// port-lint: source x_user_defined.rs` (current: `// port-lint: source encoding_rs/src/x_user_defined.rs`)
-- **Proposed provenance header:** `// port-lint: tests x_user_defined.rs` (current: `// port-lint: tests encoding_rs/src/x_user_defined.rs`)
-- **Lint issues:** 2
 
-### 18. replacement
+### 18. encoding_rs.replacement
 
-- **Target:** `encodingrs.Replacement [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.Replacement`
 - **Similarity:** 0.71
 - **Dependents:** 0
 - **Priority Score:** 1102.9
@@ -329,15 +238,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 1/1 matched (target 2)
 - **Missing types:** _none_
 - **Tests:** 2/2 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/replacement.rs` vs expected `replacement.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/replacement.rs` vs expected `replacement.rs`
-- **Proposed provenance header:** `// port-lint: source replacement.rs` (current: `// port-lint: source encoding_rs/src/replacement.rs`)
-- **Proposed provenance header:** `// port-lint: tests replacement.rs` (current: `// port-lint: tests encoding_rs/src/replacement.rs`)
-- **Lint issues:** 2
 
-### 19. ascii
+### 19. encoding_rs.ascii
 
-- **Target:** `encodingrs.Ascii [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.Ascii`
 - **Similarity:** 0.73
 - **Dependents:** 0
 - **Priority Score:** 202.7
@@ -345,15 +249,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** _none_
 - **Types:** 0/0 matched (target 2)
 - **Missing types:** _none_
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/ascii.rs` vs expected `ascii.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/ascii.rs` vs expected `ascii.rs`
-- **Proposed provenance header:** `// port-lint: source ascii.rs` (current: `// port-lint: source encoding_rs/src/ascii.rs`)
-- **Proposed provenance header:** `// port-lint: tests ascii.rs` (current: `// port-lint: tests encoding_rs/src/ascii.rs`)
-- **Lint issues:** 2
 
-### 20. test_labels_names
+### 20. encoding_rs.test_labels_names
 
-- **Target:** `encodingrs.TestLabelsNames [STUB] [PROVENANCE-FALLBACK]`
+- **Target:** `encodingrs.TestLabelsNames [STUB]`
 - **Similarity:** 0.69
 - **Dependents:** 0
 - **Priority Score:** 103.1
@@ -362,11 +261,6 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched (target 2)
 - **Missing types:** _none_
 - **Tests:** 1/1 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `encoding_rs/src/test_labels_names.rs` vs expected `test_labels_names.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:encoding_rs/src/test_labels_names.rs` vs expected `test_labels_names.rs`
-- **Proposed provenance header:** `// port-lint: source test_labels_names.rs` (current: `// port-lint: source encoding_rs/src/test_labels_names.rs`)
-- **Proposed provenance header:** `// port-lint: tests test_labels_names.rs` (current: `// port-lint: tests encoding_rs/src/test_labels_names.rs`)
-- **Lint issues:** 2
 
 ## Success Criteria
 
@@ -388,6 +282,6 @@ do not treat them as the next implementation target by default.
 
 | Source | Target | Path |
 |--------|--------|------|
-| `gb18030_2022` | `encodingrs.Gb180302022` | `gb18030_2022` |
-| `macros` | `encodingrs.Macros` | `macros` |
+| `encoding_rs.gb18030_2022` | `encodingrs.Gb180302022` | `encoding_rs/src/gb18030_2022` |
+| `encoding_rs.macros` | `encodingrs.Macros` | `encoding_rs/src/macros` |
 
