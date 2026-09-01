@@ -1,4 +1,4 @@
-// port-lint: source encoding_rs/src/variant.rs
+// port-lint: source variant.rs
 package io.github.kotlinmania.encodingrs
 
 internal sealed class VariantEncoding {

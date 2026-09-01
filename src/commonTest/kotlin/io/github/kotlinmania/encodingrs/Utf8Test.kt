@@ -1,4 +1,4 @@
-// port-lint: tests encoding_rs/src/utf_8.rs
+// port-lint: tests utf_8.rs
 package io.github.kotlinmania.encodingrs
 
 import kotlin.test.Test

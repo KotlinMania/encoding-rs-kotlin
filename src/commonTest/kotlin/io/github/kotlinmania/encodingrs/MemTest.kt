@@ -1,4 +1,4 @@
-// port-lint: tests encoding_rs/src/mem.rs
+// port-lint: tests mem.rs
 package io.github.kotlinmania.encodingrs
 
 import kotlin.test.Test
