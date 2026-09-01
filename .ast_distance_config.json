@@ -17,7 +17,11 @@
   },
   "reexport_modules": [
     "macros",
+    "macros.rs",
+    "encoding_rs/src/macros.rs",
     "gb18030_2022",
+    "gb18030_2022.rs",
+    "encoding_rs/src/gb18030_2022.rs",
     "mod.rs",
     "lib.rs"
   ]
