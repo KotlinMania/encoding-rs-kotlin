@@ -855,7 +855,7 @@ The initial release.
 
 ```kotlin
 dependencies {
-    implementation("io.github.kotlinmania:encoding-rs-kotlin:0.1.1")
+    implementation("io.github.kotlinmania:encoding-rs-kotlin:0.1.2")
 }
 ```
 
