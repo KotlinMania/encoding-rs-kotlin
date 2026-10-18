@@ -1,5 +1,12 @@
-// port-lint: source lib.rs
 package io.github.kotlinmania.encodingrs
+
+import io.github.kotlinmania.serde.SerdeError
+import io.github.kotlinmania.serde.SerdeResult
+import io.github.kotlinmania.serdecore.de.Deserialize
+import io.github.kotlinmania.serdecore.de.Deserializer
+import io.github.kotlinmania.serdecore.de.Visitor
+import io.github.kotlinmania.serdecore.ser.Serialize
+import io.github.kotlinmania.serdecore.ser.Serializer
 
 /**
  * An encoding as defined in the WHATWG Encoding Standard.
@@ -7,7 +14,7 @@ package io.github.kotlinmania.encodingrs
 class Encoding internal constructor(
     public val name: String,
     internal val variant: VariantEncoding,
-) {
+) : Serialize {
     internal fun newVariantDecoder(): VariantDecoder = variant.newVariantDecoder()
 
     public override fun equals(other: Any?): Boolean =
@@ -19,7 +26,8 @@ class Encoding internal constructor(
 
     public fun fmt(): String = name
 
-    public fun serialize(): String = name
+    override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
+        serializer.serializeStr(name)
 
     public fun deserialize(s: String): Encoding? = Encoding.forLabel(s.encodeToByteArray())
 
@@ -198,7 +206,7 @@ class Encoding internal constructor(
         return Triple(dst.copyOf(res.written), outputEnc, res.hadErrors)
     }
 
-    public companion object {
+    public companion object : Deserialize<Encoding> {
         private const val LONGEST_LABEL_LENGTH: Int = 21
 
         public val BIG5: Encoding = Encoding("Big5", VariantEncoding.Big5)
@@ -809,6 +817,10 @@ class Encoding internal constructor(
             Utf8.convertUtf8ToUtf16UpToInvalid(bytes, CharArray(bytes.size)).first
 
         public fun iso2022JpAsciiValidUpTo(bytes: ByteArray): Int = Ascii.iso2022JpAsciiValidUpTo(bytes)
+
+        override fun <D> deserialize(deserializer: D): SerdeResult<Encoding>
+            where D : Deserializer =
+            deserializer.deserializeStr(EncodingVisitor)
     }
 }
 
@@ -1554,12 +1566,17 @@ public val X_USER_DEFINED: Encoding = Encoding.X_USER_DEFINED
 /**
  * Visitor for deserializing Encoding references.
  */
-public class EncodingVisitor {
-    public typealias Value = Encoding
+public object EncodingVisitor : Visitor<Encoding> {
+    override fun expecting(): String = "a valid encoding label"
 
-    public fun expecting(): String = "a valid encoding label"
-
-    public fun visitStr(value: String): Encoding? = Encoding.forLabel(value.encodeToByteArray())
+    override fun visitStr(v: String): SerdeResult<Encoding> {
+        val enc = Encoding.forLabel(v.encodeToByteArray())
+        return if (enc != null) {
+            SerdeResult.success(enc)
+        } else {
+            SerdeResult.failure(SerdeError.custom("invalid encoding label: $v"))
+        }
+    }
 }
 
 /**
@@ -1569,7 +1586,110 @@ public data class Demo(
     public val num: UInt,
     public val name: String,
     public val enc: Encoding,
-)
+) : Serialize {
+    override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> {
+        val struct = serializer.serializeStruct("Demo", 3).getOrElse { return SerdeResult.failure(it) }
+        struct.serializeField("num", SerdeUInt(num)).getOrElse { return SerdeResult.failure(it) }
+        struct.serializeField("name", SerdeString(name)).getOrElse { return SerdeResult.failure(it) }
+        struct.serializeField("enc", enc).getOrElse { return SerdeResult.failure(it) }
+        return struct.end()
+    }
+
+    public companion object : Deserialize<Demo> {
+        override fun <D> deserialize(deserializer: D): SerdeResult<Demo>
+            where D : Deserializer =
+            deserializer.deserializeStruct("Demo", listOf("num", "name", "enc"), DemoVisitor)
+    }
+}
+
+private class SerdeUInt(
+    private val value: UInt,
+) : Serialize {
+    override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> = serializer.serializeU32(value)
+}
+
+private class SerdeString(
+    private val value: String,
+) : Serialize {
+    override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> = serializer.serializeStr(value)
+}
+
+private object DemoVisitor : Visitor<Demo> {
+    override fun expecting(): String = "struct Demo"
+
+    override fun <A> visitMap(access: A): SerdeResult<Demo>
+        where A : io.github.kotlinmania.serdecore.de.MapAccess {
+        var num: UInt? = null
+        var name: String? = null
+        var enc: Encoding? = null
+        while (true) {
+            val key = access.nextKeySeed(DemoFieldSeed).getOrElse { return SerdeResult.failure(it) } ?: break
+            when (key) {
+                DemoField.Num -> num = access.nextValueSeed(UIntSeed).getOrElse { return SerdeResult.failure(it) }
+                DemoField.Name -> name = access.nextValueSeed(StringSeed).getOrElse { return SerdeResult.failure(it) }
+                DemoField.Enc -> enc = access.nextValueSeed(EncodingSeed).getOrElse { return SerdeResult.failure(it) }
+            }
+        }
+        if (num == null) return SerdeResult.failure(SerdeError.missingField("num"))
+        if (name == null) return SerdeResult.failure(SerdeError.missingField("name"))
+        if (enc == null) return SerdeResult.failure(SerdeError.missingField("enc"))
+        return SerdeResult.success(Demo(num, name, enc))
+    }
+}
+
+private enum class DemoField { Num, Name, Enc }
+
+private object DemoFieldSeed : io.github.kotlinmania.serdecore.de.DeserializeSeed<DemoField> {
+    override fun <D> deserialize(deserializer: D): SerdeResult<DemoField>
+        where D : Deserializer =
+        deserializer.deserializeIdentifier(DemoFieldVisitor)
+}
+
+private object DemoFieldVisitor : Visitor<DemoField> {
+    override fun expecting(): String = "field identifier"
+
+    override fun visitStr(v: String): SerdeResult<DemoField> =
+        when (v) {
+            "num" -> SerdeResult.success(DemoField.Num)
+            "name" -> SerdeResult.success(DemoField.Name)
+            "enc" -> SerdeResult.success(DemoField.Enc)
+            else -> SerdeResult.failure(SerdeError.unknownField(v, listOf("num", "name", "enc")))
+        }
+}
+
+private object UIntSeed : io.github.kotlinmania.serdecore.de.DeserializeSeed<UInt> {
+    override fun <D> deserialize(deserializer: D): SerdeResult<UInt>
+        where D : Deserializer =
+        deserializer.deserializeU32(UIntVisitor)
+}
+
+private object UIntVisitor : Visitor<UInt> {
+    override fun expecting(): String = "an unsigned 32-bit integer"
+
+    override fun visitU32(v: UInt): SerdeResult<UInt> = SerdeResult.success(v)
+
+    override fun visitU64(v: ULong): SerdeResult<UInt> = SerdeResult.success(v.toUInt())
+
+    override fun visitI64(v: Long): SerdeResult<UInt> = SerdeResult.success(v.toUInt())
+}
+
+private object StringSeed : io.github.kotlinmania.serdecore.de.DeserializeSeed<String> {
+    override fun <D> deserialize(deserializer: D): SerdeResult<String>
+        where D : Deserializer =
+        deserializer.deserializeStr(StringVisitor)
+}
+
+private object StringVisitor : Visitor<String> {
+    override fun expecting(): String = "a string"
+
+    override fun visitStr(v: String): SerdeResult<String> = SerdeResult.success(v)
+}
+
+private object EncodingSeed : io.github.kotlinmania.serdecore.de.DeserializeSeed<Encoding> {
+    override fun <D> deserialize(deserializer: D): SerdeResult<Encoding>
+        where D : Deserializer =
+        Encoding.deserialize(deserializer)
+}
 
 /**
  * Format an unmappable as NCR without heap allocation.
