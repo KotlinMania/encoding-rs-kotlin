@@ -1,6 +1,6 @@
 # port-lint Proposed Changes
 
-**Generated:** 2026-09-02
+**Generated:** 2026-10-18
 **Source:** tmp/encoding_rs/src
 **Target:** src/commonMain/kotlin/io/github/kotlinmania/encodingrs
 

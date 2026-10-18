@@ -1,4 +1,3 @@
-// port-lint: tests lib.rs
 package io.github.kotlinmania.encodingrs
 
 import kotlin.test.Test
@@ -650,11 +649,24 @@ class EncodingTest {
 
     @Test
     fun testSerde() {
-        // Serde roundtrip parity: verify encoding name resolution and label roundtrip
-        val enc = UTF_8
-        val name = enc.name
-        val resolved = Encoding.forLabel(name)
-        assertEquals(enc, resolved)
+        val demo =
+            Demo(
+                num = 42u,
+                name = "foo",
+                enc = UTF_8,
+            )
+
+        val serialized =
+            io.github.kotlinmania.serdejson
+                .toStr(demo)
+                .getOrThrow()
+        val deserialized =
+            io.github.kotlinmania.serdejson
+                .fromStr(serialized, Demo)
+                .getOrThrow()
+        assertEquals(demo, deserialized)
+
+        // bincode roundtrip unported: bincode-kotlin has no Maven Central publication yet
     }
 
     @Test
