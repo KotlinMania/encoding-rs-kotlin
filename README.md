@@ -426,6 +426,9 @@ let isAscii = ExportedKotlinPackages.io.github.kotlinmania.encodingrs.Mem.isAsci
 
 ## Building & Testing
 
+Swift Export and its test harness require macOS 15 or newer. The Swift
+workflow uses the current template’s macOS 26 runner for its Xcode SDK.
+
 This project uses standard Gradle multiplatform builds:
 
 ```bash
