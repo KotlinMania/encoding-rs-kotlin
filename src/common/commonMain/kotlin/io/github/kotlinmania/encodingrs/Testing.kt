@@ -155,23 +155,27 @@ internal object Testing {
 
     fun encodeFromUtf8(encoding: Encoding, string: String, expect: ByteArray) {
         val encoder = encoding.newEncoder()
-        val dest = ByteArray(10 * (string.length + 1))
-        val (_, read, written) = encoder.encodeFromUtf8Raw(string, dest, last = true)
-        assertEq(string.length, read)
-        assertEq(expect.size, written)
+        val byteLength = string.encodeToByteArray().size
+        val dest = ByteArray(10 * (byteLength + 1)) // 10 is replacement worst case.
+        val result = encoder.encodeFromUtf8(string, dest, last = true)
+        assertEq(CoderResult.InputEmpty, result.result)
+        assertEq(byteLength, result.read)
+        assertEq(expect.size, result.written)
+        assertEq(expect.toList(), dest.copyOf(result.written).toList())
     }
 
     fun encodeFromUtf16(encoding: Encoding, string: CharArray, expect: ByteArray) {
         val encoder = encoding.newEncoder()
-        val dest = ByteArray(10 * (string.size + 1))
-        val (_, read, written) = encoder.encodeFromUtf16Raw(string, dest, last = true)
-        assertEq(string.size, read)
-        assertEq(expect.size, written)
+        val dest = ByteArray(10 * (string.size + 1)) // 10 is replacement worst case.
+        val result = encoder.encodeFromUtf16(string, dest, last = true)
+        assertEq(CoderResult.InputEmpty, result.result)
+        assertEq(string.size, result.read)
+        assertEq(expect.toList(), dest.copyOf(result.written).toList())
     }
 
     fun encodeToVec(encoding: Encoding, string: String, expect: ByteArray) {
         val (bytes, _, _) = encoding.encode(string)
-        assertEq(expect.size, bytes.size)
+        assertEq(expect.toList(), bytes.toList())
     }
 
     fun utf16FromUtf8(string: String): CharArray = string.toCharArray()

@@ -479,7 +479,6 @@ class EncodingTest {
     @Test
     fun testUtf16SpaceWithOneBomByte() {
         val decoder = UTF_16LE.newDecoder()
-        val dst = CharArray(12)
         val needed = decoder.maxUtf16BufferLength(1)!!
         val sub1 = CharArray(needed)
         val res1 = decoder.decodeToUtf16(byteArrayOf(0xFF.toByte()), sub1, false)
@@ -560,6 +559,9 @@ class EncodingTest {
 
         val res2 = encoder.encodeFromUtf8("", dst.copyOfRange(0, 8), false)
         assertEquals(CoderResult.InputEmpty, res2.result)
+
+        val res3 = encoder.encodeFromUtf8("", dst.copyOfRange(0, 8), true)
+        assertEquals(CoderResult.OutputFull, res3.result)
     }
 
     @Test
@@ -569,9 +571,17 @@ class EncodingTest {
         val res1 = encoder1.encodeFromUtf8("\u00A5\uD83D\uDCA9", dst, false)
         assertEquals(CoderResult.InputEmpty, res1.result)
 
+        val encoder2 = ISO_2022_JP.newEncoder()
+        val res2 = encoder2.encodeFromUtf8("\u00A5\uD83D\uDCA9", dst, true)
+        assertEquals(CoderResult.OutputFull, res2.result)
+
         val encoder3 = ISO_2022_JP.newEncoder()
         val res3 = encoder3.encodeFromUtf8("\uD83D\uDCA9", dst.copyOfRange(0, 13), false)
         assertEquals(CoderResult.InputEmpty, res3.result)
+
+        val encoder4 = ISO_2022_JP.newEncoder()
+        val res4 = encoder4.encodeFromUtf8("\uD83D\uDCA9", dst.copyOfRange(0, 13), true)
+        assertEquals(CoderResult.InputEmpty, res4.result)
     }
 
     @Test
@@ -594,6 +604,9 @@ class EncodingTest {
 
         val res2 = encoder.encodeFromUtf16(charArrayOf(), dst.copyOfRange(0, 8), false)
         assertEquals(CoderResult.InputEmpty, res2.result)
+
+        val res3 = encoder.encodeFromUtf16(charArrayOf(), dst.copyOfRange(0, 8), true)
+        assertEquals(CoderResult.OutputFull, res3.result)
     }
 
     @Test
@@ -603,9 +616,17 @@ class EncodingTest {
         val res1 = encoder1.encodeFromUtf16(charArrayOf(0x00A5.toChar(), 0xD83D.toChar(), 0xDCA9.toChar()), dst, false)
         assertEquals(CoderResult.InputEmpty, res1.result)
 
+        val encoder2 = ISO_2022_JP.newEncoder()
+        val res2 = encoder2.encodeFromUtf16(charArrayOf(0x00A5.toChar(), 0xD83D.toChar(), 0xDCA9.toChar()), dst, true)
+        assertEquals(CoderResult.OutputFull, res2.result)
+
         val encoder3 = ISO_2022_JP.newEncoder()
         val res3 = encoder3.encodeFromUtf16(charArrayOf(0xD83D.toChar(), 0xDCA9.toChar()), dst.copyOfRange(0, 13), false)
         assertEquals(CoderResult.InputEmpty, res3.result)
+
+        val encoder4 = ISO_2022_JP.newEncoder()
+        val res4 = encoder4.encodeFromUtf16(charArrayOf(0xD83D.toChar(), 0xDCA9.toChar()), dst.copyOfRange(0, 13), true)
+        assertEquals(CoderResult.InputEmpty, res4.result)
     }
 
     @Test
@@ -633,18 +654,18 @@ class EncodingTest {
     fun testIso2022JpNcrExtraFromUtf16() {
         val dst = ByteArray(10)
         val encoder = ISO_2022_JP.newEncoder()
-        val (result, _, _, _) =
+        val outcome =
             encoder.encodeFromUtf16(charArrayOf(0x3041.toChar(), 0xFFFF.toChar()), dst, true)
-        assertEquals(CoderResult.OutputFull, result)
+        assertEquals(CoderResult.OutputFull, outcome.result)
     }
 
     @Test
     fun testIso2022JpNcrExtraFromUtf8() {
         val dst = ByteArray(10)
         val encoder = ISO_2022_JP.newEncoder()
-        val (result, _, _, _) =
+        val outcome =
             encoder.encodeFromUtf8("\u3041\uFFFF", dst, true)
-        assertEquals(CoderResult.OutputFull, result)
+        assertEquals(CoderResult.OutputFull, outcome.result)
     }
 
     @Test
@@ -671,7 +692,6 @@ class EncodingTest {
 
     @Test
     fun testMaxLengthWithBomToUtf8() {
-        val output = ByteArray(20)
         val decoder = REPLACEMENT.newDecoder()
         val input = byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte(), 'A'.code.toByte())
         val needed = decoder.maxUtf8BufferLengthWithoutReplacement(input.size)!!

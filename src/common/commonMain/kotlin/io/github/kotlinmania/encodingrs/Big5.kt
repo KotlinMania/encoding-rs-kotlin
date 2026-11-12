@@ -33,11 +33,12 @@ class Big5Decoder internal constructor(
         var srcPos = 0
         var dstPos = 0
 
-        if (pendingHighSurrogate != null) {
+        val pendingSurrogate = pendingHighSurrogate
+        if (pendingSurrogate != null) {
             if (dstPos >= dst.size) {
                 return Triple(DecoderResult.OutputFull, srcPos, dstPos)
             }
-            dst[dstPos++] = pendingHighSurrogate!!
+            dst[dstPos++] = pendingSurrogate
             pendingHighSurrogate = null
         }
 
@@ -155,7 +156,8 @@ class Big5Decoder internal constructor(
             }
         }
 
-        if (last && lead != null) {
+        val pendingLead = lead
+        if (last && pendingLead != null) {
             lead = null
             return Triple(DecoderResult.Malformed(1, 0), srcPos, dstPos)
         }

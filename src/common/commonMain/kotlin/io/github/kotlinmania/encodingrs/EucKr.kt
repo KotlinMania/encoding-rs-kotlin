@@ -287,7 +287,7 @@ public class EucKrEncoder internal constructor() {
 
 internal fun ksx1001EncodeMisc(bmp: Int): Pair<Int, Int>? {
     if (bmp in 0x3000..0x3015) {
-        val pos = position(KSX1001_SYMBOLS, 0, 0xAB - 0x60, bmp)
+        val pos = position(KSX1001_SYMBOLS, 0, 0xAB - 0x60 - 1, bmp)
         if (pos != null) {
             return Pair(0xA1, pos + 0xA1)
         }
@@ -319,8 +319,10 @@ internal fun ksx1001EncodeMisc(bmp: Int): Pair<Int, Int>? {
         bmp in 0x00A1..0x00F7 ||
         bmp in 0x02C7..0x02DD
     ) {
-        val pos = position(KSX1001_SYMBOLS, 3, KSX1001_SYMBOLS.size, bmp)
-        if (pos != null) {
+        val index = position(KSX1001_SYMBOLS, 3, KSX1001_SYMBOLS.size - 1, bmp)
+        if (index != null) {
+            // Upstream searches a slice starting at index 3, returning a slice-relative position.
+            val pos = index - 3
             if (pos < (94 - 3)) {
                 return Pair(0xA1, pos + 0xA1 + 3)
             }

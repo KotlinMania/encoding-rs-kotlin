@@ -8,7 +8,7 @@ class Utf16Test {
     private fun decodeUtf16le(bytes: ByteArray, expect: String) {
         val decoder = Utf16Decoder.new(false)
         val dst = CharArray(expect.length + 10)
-        val (res, _, written) = decoder.decodeToUtf16Raw(bytes, dst, last = true)
+        val (_, _, written) = decoder.decodeToUtf16Raw(bytes, dst, last = true)
         val out = dst.concatToString(0, written)
         assertEquals(expect, out)
     }
@@ -16,7 +16,7 @@ class Utf16Test {
     private fun decodeUtf16be(bytes: ByteArray, expect: String) {
         val decoder = Utf16Decoder.new(true)
         val dst = CharArray(expect.length + 10)
-        val (res, _, written) = decoder.decodeToUtf16Raw(bytes, dst, last = true)
+        val (_, _, written) = decoder.decodeToUtf16Raw(bytes, dst, last = true)
         val out = dst.concatToString(0, written)
         assertEquals(expect, out)
     }

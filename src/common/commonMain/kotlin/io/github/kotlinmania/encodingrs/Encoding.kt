@@ -8,6 +8,13 @@ import io.github.kotlinmania.serdecore.de.Visitor
 import io.github.kotlinmania.serdecore.ser.Serialize
 import io.github.kotlinmania.serdecore.ser.Serializer
 
+// This has to be the max length of an NCR instead of max
+// minus one, because we can't rely on getting the minus
+// one from the space reserved for the current unmappable,
+// because the ISO-2022-JP encoder can fill up that space
+// with a state transition escape.
+private const val NCR_EXTRA: Int = 10 // &#1114111;
+
 /**
  * An encoding as defined in the WHATWG Encoding Standard.
  */
@@ -125,13 +132,13 @@ class Encoding internal constructor(
         val decoder = newDecoderWithoutBomHandling()
         val maxLen = decoder.maxUtf16BufferLength(bytes.size) ?: bytes.size
         val dst = CharArray(maxLen)
-        val (result, read, written) = decoder.decodeToUtf16Raw(bytes, dst, true)
+        val (result, _, written) = decoder.decodeToUtf16Raw(bytes, dst, true)
         val hadErrors = result is DecoderResult.Malformed
         val str =
             if (result is DecoderResult.Malformed) {
                 val sb = StringBuilder()
                 var srcPos = 0
-                var d = newDecoderWithoutBomHandling()
+                val d = newDecoderWithoutBomHandling()
                 val tempDst = CharArray(128)
                 while (srcPos < bytes.size) {
                     val (r, inRead, outWritten) = d.decodeToUtf16Raw(bytes.copyOfRange(srcPos, bytes.size), tempDst, true)
@@ -162,48 +169,76 @@ class Encoding internal constructor(
         }
     }
 
+    /**
+     * Encode complete input using the output encoding, replacing unmappable
+     * characters with decimal numeric character references.
+     *
+     * The second result is the encoding actually used, which may differ when
+     * this encoding has UTF-8 as its output encoding. The third result reports
+     * unmappable characters replaced with numeric character references.
+     *
+     * It is wrong to use this for only a segment of the input. Use [newEncoder]
+     * for segmented input.
+     *
+     * The original borrows UTF-8 or ASCII-only input. Kotlin materializes the
+     * UTF-8 bytes of its string representation. Other input uses a backing
+     * buffer, growing it when numeric character references require more space.
+     *
+     * The backing buffer size calculation fails if it overflows.
+     */
     public fun encode(string: String): Triple<ByteArray, Encoding, Boolean> {
-        val outputEnc = outputEncoding()
-        if (outputEnc === UTF_8) {
-            return Triple(string.encodeToByteArray(), outputEnc, false)
+        val outputEncoding = outputEncoding()
+        val bytes = string.encodeToByteArray()
+        if (outputEncoding === UTF_8) {
+            return Triple(bytes, outputEncoding, false)
         }
-        val encoder = outputEnc.newEncoder()
-        val chars = string.toCharArray()
-        val maxLen = encoder.maxBufferLengthFromUtf16WithoutReplacement(chars.size) ?: chars.size
-        val dst = ByteArray(maxLen)
-        val (result, read, written) = encoder.encodeFromUtf16Raw(chars, dst, true)
-        return if (result is EncoderResult.InputEmpty) {
-            Triple(dst.copyOf(written), outputEnc, false)
-        } else {
-            val sb = mutableListOf<Byte>()
-            var srcPos = 0
-            var enc = outputEnc.newEncoder()
-            val tempDst = ByteArray(128)
-            while (srcPos < chars.size) {
-                val (r, inRead, outWritten) = enc.encodeFromUtf16Raw(chars.copyOfRange(srcPos, chars.size), tempDst, true)
-                for (i in 0 until outWritten) {
-                    sb.add(tempDst[i])
+        val validUpTo =
+            if (outputEncoding === ISO_2022_JP) {
+                iso2022JpAsciiValidUpTo(bytes)
+            } else {
+                asciiValidUpTo(bytes)
+            }
+        if (validUpTo == bytes.size) {
+            return Triple(bytes, outputEncoding, false)
+        }
+        val encoder = outputEncoding.newEncoder()
+        val initialCapacity =
+            checkNotNull(
+                checkedNextPowerOfTwo(
+                    checkedAdd(validUpTo, encoder.maxBufferLengthFromUtf8IfNoUnmappables(bytes.size - validUpTo)),
+                ),
+            ) { "Encoding output buffer size overflow." }
+        var output = ByteArray(initialCapacity)
+        bytes.copyInto(output, endIndex = validUpTo)
+        var totalRead = validUpTo
+        var totalWritten = validUpTo
+        var totalHadErrors = false
+        while (true) {
+            // This is the source Vec append operation: the writable tail ends
+            // at capacity, and only the bytes written extend the logical length.
+            val destination = output.copyOfRange(totalWritten, output.size)
+            val result = encoder.encodeFromUtf8(bytes.decodeToString(totalRead, bytes.size), destination, true)
+            destination.copyInto(output, destinationOffset = totalWritten, endIndex = result.written)
+            totalRead += result.read
+            totalWritten += result.written
+            totalHadErrors = totalHadErrors || result.hadErrors
+            when (result.result) {
+                CoderResult.InputEmpty -> {
+                    check(totalRead == bytes.size)
+                    return Triple(output.copyOf(totalWritten), outputEncoding, totalHadErrors)
                 }
-                srcPos += inRead
-                if (r is EncoderResult.Unmappable) {
-                    val codePoint = r.codePoint
-                    val ref = "&#$codePoint;".encodeToByteArray()
-                    for (b in ref) {
-                        sb.add(b)
-                    }
+                CoderResult.OutputFull -> {
+                    // reserveExact wants how much more on top of current
+                    // length, not current capacity.
+                    val needed = encoder.maxBufferLengthFromUtf8IfNoUnmappables(bytes.size - totalRead)
+                    val rounded =
+                        checkNotNull(checkedNextPowerOfTwo(checkedAdd(output.size, needed))) {
+                            "Encoding output buffer size overflow."
+                        }
+                    output = output.copyOf(rounded)
                 }
             }
-            Triple(sb.toByteArray(), outputEnc, true)
         }
-    }
-
-    public fun encodeFromUtf16(chars: CharArray): Triple<ByteArray, Encoding, Boolean> {
-        val outputEnc = outputEncoding()
-        val encoder = outputEnc.newEncoder()
-        val maxLen = (encoder.maxBufferLengthFromUtf16WithoutReplacement(chars.size) ?: chars.size) + 64
-        val dst = ByteArray(maxLen)
-        val res = encoder.encodeFromUtf16(chars, dst, true)
-        return Triple(dst.copyOf(res.written), outputEnc, res.hadErrors)
     }
 
     public companion object : Deserialize<Encoding> {
@@ -726,7 +761,6 @@ class Encoding internal constructor(
             if (i >= label.size) {
                 return null
             }
-            val start = i
             val sb = StringBuilder()
             while (i < label.size) {
                 val b = label[i].toInt() and 0xFF
@@ -1236,26 +1270,282 @@ class Decoder internal constructor(
         last: Boolean = false,
     ): Triple<DecoderResult, Int, Int> = decodeToUtf16WithoutReplacement(src, dst, last)
 
+    /**
+     * Incrementally decode a byte stream into UTF-8 without replacement.
+     *
+     * See the documentation of the decoder for decode methods collectively.
+     *
+     * Available via the C wrapper.
+     */
     public fun decodeToUtf8WithoutReplacement(
         src: ByteArray,
         dst: ByteArray,
         last: Boolean = false,
     ): Triple<DecoderResult, Int, Int> {
-        val tempDst = CharArray(dst.size)
-        val (result, read, written) = decodeToUtf16WithoutReplacement(src, tempDst, last)
-        when (result) {
-            is DecoderResult.Malformed -> return Triple(result, read, 0)
-            is DecoderResult.OutputFull -> return Triple(result, read, 0)
-            is DecoderResult.InputEmpty -> {
-                val str = tempDst.concatToString(0, written)
-                val encoded = str.encodeToByteArray()
-                if (encoded.size > dst.size) {
-                    return Triple(DecoderResult.OutputFull, 0, 0)
+        var offset = 0
+        while (true) {
+            when (this.lifeCycle) {
+                DecoderLifeCycle.Converting -> {
+                    return this.decodeToUtf8CheckingEnd(src, dst, last)
                 }
-                encoded.copyInto(dst, 0, 0, encoded.size)
-                return Triple(DecoderResult.InputEmpty, read, encoded.size)
+                DecoderLifeCycle.AtStart -> {
+                    check(offset == 0)
+                    if (src.isEmpty()) {
+                        return Triple(DecoderResult.InputEmpty, 0, 0)
+                    }
+                    when (src[0]) {
+                        0xEF.toByte() -> {
+                            this.lifeCycle = DecoderLifeCycle.SeenUtf8First
+                            offset += 1
+                            continue
+                        }
+                        0xFE.toByte() -> {
+                            this.lifeCycle = DecoderLifeCycle.SeenUtf16BeFirst
+                            offset += 1
+                            continue
+                        }
+                        0xFF.toByte() -> {
+                            this.lifeCycle = DecoderLifeCycle.SeenUtf16LeFirst
+                            offset += 1
+                            continue
+                        }
+                        else -> {
+                            this.lifeCycle = DecoderLifeCycle.Converting
+                            continue
+                        }
+                    }
+                }
+                DecoderLifeCycle.AtUtf8Start -> {
+                    check(offset == 0)
+                    if (src.isEmpty()) {
+                        return Triple(DecoderResult.InputEmpty, 0, 0)
+                    }
+                    when (src[0]) {
+                        0xEF.toByte() -> {
+                            this.lifeCycle = DecoderLifeCycle.SeenUtf8First
+                            offset += 1
+                            continue
+                        }
+                        else -> {
+                            this.lifeCycle = DecoderLifeCycle.Converting
+                            continue
+                        }
+                    }
+                }
+                DecoderLifeCycle.AtUtf16BeStart -> {
+                    check(offset == 0)
+                    if (src.isEmpty()) {
+                        return Triple(DecoderResult.InputEmpty, 0, 0)
+                    }
+                    when (src[0]) {
+                        0xFE.toByte() -> {
+                            this.lifeCycle = DecoderLifeCycle.SeenUtf16BeFirst
+                            offset += 1
+                            continue
+                        }
+                        else -> {
+                            this.lifeCycle = DecoderLifeCycle.Converting
+                            continue
+                        }
+                    }
+                }
+                DecoderLifeCycle.AtUtf16LeStart -> {
+                    check(offset == 0)
+                    if (src.isEmpty()) {
+                        return Triple(DecoderResult.InputEmpty, 0, 0)
+                    }
+                    when (src[0]) {
+                        0xFF.toByte() -> {
+                            this.lifeCycle = DecoderLifeCycle.SeenUtf16LeFirst
+                            offset += 1
+                            continue
+                        }
+                        else -> {
+                            this.lifeCycle = DecoderLifeCycle.Converting
+                            continue
+                        }
+                    }
+                }
+                DecoderLifeCycle.SeenUtf8First -> {
+                    if (offset >= src.size) {
+                        if (last) {
+                            return this.decodeToUtf8AfterOnePotentialBomByte(src, dst, last, offset, 0xEF.toByte())
+                        }
+                        return Triple(DecoderResult.InputEmpty, offset, 0)
+                    }
+                    if (src[offset] == 0xBB.toByte()) {
+                        this.lifeCycle = DecoderLifeCycle.SeenUtf8Second
+                        offset += 1
+                        continue
+                    }
+                    return this.decodeToUtf8AfterOnePotentialBomByte(src, dst, last, offset, 0xEF.toByte())
+                }
+                DecoderLifeCycle.SeenUtf8Second -> {
+                    if (offset >= src.size) {
+                        if (last) {
+                            return this.decodeToUtf8AfterTwoPotentialBomBytes(src, dst, last, offset)
+                        }
+                        return Triple(DecoderResult.InputEmpty, offset, 0)
+                    }
+                    if (src[offset] == 0xBF.toByte()) {
+                        this.lifeCycle = DecoderLifeCycle.Converting
+                        offset += 1
+                        if (this.encoding != UTF_8) {
+                            this.encoding = UTF_8
+                            this.variant = UTF_8.variant.newVariantDecoder()
+                        }
+                        return this.decodeToUtf8CheckingEndWithOffset(src, dst, last, offset)
+                    }
+                    return this.decodeToUtf8AfterTwoPotentialBomBytes(src, dst, last, offset)
+                }
+                DecoderLifeCycle.SeenUtf16BeFirst -> {
+                    if (offset >= src.size) {
+                        if (last) {
+                            return this.decodeToUtf8AfterOnePotentialBomByte(src, dst, last, offset, 0xFE.toByte())
+                        }
+                        return Triple(DecoderResult.InputEmpty, offset, 0)
+                    }
+                    if (src[offset] == 0xFF.toByte()) {
+                        this.lifeCycle = DecoderLifeCycle.Converting
+                        offset += 1
+                        if (this.encoding != UTF_16BE) {
+                            this.encoding = UTF_16BE
+                            this.variant = UTF_16BE.variant.newVariantDecoder()
+                        }
+                        return this.decodeToUtf8CheckingEndWithOffset(src, dst, last, offset)
+                    }
+                    return this.decodeToUtf8AfterOnePotentialBomByte(src, dst, last, offset, 0xFE.toByte())
+                }
+                DecoderLifeCycle.SeenUtf16LeFirst -> {
+                    if (offset >= src.size) {
+                        if (last) {
+                            return this.decodeToUtf8AfterOnePotentialBomByte(src, dst, last, offset, 0xFF.toByte())
+                        }
+                        return Triple(DecoderResult.InputEmpty, offset, 0)
+                    }
+                    if (src[offset] == 0xFE.toByte()) {
+                        this.lifeCycle = DecoderLifeCycle.Converting
+                        offset += 1
+                        if (this.encoding != UTF_16LE) {
+                            this.encoding = UTF_16LE
+                            this.variant = UTF_16LE.variant.newVariantDecoder()
+                        }
+                        return this.decodeToUtf8CheckingEndWithOffset(src, dst, last, offset)
+                    }
+                    return this.decodeToUtf8AfterOnePotentialBomByte(src, dst, last, offset, 0xFF.toByte())
+                }
+                DecoderLifeCycle.ConvertingWithPendingBB -> {
+                    check(offset == 0)
+                    return this.decodeToUtf8AfterOnePotentialBomByte(src, dst, last, 0, 0xBB.toByte())
+                }
+                DecoderLifeCycle.Finished -> error("Must not use a decoder that has finished.")
             }
         }
+    }
+
+    private fun decodeToUtf8AfterOnePotentialBomByte(
+        src: ByteArray,
+        dst: ByteArray,
+        last: Boolean,
+        offset: Int,
+        firstByte: Byte,
+    ): Triple<DecoderResult, Int, Int> {
+        this.lifeCycle = DecoderLifeCycle.Converting
+        if (offset == 0) {
+            val first = byteArrayOf(firstByte)
+            var outRead = 0
+            var (firstResult, _, firstWritten) = this.variant.decodeToUtf8Raw(first, dst, false)
+            when (firstResult) {
+                DecoderResult.InputEmpty -> {
+                    val remainingDestination = dst.copyOfRange(firstWritten, dst.size)
+                    val (result, read, written) = this.decodeToUtf8CheckingEnd(src, remainingDestination, last)
+                    remainingDestination.copyInto(dst, destinationOffset = firstWritten)
+                    firstResult = result
+                    outRead = read
+                    firstWritten += written
+                }
+                is DecoderResult.Malformed -> {}
+                DecoderResult.OutputFull -> {
+                    error("Output buffer must have been too small.")
+                }
+            }
+            return Triple(firstResult, outRead, firstWritten)
+        }
+        check(offset == 1)
+        return this.decodeToUtf8CheckingEnd(src, dst, last)
+    }
+
+    private fun decodeToUtf8AfterTwoPotentialBomBytes(
+        src: ByteArray,
+        dst: ByteArray,
+        last: Boolean,
+        offset: Int,
+    ): Triple<DecoderResult, Int, Int> {
+        this.lifeCycle = DecoderLifeCycle.Converting
+        if (offset == 0) {
+            val efBb = byteArrayOf(0xEF.toByte(), 0xBB.toByte())
+            var (firstResult, firstRead, firstWritten) = this.variant.decodeToUtf8Raw(efBb, dst, false)
+            when (firstResult) {
+                DecoderResult.InputEmpty -> {
+                    val remainingDestination = dst.copyOfRange(firstWritten, dst.size)
+                    val (result, read, written) = this.decodeToUtf8CheckingEnd(src, remainingDestination, last)
+                    remainingDestination.copyInto(dst, destinationOffset = firstWritten)
+                    firstResult = result
+                    firstRead = read
+                    firstWritten += written
+                }
+                is DecoderResult.Malformed -> {
+                    if (firstRead == 1) {
+                        this.lifeCycle = DecoderLifeCycle.ConvertingWithPendingBB
+                    }
+                    firstRead = 0
+                }
+                DecoderResult.OutputFull -> {
+                    error("Output buffer must have been too small.")
+                }
+            }
+            return Triple(firstResult, firstRead, firstWritten)
+        }
+        if (offset == 1) {
+            return this.decodeToUtf8AfterOnePotentialBomByte(src, dst, last, 0, 0xEF.toByte())
+        }
+        check(offset == 2)
+        return this.decodeToUtf8CheckingEnd(src, dst, last)
+    }
+
+    /**
+     * Calls [decodeToUtf8CheckingEnd] with `offset` bytes omitted from
+     * the start of `src` but adjusting the return values to show those bytes
+     * as having been consumed.
+     */
+    private fun decodeToUtf8CheckingEndWithOffset(
+        src: ByteArray,
+        dst: ByteArray,
+        last: Boolean,
+        offset: Int,
+    ): Triple<DecoderResult, Int, Int> {
+        check(this.lifeCycle == DecoderLifeCycle.Converting)
+        val (result, read, written) = this.decodeToUtf8CheckingEnd(src.copyOfRange(offset, src.size), dst, last)
+        return Triple(result, read + offset, written)
+    }
+
+    /**
+     * Calls through to the delegate and adjusts life cycle iff `last` is
+     * `true` and result is `DecoderResult.InputEmpty`.
+     */
+    private fun decodeToUtf8CheckingEnd(
+        src: ByteArray,
+        dst: ByteArray,
+        last: Boolean,
+    ): Triple<DecoderResult, Int, Int> {
+        check(this.lifeCycle == DecoderLifeCycle.Converting)
+        val (result, read, written) = this.variant.decodeToUtf8Raw(src, dst, last)
+        if (last) {
+            if (result == DecoderResult.InputEmpty) {
+                this.lifeCycle = DecoderLifeCycle.Finished
+            }
+        }
+        return Triple(result, read, written)
     }
 
     public fun decodeToUtf16(
@@ -1315,7 +1605,7 @@ class Decoder internal constructor(
                 }
                 is DecoderResult.Malformed -> {
                     hadErrors = true
-                    val replacement = byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte())
+                    val replacement = byteArrayOf(0xEF.toByte(), 0xBF.toByte(), 0xBD.toByte())
                     if (totalWritten + 3 > dst.size) {
                         return DecodeResult(CoderResult.OutputFull, totalRead, totalWritten, hadErrors)
                     }
@@ -1394,17 +1684,17 @@ class Encoder internal constructor(
         variant.maxBufferLengthFromUtf16WithoutReplacement(u16Length)
 
     public fun maxBufferLengthFromUtf8WithoutReplacement(byteLength: Int): Int? =
-        byteLength
+        variant.maxBufferLengthFromUtf8WithoutReplacement(byteLength)
 
     public fun maxBufferLengthFromUtf8IfNoUnmappables(byteLength: Int): Int? =
         checkedAdd(
-            if (encoding.canEncodeEverything()) 0 else 12,
+            if (encoding.canEncodeEverything()) 0 else NCR_EXTRA,
             maxBufferLengthFromUtf8WithoutReplacement(byteLength),
         )
 
     public fun maxBufferLengthFromUtf16IfNoUnmappables(u16Length: Int): Int? =
         checkedAdd(
-            if (encoding.canEncodeEverything()) 0 else 12,
+            if (encoding.canEncodeEverything()) 0 else NCR_EXTRA,
             maxBufferLengthFromUtf16WithoutReplacement(u16Length),
         )
 
@@ -1462,56 +1752,128 @@ class Encoder internal constructor(
     ): Triple<EncoderResult, Int, Int> =
         encodeFromUtf8Raw(src, dst, last)
 
+    /**
+     * Incrementally encode a byte stream from UTF-8, replacing
+     * unmappable characters with decimal numeric character references.
+     *
+     * See the encoder documentation for encode methods collectively.
+     *
+     * Available via the C wrapper.
+     */
     public fun encodeFromUtf8(
         src: String,
         dst: ByteArray,
         last: Boolean = false,
     ): EncodeResult {
-        val chars = src.toCharArray()
-        return encodeFromUtf16(chars, dst, last)
+        val sourceBytes = src.encodeToByteArray()
+        val effectiveDestinationLength =
+            if (encoding.canEncodeEverything()) {
+                dst.size
+            } else {
+                if (dst.size < NCR_EXTRA) {
+                    if (src.isEmpty() && !(last && hasPendingState())) {
+                        return EncodeResult(CoderResult.InputEmpty, 0, 0, false)
+                    }
+                    return EncodeResult(CoderResult.OutputFull, 0, 0, false)
+                }
+                dst.size - NCR_EXTRA
+            }
+        var totalRead = 0
+        var totalWritten = 0
+        var hadErrors = false
+        while (true) {
+            val destination = dst.copyOfRange(totalWritten, effectiveDestinationLength)
+            val (result, read, written) =
+                encodeFromUtf8WithoutReplacement(sourceBytes.decodeToString(totalRead, sourceBytes.size), destination, last)
+            destination.copyInto(dst, destinationOffset = totalWritten, endIndex = written)
+            totalRead += read
+            totalWritten += written
+            when (result) {
+                EncoderResult.InputEmpty -> {
+                    return EncodeResult(CoderResult.InputEmpty, totalRead, totalWritten, hadErrors)
+                }
+                EncoderResult.OutputFull -> {
+                    return EncodeResult(CoderResult.OutputFull, totalRead, totalWritten, hadErrors)
+                }
+                is EncoderResult.Unmappable -> {
+                    hadErrors = true
+                    check(dst.size - totalWritten >= NCR_EXTRA)
+                    // Additionally, Iso2022JpEncoder is responsible for
+                    // transitioning to ASCII when returning with Unmappable.
+                    totalWritten += writeNcr(result.codePoint, dst, totalWritten)
+                    if (totalWritten >= effectiveDestinationLength) {
+                        if (totalRead == sourceBytes.size && !(last && hasPendingState())) {
+                            return EncodeResult(CoderResult.InputEmpty, totalRead, totalWritten, hadErrors)
+                        }
+                        return EncodeResult(CoderResult.OutputFull, totalRead, totalWritten, hadErrors)
+                    }
+                }
+            }
+        }
     }
 
+    /**
+     * Incrementally encode a byte stream from UTF-16, replacing
+     * unmappable characters with decimal numeric character references.
+     *
+     * See the encoder documentation for encode methods collectively.
+     *
+     * Available via the C wrapper.
+     */
     public fun encodeFromUtf16(
         src: CharArray,
         dst: ByteArray,
         last: Boolean = false,
     ): EncodeResult {
+        val effectiveDestinationLength =
+            if (encoding.canEncodeEverything()) {
+                dst.size
+            } else {
+                if (dst.size < NCR_EXTRA) {
+                    if (src.isEmpty() && !(last && hasPendingState())) {
+                        return EncodeResult(CoderResult.InputEmpty, 0, 0, false)
+                    }
+                    return EncodeResult(CoderResult.OutputFull, 0, 0, false)
+                }
+                dst.size - NCR_EXTRA
+            }
         var totalRead = 0
         var totalWritten = 0
         var hadErrors = false
-        while (totalRead < src.size) {
-            val currentDst = ByteArray(dst.size - totalWritten)
+        while (true) {
+            val destination = dst.copyOfRange(totalWritten, effectiveDestinationLength)
             val (result, read, written) =
-                encodeFromUtf16Raw(
-                    src.copyOfRange(totalRead, src.size),
-                    currentDst,
-                    last,
-                )
-            currentDst.copyInto(dst, destinationOffset = totalWritten, startIndex = 0, endIndex = written)
+                encodeFromUtf16WithoutReplacement(src.copyOfRange(totalRead, src.size), destination, last)
+            destination.copyInto(dst, destinationOffset = totalWritten, endIndex = written)
             totalRead += read
             totalWritten += written
             when (result) {
-                is EncoderResult.InputEmpty -> {
+                EncoderResult.InputEmpty -> {
                     return EncodeResult(CoderResult.InputEmpty, totalRead, totalWritten, hadErrors)
                 }
-                is EncoderResult.OutputFull -> {
+                EncoderResult.OutputFull -> {
                     return EncodeResult(CoderResult.OutputFull, totalRead, totalWritten, hadErrors)
                 }
                 is EncoderResult.Unmappable -> {
                     hadErrors = true
-                    val codePoint = result.codePoint
-                    val ref = "&#$codePoint;".encodeToByteArray()
-                    if (totalWritten + ref.size > dst.size) {
+                    check(dst.size - totalWritten >= NCR_EXTRA)
+                    // There are no UTF-16 encoders, and even if there were,
+                    // they would never have unmappables.
+                    // Additionally, Iso2022JpEncoder is responsible for
+                    // transitioning to ASCII when returning with Unmappable
+                    // from the jis0208 state. Here the encoder is in either
+                    // ASCII or Roman state, so printable ASCII except \ and ~
+                    // is allowed.
+                    totalWritten += writeNcr(result.codePoint, dst, totalWritten)
+                    if (totalWritten >= effectiveDestinationLength) {
+                        if (totalRead == src.size && !(last && hasPendingState())) {
+                            return EncodeResult(CoderResult.InputEmpty, totalRead, totalWritten, hadErrors)
+                        }
                         return EncodeResult(CoderResult.OutputFull, totalRead, totalWritten, hadErrors)
                     }
-                    for (i in ref.indices) {
-                        dst[totalWritten + i] = ref[i]
-                    }
-                    totalWritten += ref.size
                 }
             }
         }
-        return EncodeResult(CoderResult.InputEmpty, totalRead, totalWritten, hadErrors)
     }
 
     public companion object {
@@ -1694,8 +2056,9 @@ private object EncodingSeed : io.github.kotlinmania.serdecore.de.DeserializeSeed
 /**
  * Format an unmappable as NCR without heap allocation.
  */
-internal fun writeNcr(unmappable: Char, dst: ByteArray, dstOffset: Int = 0): Int {
-    var number = unmappable.code
+internal fun writeNcr(unmappable: Int, dst: ByteArray, dstOffset: Int = 0): Int {
+    // The number of decimal digits needed plus the length of "&#" and ";".
+    var number = unmappable
     val len =
         when {
             number >= 1_000_000 -> 10
@@ -1703,8 +2066,14 @@ internal fun writeNcr(unmappable: Char, dst: ByteArray, dstOffset: Int = 0): Int
             number >= 10_000 -> 8
             number >= 1_000 -> 7
             number >= 100 -> 6
-            else -> 5
+            else -> {
+                // Review https://github.com/whatwg/encoding/issues/15 to see
+                // whether this case is possible.
+                5
+            }
         }
+    check(number >= 10)
+    check(dstOffset + len <= dst.size)
     var pos = dstOffset + len - 1
     dst[pos--] = ';'.code.toByte()
     while (true) {
@@ -1750,6 +2119,8 @@ internal fun checkedDiv(opt: Int?, num: Int): Int? =
 
 internal fun checkedNextPowerOfTwo(opt: Int?): Int? =
     opt?.let {
+        if (it < 0 || it > (1 shl 30)) return@let null
+        if (it <= 1) return@let 1
         var v = it - 1
         v = v or (v ushr 1)
         v = v or (v ushr 2)

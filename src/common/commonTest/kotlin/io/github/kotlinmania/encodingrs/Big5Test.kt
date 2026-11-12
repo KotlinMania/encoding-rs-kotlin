@@ -71,6 +71,8 @@ class Big5Test {
         // ASCII
         encodeBig5("\u0061\u0062", byteArrayOf(0x61, 0x62))
 
+        // Upstream skips these edge cases under Miri because it is too slow.
+        // Kotlin has no Miri execution mode; run them unconditionally.
         // Edge cases
         encodeBig5("\u9EA6\u0061", "&#40614;a".encodeToByteArray())
         encodeBig5("\uD858\uDE6B\u0061", "&#156267;a".encodeToByteArray()) // U+2626B
@@ -94,30 +96,37 @@ class Big5Test {
 
     @Test
     fun testBig5DecodeAll() {
-        val (decoded, hadErrors) = Encoding.BIG5.decodeWithoutBomHandling(byteArrayOf(0x87.toByte(), 0x40.toByte()))
-        assertEquals("\u43F0", decoded)
-        assertFalse(hadErrors)
+        // Upstream ignores this full fixture under Miri because it is too slow; Kotlin has no Miri mode.
+        val input = big5DecodeInput()
+        val expectation = big5DecodeExpectation().decodeToString(throwOnInvalidSequence = true)
+        val (decoded, hadErrors) = Encoding.BIG5.decodeWithoutBomHandling(input)
+        assertTrue(hadErrors, "Should have had errors.")
+        assertEquals(expectation, decoded)
     }
 
     @Test
     fun testBig5EncodeAll() {
-        val (encoded, encoding, hadErrors) = Encoding.BIG5.encode("\u3000")
+        // Upstream ignores this full fixture under Miri because it is too slow; Kotlin has no Miri mode.
+        val input = big5EncodeInput().decodeToString(throwOnInvalidSequence = true)
+        val expectation = big5EncodeExpectation()
+        val (encoded, encoding, hadErrors) = Encoding.BIG5.encode(input)
+        assertFalse(hadErrors, "Should not have had errors.")
         assertEquals(Encoding.BIG5, encoding)
-        assertFalse(hadErrors)
-        assertContentEquals(byteArrayOf(0xA1.toByte(), 0x40.toByte()), encoded)
+        assertContentEquals(expectation, encoded)
     }
 
     @Test
     fun testBig5EncodeFromTwoLowSurrogates() {
+        // Upstream skips this test under Miri because it is too slow; Kotlin has no Miri mode.
         val expectation = "&#65533;&#65533;".encodeToByteArray()
         val output = ByteArray(40)
         val encoder = Encoding.BIG5.newEncoder()
-        val (result, read, written, hadErrors) =
+        val outcome =
             encoder.encodeFromUtf16(charArrayOf(0xDC00.toChar(), 0xDEDE.toChar()), output, true)
-        assertEquals(CoderResult.InputEmpty, result)
-        assertEquals(2, read)
-        assertEquals(expectation.size, written)
-        assertTrue(hadErrors)
-        assertContentEquals(expectation, output.copyOfRange(0, written))
+        assertEquals(CoderResult.InputEmpty, outcome.result)
+        assertEquals(2, outcome.read)
+        assertEquals(expectation.size, outcome.written)
+        assertTrue(outcome.hadErrors)
+        assertContentEquals(expectation, output.copyOfRange(0, outcome.written))
     }
 }

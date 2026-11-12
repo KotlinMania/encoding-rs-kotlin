@@ -50,17 +50,31 @@ class EucKrTest {
 
     @Test
     fun testEucKrDecodeAll() {
-        val (decoded, hadErrors) = Encoding.EUC_KR.decodeWithoutBomHandling(byteArrayOf(0x81.toByte(), 0x41))
-        assertEquals("\uAC02", decoded)
-        assertFalse(hadErrors)
+        // Upstream ignores this full fixture under Miri because it is too slow; Kotlin has no Miri mode.
+        val input = eucKrDecodeInput()
+        val expectation = eucKrDecodeExpectation().decodeToString(throwOnInvalidSequence = true)
+        val (decoded, hadErrors) = Encoding.EUC_KR.decodeWithoutBomHandling(input)
+        assertTrue(hadErrors, "Should have had errors.")
+        assertEquals(expectation, decoded)
     }
 
     @Test
     fun testEucKrEncodeAll() {
-        val (encoded, encoding, hadErrors) = Encoding.EUC_KR.encode("\uAC02")
+        // Upstream ignores this full fixture under Miri because it is too slow; Kotlin has no Miri mode.
+        val input = eucKrEncodeInput().decodeToString(throwOnInvalidSequence = true)
+        val expectation = eucKrEncodeExpectation()
+        val (encoded, encoding, hadErrors) = Encoding.EUC_KR.encode(input)
+        assertFalse(hadErrors, "Should not have had errors.")
         assertEquals(Encoding.EUC_KR, encoding)
-        assertFalse(hadErrors)
-        assertContentEquals(byteArrayOf(0x81.toByte(), 0x41), encoded)
+        assertContentEquals(expectation, encoded)
+    }
+
+    @Test
+    fun testEucKrSymbolSliceOffsets() {
+        // Original full-corpus expectations spanning the first and second symbol rows.
+        encodeEucKr("\u00B7", byteArrayOf(0xA1.toByte(), 0xA4.toByte()))
+        encodeEucKr("\u21D2", byteArrayOf(0xA2.toByte(), 0xA1.toByte()))
+        encodeEucKr("\u00AE", byteArrayOf(0xA2.toByte(), 0xE7.toByte()))
     }
 
     @Test
@@ -68,12 +82,12 @@ class EucKrTest {
         val expectation = "&#65533;&#65533;".encodeToByteArray()
         val output = ByteArray(40)
         val encoder = Encoding.EUC_KR.newEncoder()
-        val (result, read, written, hadErrors) =
+        val outcome =
             encoder.encodeFromUtf16(charArrayOf(0xDC00.toChar(), 0xDEDE.toChar()), output, true)
-        assertEquals(CoderResult.InputEmpty, result)
-        assertEquals(2, read)
-        assertEquals(expectation.size, written)
-        assertTrue(hadErrors)
-        assertContentEquals(expectation, output.copyOfRange(0, written))
+        assertEquals(CoderResult.InputEmpty, outcome.result)
+        assertEquals(2, outcome.read)
+        assertEquals(expectation.size, outcome.written)
+        assertTrue(outcome.hadErrors)
+        assertContentEquals(expectation, output.copyOfRange(0, outcome.written))
     }
 }

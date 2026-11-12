@@ -5,6 +5,7 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class ShiftJisTest {
     private fun decodeShiftJis(bytes: ByteArray, expect: String) {
@@ -99,16 +100,22 @@ class ShiftJisTest {
 
     @Test
     fun testShiftJisDecodeAll() {
-        val (decoded, hadErrors) = Encoding.SHIFT_JIS.decodeWithoutBomHandling(byteArrayOf(0x81.toByte(), 0x40))
-        assertEquals("\u3000", decoded)
-        assertFalse(hadErrors)
+        // Upstream ignores this full fixture under Miri because it is too slow; Kotlin has no Miri mode.
+        val input = shiftJisDecodeInput()
+        val expectation = shiftJisDecodeExpectation().decodeToString(throwOnInvalidSequence = true)
+        val (decoded, hadErrors) = Encoding.SHIFT_JIS.decodeWithoutBomHandling(input)
+        assertTrue(hadErrors, "Should have had errors.")
+        assertEquals(expectation, decoded)
     }
 
     @Test
     fun testShiftJisEncodeAll() {
-        val (encoded, encoding, hadErrors) = Encoding.SHIFT_JIS.encode("\u3000")
+        // Upstream ignores this full fixture under Miri because it is too slow; Kotlin has no Miri mode.
+        val input = shiftJisEncodeInput().decodeToString(throwOnInvalidSequence = true)
+        val expectation = shiftJisEncodeExpectation()
+        val (encoded, encoding, hadErrors) = Encoding.SHIFT_JIS.encode(input)
+        assertFalse(hadErrors, "Should not have had errors.")
         assertEquals(Encoding.SHIFT_JIS, encoding)
-        assertFalse(hadErrors)
-        assertContentEquals(byteArrayOf(0x81.toByte(), 0x40), encoded)
+        assertContentEquals(expectation, encoded)
     }
 }

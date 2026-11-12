@@ -17,8 +17,7 @@ class Utf8Test {
     }
 
     private fun encodeUtf8FromUtf16(string: CharArray, expect: ByteArray) {
-        val (encoded, _, _) = Encoding.UTF_8.encodeFromUtf16(string)
-        assertEquals(expect.toList(), encoded.toList())
+        Testing.encodeFromUtf16(UTF_8, string, expect)
     }
 
     private fun encodeUtf8FromUtf8(string: String, expect: ByteArray) {
@@ -286,7 +285,6 @@ class Utf8Test {
 
     @Test
     fun testDecodeBomPrefixedSplitByteTriple() {
-        val output = CharArray(20)
         val decoder = Encoding.UTF_8.newDecoder()
         val needed1 = decoder.maxUtf16BufferLength(1)!!
         val slice1 = CharArray(needed1)

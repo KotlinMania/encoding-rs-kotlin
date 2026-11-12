@@ -144,38 +144,65 @@ class Iso2022JpTest {
     fun testIso2022JpLengthAfterEscape() {
         val output = CharArray(20)
         val decoder = Encoding.ISO_2022_JP.newDecoder()
-        val (res1, read1, written1, hadErrors1) =
+        val outcome1 =
             decoder.decodeToUtf16(byteArrayOf(0x1B), output, false)
-        assertEquals(CoderResult.InputEmpty, res1)
-        assertEquals(1, read1)
-        assertEquals(0, written1)
-        assertFalse(hadErrors1)
+        assertEquals(CoderResult.InputEmpty, outcome1.result)
+        assertEquals(1, outcome1.read)
+        assertEquals(0, outcome1.written)
+        assertFalse(outcome1.hadErrors)
 
         val needed = decoder.maxUtf16BufferLength(1)!!
         val output2 = CharArray(needed)
-        val (res2, read2, written2, hadErrors2) =
+        val outcome2 =
             decoder.decodeToUtf16("A".encodeToByteArray(), output2, true)
-        assertEquals(CoderResult.InputEmpty, res2)
-        assertEquals(1, read2)
-        assertEquals(2, written2)
-        assertTrue(hadErrors2)
+        assertEquals(CoderResult.InputEmpty, outcome2.result)
+        assertEquals(1, outcome2.read)
+        assertEquals(2, outcome2.written)
+        assertTrue(outcome2.hadErrors)
         assertEquals('\uFFFD', output2[0])
         assertEquals('A', output2[1])
     }
 
     @Test
     fun testIso2022JpDecodeAll() {
-        val (decoded, hadErrors) = Encoding.ISO_2022_JP.decodeWithoutBomHandling(byteArrayOf(0x1B, 0x28, 0x42, 0x5B))
-        assertEquals("\u005B", decoded)
-        assertFalse(hadErrors)
+        // Upstream ignores this full fixture under Miri because it is too slow; Kotlin has no Miri mode.
+        val input = iso2022JpDecodeInput()
+        val expectation = iso2022JpDecodeExpectation().decodeToString(throwOnInvalidSequence = true)
+        val (decoded, hadErrors) = Encoding.ISO_2022_JP.decodeWithoutBomHandling(input)
+        assertTrue(hadErrors, "Should have had errors.")
+        assertEquals(expectation, decoded)
     }
 
     @Test
     fun testIso2022JpEncodeAll() {
-        val (encoded, encoding, hadErrors) = Encoding.ISO_2022_JP.encode("\u005B")
+        // Upstream ignores this full fixture under Miri because it is too slow; Kotlin has no Miri mode.
+        val input = iso2022JpEncodeInput().decodeToString(throwOnInvalidSequence = true)
+        val expectation = iso2022JpEncodeExpectation()
+        val (encoded, encoding, hadErrors) = Encoding.ISO_2022_JP.encode(input)
+        assertFalse(hadErrors, "Should not have had errors.")
         assertEquals(Encoding.ISO_2022_JP, encoding)
-        assertFalse(hadErrors)
-        assertContentEquals(byteArrayOf(0x5B), encoded)
+        assertContentEquals(expectation, encoded)
+    }
+
+    @Test
+    fun testIso2022JpRetainsLeadWhenOutputIsFull() {
+        val decoder = Iso2022JpDecoder()
+        val prefix = byteArrayOf(0x1B, 0x24, 0x42, 0x21)
+        assertEquals(
+            Triple(DecoderResult.InputEmpty, prefix.size, 0),
+            decoder.decodeToUtf16Raw(prefix, CharArray(1), false),
+        )
+        val trail = byteArrayOf(0x50)
+        assertEquals(
+            Triple(DecoderResult.OutputFull, 0, 0),
+            decoder.decodeToUtf16Raw(trail, CharArray(0), false),
+        )
+        val output = CharArray(1)
+        assertEquals(
+            Triple(DecoderResult.InputEmpty, 1, 1),
+            decoder.decodeToUtf16Raw(trail, output, true),
+        )
+        assertEquals("\uFF5B", output.concatToString())
     }
 
     @Test
@@ -183,12 +210,12 @@ class Iso2022JpTest {
         val expectation = "&#65533;&#65533;".encodeToByteArray()
         val output = ByteArray(40)
         val encoder = Encoding.ISO_2022_JP.newEncoder()
-        val (result, read, written, hadErrors) =
+        val outcome =
             encoder.encodeFromUtf16(charArrayOf(0xDC00.toChar(), 0xDEDE.toChar()), output, true)
-        assertEquals(CoderResult.InputEmpty, result)
-        assertEquals(2, read)
-        assertEquals(expectation.size, written)
-        assertTrue(hadErrors)
-        assertContentEquals(expectation, output.copyOfRange(0, written))
+        assertEquals(CoderResult.InputEmpty, outcome.result)
+        assertEquals(2, outcome.read)
+        assertEquals(expectation.size, outcome.written)
+        assertTrue(outcome.hadErrors)
+        assertContentEquals(expectation, output.copyOfRange(0, outcome.written))
     }
 }

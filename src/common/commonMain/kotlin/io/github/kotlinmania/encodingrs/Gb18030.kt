@@ -75,20 +75,22 @@ class Gb18030Decoder internal constructor(
         var srcPos = 0
         var dstPos = 0
 
-        if (pendingHighSurrogate != null) {
+        val pendingSurrogate = pendingHighSurrogate
+        if (pendingSurrogate != null) {
             if (dstPos >= dst.size) {
                 return Triple(DecoderResult.OutputFull, srcPos, dstPos)
             }
-            dst[dstPos++] = pendingHighSurrogate!!
+            dst[dstPos++] = pendingSurrogate
             pendingHighSurrogate = null
         }
 
         while (srcPos < src.size || pendingAscii != null || pending !is Gb18030Pending.None) {
-            if (pendingAscii != null) {
+            val ascii = pendingAscii
+            if (ascii != null) {
                 if (dstPos >= dst.size) {
                     return Triple(DecoderResult.OutputFull, srcPos, dstPos)
                 }
-                dst[dstPos++] = pendingAscii!!.toChar()
+                dst[dstPos++] = ascii.toChar()
                 pendingAscii = null
                 continue
             }
@@ -330,11 +332,14 @@ class Gb18030Decoder internal constructor(
                 pending = Gb18030Pending.None
                 return Triple(DecoderResult.Malformed(pendingCount, 0), srcPos, dstPos)
             }
-            if (first != null || second != null || third != null) {
+            val firstByte = first
+            val secondByte = second
+            val thirdByte = third
+            if (firstByte != null || secondByte != null || thirdByte != null) {
                 var count = 0
-                if (first != null) count++
-                if (second != null) count++
-                if (third != null) count++
+                if (firstByte != null) count++
+                if (secondByte != null) count++
+                if (thirdByte != null) count++
                 first = null
                 second = null
                 third = null

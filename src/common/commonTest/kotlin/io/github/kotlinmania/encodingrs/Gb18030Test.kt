@@ -150,17 +150,23 @@ class Gb18030Test {
 
     @Test
     fun testGb18030DecodeAll() {
-        val (decoded, hadErrors) = Encoding.GB18030.decodeWithoutBomHandling(byteArrayOf(0x81.toByte(), 0x40))
-        assertEquals("\u4E02", decoded)
-        assertFalse(hadErrors)
+        // Upstream ignores this full fixture under Miri because it is too slow; Kotlin has no Miri mode.
+        val input = gb18030DecodeInput()
+        val expectation = gb18030DecodeExpectation().decodeToString(throwOnInvalidSequence = true)
+        val (decoded, hadErrors) = Encoding.GB18030.decodeWithoutBomHandling(input)
+        assertFalse(hadErrors, "Should not have had errors.")
+        assertEquals(expectation, decoded)
     }
 
     @Test
     fun testGb18030EncodeAll() {
-        val (encoded, encoding, hadErrors) = Encoding.GB18030.encode("\u4E02")
+        // Upstream ignores this full fixture under Miri because it is too slow; Kotlin has no Miri mode.
+        val input = gb18030EncodeInput().decodeToString(throwOnInvalidSequence = true)
+        val expectation = gb18030EncodeExpectation()
+        val (encoded, encoding, hadErrors) = Encoding.GB18030.encode(input)
+        assertFalse(hadErrors, "Should not have had errors.")
         assertEquals(Encoding.GB18030, encoding)
-        assertFalse(hadErrors)
-        assertContentEquals(byteArrayOf(0x81.toByte(), 0x40), encoded)
+        assertContentEquals(expectation, encoded)
     }
 
     @Test

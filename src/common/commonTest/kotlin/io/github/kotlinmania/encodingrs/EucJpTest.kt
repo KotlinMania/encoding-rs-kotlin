@@ -5,6 +5,7 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class EucJpTest {
     private fun decodeEucJp(bytes: ByteArray, expect: String) {
@@ -96,23 +97,32 @@ class EucJpTest {
 
     @Test
     fun testJis0208DecodeAll() {
-        val (decoded, hadErrors) = Encoding.EUC_JP.decodeWithoutBomHandling(byteArrayOf(0xA1.toByte(), 0xA1.toByte()))
-        assertEquals("\u3000", decoded)
-        assertFalse(hadErrors)
+        // Upstream ignores this full fixture under Miri because it is too slow; Kotlin has no Miri mode.
+        val input = jis0208DecodeInput()
+        val expectation = jis0208DecodeExpectation().decodeToString(throwOnInvalidSequence = true)
+        val (decoded, hadErrors) = Encoding.EUC_JP.decodeWithoutBomHandling(input)
+        assertTrue(hadErrors, "Should have had errors.")
+        assertEquals(expectation, decoded)
     }
 
     @Test
     fun testJis0208EncodeAll() {
-        val (encoded, encoding, hadErrors) = Encoding.EUC_JP.encode("\u3000")
+        // Upstream ignores this full fixture under Miri because it is too slow; Kotlin has no Miri mode.
+        val input = jis0208EncodeInput().decodeToString(throwOnInvalidSequence = true)
+        val expectation = jis0208EncodeExpectation()
+        val (encoded, encoding, hadErrors) = Encoding.EUC_JP.encode(input)
+        assertFalse(hadErrors, "Should not have had errors.")
         assertEquals(Encoding.EUC_JP, encoding)
-        assertFalse(hadErrors)
-        assertContentEquals(byteArrayOf(0xA1.toByte(), 0xA1.toByte()), encoded)
+        assertContentEquals(expectation, encoded)
     }
 
     @Test
     fun testJis0212DecodeAll() {
-        val (decoded, hadErrors) = Encoding.EUC_JP.decodeWithoutBomHandling(byteArrayOf(0x8F.toByte(), 0xA2.toByte(), 0xAF.toByte()))
-        assertEquals("\u02D8", decoded)
-        assertFalse(hadErrors)
+        // Upstream ignores this full fixture under Miri because it is too slow; Kotlin has no Miri mode.
+        val input = jis0212DecodeInput()
+        val expectation = jis0212DecodeExpectation().decodeToString(throwOnInvalidSequence = true)
+        val (decoded, hadErrors) = Encoding.EUC_JP.decodeWithoutBomHandling(input)
+        assertTrue(hadErrors, "Should have had errors.")
+        assertEquals(expectation, decoded)
     }
 }

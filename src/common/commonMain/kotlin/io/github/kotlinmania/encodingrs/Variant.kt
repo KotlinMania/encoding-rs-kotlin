@@ -353,6 +353,10 @@ internal sealed class VariantEncoder {
     fun encodeFromUtf8Raw(src: String, dst: ByteArray, last: Boolean): Triple<EncoderResult, Int, Int> =
         when (this) {
             Utf8 -> Utf8Encoder().encodeFromUtf8Raw(src, dst, last)
-            else -> encodeFromUtf16Raw(src.toCharArray(), dst, last)
+            is SingleByte -> encoder.encodeFromUtf8Raw(src.encodeToByteArray(), dst, last)
+            else -> {
+                val (result, read, written) = encodeFromUtf16Raw(src.toCharArray(), dst, last)
+                Triple(result, src.substring(0, read).encodeToByteArray().size, written)
+            }
         }
 }

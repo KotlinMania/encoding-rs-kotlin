@@ -85,6 +85,11 @@ public class Iso2022JpDecoder internal constructor() {
         }
 
         while (srcPos < src.size) {
+            // The upstream decoder macro reserves destination space before reading a byte
+            // or mutating state, including the buffered JIS lead when output is full.
+            if (dstPos >= dst.size) {
+                return Triple(DecoderResult.OutputFull, srcPos, dstPos)
+            }
             val b = src[srcPos].toInt() and 0xFF
 
             when (decoderState) {

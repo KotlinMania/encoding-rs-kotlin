@@ -104,13 +104,14 @@ public class Utf16Decoder(
         }
 
         if (last) {
-            if (leadSurrogate != 0 || leadByte != null) {
+            val pendingLeadByte = leadByte
+            if (leadSurrogate != 0 || pendingLeadByte != null) {
                 if (dstPos >= dst.size) {
                     return Triple(DecoderResult.OutputFull, srcPos, dstPos)
                 }
                 if (leadSurrogate != 0) {
                     leadSurrogate = 0
-                    return if (leadByte == null) {
+                    return if (pendingLeadByte == null) {
                         Triple(DecoderResult.Malformed(2u, 0u), srcPos, dstPos)
                     } else {
                         leadByte = null
@@ -244,13 +245,14 @@ public class Utf16Decoder(
         }
 
         if (last) {
-            if (leadSurrogate != 0 || leadByte != null) {
+            val pendingLeadByte = leadByte
+            if (leadSurrogate != 0 || pendingLeadByte != null) {
                 if (dstPos >= dst.size) {
                     return Triple(DecoderResult.OutputFull, srcPos, dstPos)
                 }
                 if (leadSurrogate != 0) {
                     leadSurrogate = 0
-                    return if (leadByte == null) {
+                    return if (pendingLeadByte == null) {
                         Triple(DecoderResult.Malformed(2u, 0u), srcPos, dstPos)
                     } else {
                         leadByte = null

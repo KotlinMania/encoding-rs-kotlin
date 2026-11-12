@@ -142,23 +142,46 @@ class SingleByteTest {
             byteArrayOf(0xC1.toByte(), 0xF5.toByte(), 0x26, 0x23, 0x39, 0x37, 0x33, 0x31, 0x3B, 0xF4.toByte(), 0xFC.toByte()).toList(),
             encoded1.toList(),
         )
+        Testing.encode(
+            WINDOWS_1253,
+            "\u0391\u03C5\uD83D\uDCA9\u03C4\u03CC",
+            byteArrayOf(0xC1.toByte(), 0xF5.toByte()) + "&#128169;".encodeToByteArray() + byteArrayOf(0xF4.toByte(), 0xFC.toByte()),
+        )
     }
 
     @Test
     fun testEncodeUnpairedSurrogates() {
-        val (encoded1, _, hasErrors1) = Encoding.WINDOWS_1253.encodeFromUtf16(charArrayOf('\u0391', '\u03C5', '\uDCA9', '\u03C4', '\u03CC'))
+        val input1 = charArrayOf('\u0391', '\u03C5', '\uDCA9', '\u03C4', '\u03CC')
+        val destination1 = ByteArray(10 * (input1.size + 1))
+        val result1 = WINDOWS_1253.newEncoder().encodeFromUtf16(input1, destination1, true)
+        assertEquals(CoderResult.InputEmpty, result1.result)
+        assertEquals(input1.size, result1.read)
+        val encoded1 = destination1.copyOf(result1.written)
+        val hasErrors1 = result1.hadErrors
         assertTrue(hasErrors1)
         assertEquals(
             byteArrayOf(0xC1.toByte(), 0xF5.toByte(), 0x26, 0x23, 0x36, 0x35, 0x35, 0x33, 0x33, 0x3B, 0xF4.toByte(), 0xFC.toByte()).toList(),
             encoded1.toList(),
         )
-        val (encoded2, _, hasErrors2) = Encoding.WINDOWS_1253.encodeFromUtf16(charArrayOf('\u0391', '\u03C5', '\uD83D', '\u03C4', '\u03CC'))
+        val input2 = charArrayOf('\u0391', '\u03C5', '\uD83D', '\u03C4', '\u03CC')
+        val destination2 = ByteArray(10 * (input2.size + 1))
+        val result2 = WINDOWS_1253.newEncoder().encodeFromUtf16(input2, destination2, true)
+        assertEquals(CoderResult.InputEmpty, result2.result)
+        assertEquals(input2.size, result2.read)
+        val encoded2 = destination2.copyOf(result2.written)
+        val hasErrors2 = result2.hadErrors
         assertTrue(hasErrors2)
         assertEquals(
             byteArrayOf(0xC1.toByte(), 0xF5.toByte(), 0x26, 0x23, 0x36, 0x35, 0x35, 0x33, 0x33, 0x3B, 0xF4.toByte(), 0xFC.toByte()).toList(),
             encoded2.toList(),
         )
-        val (encoded3, _, hasErrors3) = Encoding.WINDOWS_1253.encodeFromUtf16(charArrayOf('\u0391', '\u03C5', '\u03C4', '\u03CC', '\uD83D'))
+        val input3 = charArrayOf('\u0391', '\u03C5', '\u03C4', '\u03CC', '\uD83D')
+        val destination3 = ByteArray(10 * (input3.size + 1))
+        val result3 = WINDOWS_1253.newEncoder().encodeFromUtf16(input3, destination3, true)
+        assertEquals(CoderResult.InputEmpty, result3.result)
+        assertEquals(input3.size, result3.read)
+        val encoded3 = destination3.copyOf(result3.written)
+        val hasErrors3 = result3.hadErrors
         assertTrue(hasErrors3)
         assertEquals(
             byteArrayOf(0xC1.toByte(), 0xF5.toByte(), 0xF4.toByte(), 0xFC.toByte(), 0x26, 0x23, 0x36, 0x35, 0x35, 0x33, 0x33, 0x3B).toList(),
