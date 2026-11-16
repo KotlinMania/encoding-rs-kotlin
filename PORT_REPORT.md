@@ -1,4 +1,4 @@
-=== Deep Analysis: tmp/encoding_rs/src (rust) -> src/commonMain/kotlin (kotlin) ===
+=== Deep Analysis: tmp/encoding_rs/src (rust) -> src/common/commonMain/kotlin (kotlin) ===
 
 Scanning source codebase (rust)...
 Codebase: tmp/encoding_rs/src (rust)
@@ -6,7 +6,7 @@ Codebase: tmp/encoding_rs/src (rust)
   Total imports: 141
 
 Scanning target codebase (kotlin)...
-Codebase: src/commonMain/kotlin (kotlin)
+Codebase: src/common/commonMain/kotlin (kotlin)
   Files: 19
   Total imports: 19
 
@@ -16,7 +16,7 @@ Computing AST similarities...
 === Codebase Comparison Report ===
 
 Source: tmp/encoding_rs/src (22 files)
-Target: src/commonMain/kotlin (19 files)
+Target: src/common/commonMain/kotlin (19 files)
 Scoring invariant: FnSim is required function body/parameter similarity. Class/type and symbol parity are reported beside it; whole-file shape is diagnostic only.
 
 Matched:   9 files
